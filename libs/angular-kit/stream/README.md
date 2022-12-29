@@ -46,6 +46,37 @@ export class MyComponent {
 
 tbd
 
+### Configuration
+
+You can configure `stream` to use defined components for loading, error and complete states instead of passing templates.
+
+```typescript
+@NgModule({
+  imports: [
+    StreamModule.forRoot({
+      loadingComponent: MyLoadingComponent,
+      errorComponent: MyErrorComponent,
+      completeComponent: MyCompleteComponent,
+    }),
+  ],
+})
+export class AppModule {}
+```
+
+In your custom components you have access to the context via `STREAM_DIR_CONTEXT` injection token.
+
+```typescript
+@Component({
+  selector: 'my-loading',
+  template: ` <div *ngIf="loading">Loading... {{ context.loading }}</div> `,
+})
+export class MyLoadingComponent {
+  constructor(@Inject(STREAM_DIR_CONTEXT) public context: StreamDirectiveContext) {}
+}
+```
+
+_Note_ When using components and passing templates, the templates will be used instead.
+
 ## Comparision of `async` pipe vs `*stream`
 
 tbd
