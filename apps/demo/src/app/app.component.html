@@ -1,15 +1,12 @@
-<ng-template [stream]="source$" let-value>
-  {{ value | json }}
-</ng-template>
 
-<!--<ng-container *subscribe="source$; let v; let error=error; let complete=completed; let state=state ">
-  <ngx-subscribe-bar [name]="v?.bar?.label ?? ''"></ngx-subscribe-bar>
+<button (click)="completeSignal$$.next(1)">complete</button>
+<ng-container *stream="complete$; let v; let error=error; let complete=completed;    errorTemplate: errorTemplate;    completeTemplate: completeTemplate;">
   Complete {{ complete }}
-  State {{ state }}
+  Value: {{ v | json }}
 
 </ng-container>
 
-<ng-container *subscribe="source$ as foo">
+<!--<ng-container *subscribe="source$ as foo">
   {{ foo }}
 </ng-container>
 
@@ -22,12 +19,13 @@
 
 </ng-container>-->
 <br>
+<hr>
 <button (click)="nextPost.next(1)">reload</button>
 
 
 <ng-container
   *stream="
-    rxRequest$;
+    sourceProvider.source$;
     let v;
     let error = error;
     let complete = completed;
@@ -36,7 +34,7 @@
     loadingTemplate: loadingTemplate;
     errorTemplate: errorTemplate;
     completeTemplate: completeTemplate;
-    keepValueOnLoading: false
+    keepValueOnLoading: true
   "
 >
   Complete {{ complete }}
@@ -61,3 +59,6 @@
   <div>COMPLETE...</div>
   completed {{ completed }}
 </ng-template>
+
+
+<angular-kit-stream-vs-async></angular-kit-stream-vs-async>

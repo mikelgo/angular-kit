@@ -16,6 +16,7 @@
     "@angular/platform-browser": "~15.0.0",
     "@angular/platform-browser-dynamic": "~15.0.0",
     "@angular/router": "~15.0.0",
+    "@code-workers.io/ngx-dirty-checker": "^1.0.1",
     "@nrwl/angular": "15.4.2",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
