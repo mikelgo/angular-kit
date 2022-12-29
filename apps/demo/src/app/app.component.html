@@ -1,1 +1,63 @@
-<angular-kit-nx-welcome></angular-kit-nx-welcome>
+<ng-template [stream]="source$" let-value>
+  {{ value | json }}
+</ng-template>
+
+<!--<ng-container *subscribe="source$; let v; let error=error; let complete=completed; let state=state ">
+  <ngx-subscribe-bar [name]="v?.bar?.label ?? ''"></ngx-subscribe-bar>
+  Complete {{ complete }}
+  State {{ state }}
+
+</ng-container>
+
+<ng-container *subscribe="source$ as foo">
+  {{ foo }}
+</ng-container>
+
+
+<ng-container *subscribe="error$; let v; let error=error">
+  <div>
+    Value: {{ v | json }}
+    Error: {{ error }}
+  </div>
+
+</ng-container>-->
+<br>
+<button (click)="nextPost.next(1)">reload</button>
+
+
+<ng-container
+  *stream="
+    rxRequest$;
+    let v;
+    let error = error;
+    let complete = completed;
+    let loading = loading;
+    refreshSignal: nextPost;
+    loadingTemplate: loadingTemplate;
+    errorTemplate: errorTemplate;
+    completeTemplate: completeTemplate;
+    keepValueOnLoading: false
+  "
+>
+  Complete {{ complete }}
+  <br>
+  Error {{ error }}
+  <br/>
+  Loading {{ loading }}
+  <br/>
+  {{ v | json }}
+</ng-container>
+<ng-template #loadingTemplate let-loading="loading">
+  <div>Loading...</div>
+  Loading {{ loading }}
+</ng-template>
+<ng-template #errorTemplate let-error="error">
+  <div>ERROR...</div>
+  Error {{ error }}
+</ng-template>
+
+
+<ng-template #completeTemplate let-completed="completed">
+  <div>COMPLETE...</div>
+  completed {{ completed }}
+</ng-template>
