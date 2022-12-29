@@ -11,7 +11,7 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 import {
-  distinctUntilChanged,
+  distinctUntilChanged, filter,
   mergeAll,
   Observable,
   ReplaySubject,
@@ -124,6 +124,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
         distinctUntilChanged(),
         mergeAll(),
         distinctUntilChanged(),
+        filter(v => v !== undefined)
       )
       .subscribe({
         next: (v) => {

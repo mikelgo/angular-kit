@@ -1,4 +1,4 @@
-# @code-workers-io/angular-kit/query-stream
+# @code-workers-io/angular-kit/query$
 
 This package provides a nice way to fetch data from an endpoint and
 expose certain states like a `isLoading` and `isRefreshing` state.
@@ -22,7 +22,7 @@ import { query$ } from '@code-workers.io/angular-kit/query';
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RxjsCacheComponent implements OnInit {
+export class SomeComponent implements OnInit {
   private http: HttpClient = inject(HttpClient);
   refreshCommand$ = new Subject();
 
