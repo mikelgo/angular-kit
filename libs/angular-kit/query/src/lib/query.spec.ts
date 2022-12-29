@@ -1,30 +1,36 @@
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { marbles } from 'rxjs-marbles';
 import { query$ } from './query';
+import { subscribeSpyTo } from '@hirez_io/observer-spy';
 
 describe('query$', () => {
-  it('should return a Query<T> object with isLoading set to true initially', marbles((m) => {
-    const source$ = m.cold('--a--b--c--d--|', { a: 1, b: 2, c: 3, d: 4 });
-    const expected$ = m.cold('--x--y--z--w--|', { x: { isLoading: true, isRefreshing: false, value: undefined }, y: { isLoading: false, isRefreshing: false, value: 1 }, z: { isLoading: false, isRefreshing: false, value: 2 }, w: { isLoading: false, isRefreshing: false, value: 3 } });
-    const result$ = query$(source$);
-    m.expect(result$).toBeObservable(expected$);
-  }));
+  it('without refresh ', () => {
+    const source$ = new Subject<number>();
+    const result = subscribeSpyTo(query$<number>(source$));
 
-  /*
-  it('should return a Query<T> object with isLoading set to true and isRefreshing set to true when refreshCommand$ emits', marbles((m) => {
-    const source$ = m.cold('--a--b--c--d--|', { a: 1, b: 2, c: 3, d: 4 });
-    const refreshCommand$ = m.cold('--r--r--r--r--|', { r: null });
-    const expected$ = m.cold('--x--y--z--w--|', { x: { isLoading: true, isRefreshing: true, value: undefined }, y: { isLoading: false, isRefreshing: false, value: 1 }, z: { isLoading: false, isRefreshing: false, value: 2 }, w: { isLoading: false, isRefreshing: false, value: 3 } });
-    const result$ = query$(source$, refreshCommand$);
-    m.expect(result$).toBeObservable(expected$);
-  }));
-  */
+    source$.next(10);
+    source$.next(20);
 
+    expect(result.getValues()).toEqual([
+      { isLoading: true, isRefreshing: false, value: undefined },
+      { isLoading: false, isRefreshing: false, value: 10 },
+      { isLoading: false, isRefreshing: false, value: 20 },
+    ]);
+  });
 
-  it('should return a Query<T> object with isLoading set to false and value set to null when source$ emits an error', marbles((m) => {
-    const source$ = m.cold('--a--#', { a: 1 }, new Error('error'));
-    const expected$ = m.cold('--x--y--|', { x: { isLoading: true, isRefreshing: false, value: undefined }, y: { isLoading: false, isRefreshing: false, value: null } });
-    const result$ = query$(source$);
-    m.expect(result$).toBeObservable(expected$);
-  }));
+  it('with refresh ', () => {
+    const source$ = new Subject<number>();
+    const refresh$ = new Subject<unknown>();
+    const result = subscribeSpyTo(query$<number>(source$, refresh$));
+
+    source$.next(10);
+    refresh$.next(null);
+
+    expect(result.getValues()).toEqual([
+      { isLoading: true, isRefreshing: false, value: undefined },
+      { isLoading: false, isRefreshing: false, value: 10 },
+      { isLoading: true, isRefreshing: true, value: 10 },
+      { isLoading: false, isRefreshing: false, value: 10 },
+    ]);
+  });
 });

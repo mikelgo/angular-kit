@@ -33,6 +33,7 @@
     "@commitlint/cli": "^17.3.0",
     "@commitlint/config-angular": "^17.3.0",
     "@commitlint/config-conventional": "^17.3.0",
+    "@hirez_io/observer-spy": "^2.2.0",
     "@ngneat/spectator": "^13.0.0",
     "@nrwl/cypress": "15.4.2",
     "@nrwl/eslint-plugin-nx": "15.4.2",
