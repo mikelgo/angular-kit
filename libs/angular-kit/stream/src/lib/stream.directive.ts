@@ -11,7 +11,8 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 import {
-  distinctUntilChanged, filter,
+  distinctUntilChanged,
+  filter,
   mergeAll,
   Observable,
   ReplaySubject,
@@ -22,11 +23,11 @@ import {
   withLatestFrom,
 } from 'rxjs';
 
-import {STREAM_DIR_CONFIG, STREAM_DIR_CONTEXT, StreamDirectiveConfig} from "./stream-directive-config";
+import { STREAM_DIR_CONFIG, STREAM_DIR_CONTEXT, StreamDirectiveConfig } from './stream-directive-config';
 
 export interface StreamDirectiveContext<T> {
   $implicit: T | null;
-  subscribe: T | null;
+  stream: T | null;
   error: any;
   completed: boolean;
   loading: boolean;
@@ -60,17 +61,16 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
     }
   }
 
-  @Input() streamErrorTemplate: TemplateRef<StreamDirectiveContext<T>> | undefined
-  @Input() streamCompleteTemplate: TemplateRef<StreamDirectiveContext<T>> | undefined
+  @Input() streamErrorTemplate: TemplateRef<StreamDirectiveContext<T>> | undefined;
+  @Input() streamCompleteTemplate: TemplateRef<StreamDirectiveContext<T>> | undefined;
   @Input() streamKeepValueOnLoading = false;
-
 
   private subscription: Unsubscribable = new Subscription();
   private embeddedView!: EmbeddedViewRef<any>;
 
   private context: StreamDirectiveContext<T> = {
     $implicit: null,
-    subscribe: null,
+    stream: null,
     error: undefined,
     completed: false,
     loading: false,
@@ -87,19 +87,14 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
     private readonly templateRef: TemplateRef<StreamDirectiveContext<T>>,
     private readonly viewContainerRef: ViewContainerRef,
     @Optional() @Inject(STREAM_DIR_CONFIG) private readonly config: StreamDirectiveConfig
-  ) {
-  }
+  ) {}
 
   ngOnInit(): void {
     if (!this.embeddedView) {
       this.createEmbeddedView();
     }
     this.refreshEffect$$
-      .pipe(
-        distinctUntilChanged(),
-        mergeAll(),
-        withLatestFrom(this.loadingTemplate$$.pipe(startWith(null)))
-      )
+      .pipe(distinctUntilChanged(), mergeAll(), withLatestFrom(this.loadingTemplate$$.pipe(startWith(null))))
       .subscribe(([_, loadingTemplate]) => {
         this.context.loading = true;
         if (!this.streamKeepValueOnLoading) {
@@ -108,7 +103,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
 
         if (this.config?.loadingComponent) {
           this.viewContainerRef.createComponent(this.config.loadingComponent, {
-            injector: this.createInjector()
+            injector: this.createInjector(),
           });
         } else {
           this.embeddedView = this.viewContainerRef.createEmbeddedView(
@@ -124,20 +119,16 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
         distinctUntilChanged(),
         mergeAll(),
         distinctUntilChanged(),
-        filter(v => v !== undefined)
+        filter((v) => v !== undefined)
       )
       .subscribe({
         next: (v) => {
           this.context.$implicit = v;
-          this.context.subscribe = v;
+          this.context.stream = v;
           this.context.loading = false;
           this.viewContainerRef.clear();
 
-
-          this.embeddedView = this.viewContainerRef.createEmbeddedView(
-            this.templateRef,
-            this.context
-          );
+          this.embeddedView = this.viewContainerRef.createEmbeddedView(this.templateRef, this.context);
 
           this.embeddedView.detectChanges();
         },
@@ -146,7 +137,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
           this.viewContainerRef.clear();
           if (this.config?.errorComponent) {
             this.viewContainerRef.createComponent(this.config.errorComponent, {
-              injector: this.createInjector()
+              injector: this.createInjector(),
             });
           } else {
             this.embeddedView = this.viewContainerRef.createEmbeddedView(
@@ -162,7 +153,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
           this.viewContainerRef.clear();
           if (this.config?.completeComponent) {
             this.viewContainerRef.createComponent(this.config.completeComponent, {
-              injector: this.createInjector()
+              injector: this.createInjector(),
             });
           } else {
             this.embeddedView = this.viewContainerRef.createEmbeddedView(
@@ -181,9 +172,9 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
       providers: [
         {
           provide: STREAM_DIR_CONTEXT,
-          useValue: this.context
-        }
-      ]
+          useValue: this.context,
+        },
+      ],
     });
   }
 
@@ -193,10 +184,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
   }
 
   private createEmbeddedView(): void {
-    this.embeddedView = this.viewContainerRef.createEmbeddedView(
-      this.templateRef,
-      this.context
-    );
+    this.embeddedView = this.viewContainerRef.createEmbeddedView(this.templateRef, this.context);
     if (this.detach) {
       this.embeddedView.detach();
     }
