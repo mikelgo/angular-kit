@@ -40,6 +40,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
   private source$$ = new ReplaySubject<Observable<any>>(1);
   private refreshEffect$$ = new ReplaySubject<Subject<any>>(1);
   private loadingTemplate$$ = new ReplaySubject<TemplateRef<StreamDirectiveContext<T>>>(1);
+  private suspenseTemplate$$ = new ReplaySubject<TemplateRef<StreamDirectiveContext<T>>>(1);
 
   private detach = true;
 
@@ -58,6 +59,11 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
   @Input() set streamLoadingTemplate(tpl: TemplateRef<StreamDirectiveContext<T>>) {
     if (tpl) {
       this.loadingTemplate$$.next(tpl);
+    }
+  }
+  @Input() set streamSuspenseTemplate(tpl: TemplateRef<StreamDirectiveContext<T>>) {
+    if (tpl) {
+      this.suspenseTemplate$$.next(tpl);
     }
   }
 
@@ -93,6 +99,10 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
     if (!this.embeddedView) {
       this.createEmbeddedView();
     }
+    this.source$$.pipe(withLatestFrom(this.suspenseTemplate$$)).subscribe(([_, suspenseTemplate]) => {
+      this.viewContainerRef.clear();
+      this.embeddedView = this.viewContainerRef.createEmbeddedView(suspenseTemplate, this.context);
+    });
     this.refreshEffect$$
       .pipe(distinctUntilChanged(), mergeAll(), withLatestFrom(this.loadingTemplate$$.pipe(startWith(null))))
       .subscribe(([_, loadingTemplate]) => {
