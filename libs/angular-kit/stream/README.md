@@ -44,7 +44,21 @@ export class MyComponent {
 
 ### API
 
-tbd
+#### Inputs
+
+- `source$` - Observable that will be subscribed to
+- `keepValueOnLoading` - If `true` the last value will be kept on loading state. If `false` the last value will be cleared on loading state. Default value is `false`.
+- `refreshSignal` - Subject that will be used to trigger refresh.
+- `loadingTemplate` - Template that will be used to render loading state.
+- `errorTemplate` - Template that will be used to render error state.
+- `completeTemplate` - Template that will be used to render complete state.
+
+#### Context variables
+
+- `$implicit` - Last value emitted by `source$`
+- `error` - Error emitted by `source$`
+- `completed` - `true` if `source$` completed
+- `loading` - `true` if `source$` is loading
 
 ### Configuration
 
