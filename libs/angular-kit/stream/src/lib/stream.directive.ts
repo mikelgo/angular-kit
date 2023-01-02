@@ -64,6 +64,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
   @Input() streamErrorTemplate: TemplateRef<StreamDirectiveContext<T>> | undefined;
   @Input() streamCompleteTemplate: TemplateRef<StreamDirectiveContext<T>> | undefined;
   @Input() streamKeepValueOnLoading = false;
+  @Input() streamLazyViewCreation = true;
 
   private subscription: Unsubscribable = new Subscription();
   private embeddedView!: EmbeddedViewRef<any>;
@@ -186,6 +187,9 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
 
   private createEmbeddedView(): void {
     this.embeddedView = this.viewContainerRef.createEmbeddedView(this.templateRef, this.context);
+    if (!this.streamLazyViewCreation){
+      this.embeddedView.detectChanges()
+    }
     if (this.detach) {
       this.embeddedView.detach();
     }
