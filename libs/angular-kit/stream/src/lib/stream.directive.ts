@@ -23,7 +23,7 @@ import {
   withLatestFrom,
 } from 'rxjs';
 
-import { STREAM_DIR_CONFIG, STREAM_DIR_CONTEXT, StreamDirectiveConfig } from './stream-directive-config';
+import {STREAM_DIR_CONFIG, STREAM_DIR_CONTEXT, StreamDirectiveConfig} from './stream-directive-config';
 
 export interface StreamDirectiveContext<T> {
   $implicit: T | null;
@@ -180,6 +180,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.viewContainerRef.clear();
+    this.embeddedView.destroy();
     this.subscription.unsubscribe();
   }
 
