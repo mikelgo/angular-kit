@@ -181,14 +181,16 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.viewContainerRef.clear();
-    this.embeddedView.destroy();
+    if (this.embeddedView) {
+      this.embeddedView.destroy();
+    }
     this.subscription.unsubscribe();
   }
 
   private createEmbeddedView(): void {
     this.embeddedView = this.viewContainerRef.createEmbeddedView(this.templateRef, this.context);
-    if (!this.streamLazyViewCreation){
-      this.embeddedView.detectChanges()
+    if (!this.streamLazyViewCreation) {
+      this.embeddedView.detectChanges();
     }
     if (this.detach) {
       this.embeddedView.detach();
