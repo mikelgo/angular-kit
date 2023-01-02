@@ -91,6 +91,19 @@ export class MyLoadingComponent {
 
 _Note_ When using components and passing templates, the templates will be used instead.
 
-## Comparision of `async` pipe vs `*stream`
+## Comparision of `async`-pipe vs `*stream`-directive
 
-tbd
+If we compare a highly optimized application where all components are using `OnPush` change detection strategy we can observe that the
+usage of the `async`-pipe is still quite expensive at it is internally calling `markForCheck` which marks the component itself and all of its parents for change detection.
+So the whole component (sub)-tree gets re-rendered. So not only the complete template of the affected component gets re-rendered but also its parents.
+
+`*stream` on the other hand will only update the affected tiny template-piece:
+![async-pipe vs stream-directive](./docs/stream-vs-async.png)
+
+### Comparison of dirty checks: `async`-pipe vs `*stream`-directive
+
+![dirty checks comparison](./docs/dirty-checks-comparison.gif)
+
+```typescript
+tbd;
+```
