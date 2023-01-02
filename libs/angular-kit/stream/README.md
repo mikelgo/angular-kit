@@ -52,6 +52,7 @@ export class MyComponent {
 - `loadingTemplate` - Template that will be used to render loading state.
 - `errorTemplate` - Template that will be used to render error state.
 - `completeTemplate` - Template that will be used to render complete state.
+- `lazyViewCreation` - If `true` the view will be created only when the observable emits. If `false` the view will be created on init. Default value is `true`.
 
 #### Context variables
 
@@ -103,7 +104,3 @@ So the whole component (sub)-tree gets re-rendered. So not only the complete tem
 ### Comparison of dirty checks: `async`-pipe vs `*stream`-directive
 
 ![dirty checks comparison](./docs/dirty-checks-comparison.gif)
-
-```typescript
-tbd;
-```
