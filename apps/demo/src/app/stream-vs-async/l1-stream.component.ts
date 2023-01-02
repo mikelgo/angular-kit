@@ -1,11 +1,13 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { Observable } from 'rxjs';
+import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'angular-kit-l1-stream',
   template: `
-    <ngx-dirty-checker></ngx-dirty-checker>
-    <div>L1</div>
+    <div>
+      <ngx-dirty-checker></ngx-dirty-checker>
+      <span>L1 Component</span>
+    </div>
     <!--    <p *stream="value; let v;"     >
       Value from L1: {{v}}
     </p>-->
@@ -17,6 +19,7 @@ import { Observable } from 'rxjs';
         display: block;
         border: 1px dashed darkseagreen;
         width: 200px;
+        padding: 16px;
       }
     `,
   ],

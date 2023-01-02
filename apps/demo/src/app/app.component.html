@@ -1,9 +1,15 @@
-
 <button (click)="completeSignal$$.next(1)">complete</button>
-<ng-container *stream="complete$; let v; let error=error; let complete=completed;    errorTemplate: errorTemplate;    completeTemplate: completeTemplate;">
-  Complete {{ complete }}
-  Value: {{ v | json }}
-
+<ng-container
+  *stream="
+    complete$;
+    let v;
+    let error = error;
+    let complete = completed;
+    errorTemplate: errorTemplate;
+    completeTemplate: completeTemplate
+  "
+>
+  Complete {{ complete }} Value: {{ v | json }}
 </ng-container>
 
 <!--<ng-container *subscribe="source$ as foo">
@@ -18,10 +24,9 @@
   </div>
 
 </ng-container>-->
-<br>
-<hr>
+<br />
+<hr />
 <button (click)="nextPost.next(1)">reload</button>
-
 
 <ng-container
   *stream="
@@ -38,11 +43,11 @@
   "
 >
   Complete {{ complete }}
-  <br>
+  <br />
   Error {{ error }}
-  <br/>
+  <br />
   Loading {{ loading }}
-  <br/>
+  <br />
   {{ v | json }}
 </ng-container>
 <ng-template #loadingTemplate let-loading="loading">
@@ -54,11 +59,11 @@
   Error {{ error }}
 </ng-template>
 
-
 <ng-template #completeTemplate let-completed="completed">
   <div>COMPLETE...</div>
   completed {{ completed }}
 </ng-template>
 
+<br /><br /><br /><br /><br /><br />
 
 <angular-kit-stream-vs-async></angular-kit-stream-vs-async>

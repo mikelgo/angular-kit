@@ -1,4 +1,19 @@
 p {
   border: 1px dashed darkcyan;
   width: fit-content;
+  padding: 8px;
+}
+
+.demo-container {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: center;
+  height: 100%;
+  gap: 16px;
+}
+
+.comp-container {
+  border: 1px dashed black;
+  padding: 16px;
 }

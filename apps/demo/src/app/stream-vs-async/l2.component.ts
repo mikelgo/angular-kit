@@ -1,11 +1,13 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
 
 @Component({
   selector: 'angular-kit-l2',
   template: `
-    <ngx-dirty-checker></ngx-dirty-checker>
-    <div>L2</div>
-    <p>Value from L1: {{ value }}</p>
+    <div>
+      <ngx-dirty-checker></ngx-dirty-checker>
+      <span>L2 Component</span>
+    </div>
+    <p>Value from L2: {{ value }}</p>
   `,
   styles: [
     `
@@ -13,6 +15,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
         display: block;
         border: 1px dashed darkseagreen;
         width: 200px;
+        padding: 16px;
       }
     `,
   ],

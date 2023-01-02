@@ -4,21 +4,24 @@ import { scan, Subject } from 'rxjs';
 @Component({
   selector: 'angular-kit-stream-vs-async',
   template: `
-    <div>
-      <ngx-dirty-checker></ngx-dirty-checker>
-      <button (click)="value$$.next(1)">value</button>
-    </div>
-    <div>
+    <div class="comp-container">
       <div>
-        async
-        <div>
-          <angular-kit-l1 [value]="value$ | async"></angular-kit-l1>
-        </div>
+        <ngx-dirty-checker></ngx-dirty-checker>
+        <button (click)="value$$.next(1)">update value</button>
       </div>
-      <div>
-        stream
+      <br />
+      <div class="demo-container">
         <div>
-          <angular-kit-l1-stream [value]="value$"></angular-kit-l1-stream>
+          <h3>Async-Pipe</h3>
+          <div>
+            <angular-kit-l1 [value]="value$ | async"></angular-kit-l1>
+          </div>
+        </div>
+        <div>
+          <h3>Stream-directive</h3>
+          <div>
+            <angular-kit-l1-stream [value]="value$"></angular-kit-l1-stream>
+          </div>
         </div>
       </div>
     </div>
