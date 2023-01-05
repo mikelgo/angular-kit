@@ -1,7 +1,22 @@
-# angular-kit
+# @code-workers.io/angular-kit
 
-This library was generated with [Nx](https://nx.dev).
+A Angular lib providing a set of 🔥 tools.
 
-## Running unit tests
+- 🍃 fully tree-shakable as we leverage secondary entry points
 
-Run `nx test angular-kit` to execute the unit tests.
+## Installation
+
+```bash
+npm install @code-workers.io/angular-kit
+```
+
+## Included
+
+- [stream](./libs/angular-kit/stream/README.md) - the better async pipe
+- [query$](./libs/angular-kit/query/README.md) - wrap http-observables and expose loading, refreshing and error states
+- [types](./libs/angular-kit/types/README.md) - a collection of types which will reflect strict types
+- [coercing](./libs/angular-kit/coercing/README.md) - a collection of coercion helpers
+
+## Version compatibility
+
+- v1.x.x is compatible with Angular >= 11.0.0
