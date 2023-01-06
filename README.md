@@ -1,3 +1,5 @@
+<img src="docs/images/logo.svg" width="200">
+
 # @code-workers.io/angular-kit
 
 A Angular lib providing a set of 🔥 tools.
