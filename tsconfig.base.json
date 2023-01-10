@@ -18,6 +18,7 @@
       "@code-workers.io/angular-kit": ["libs/angular-kit/src/index.ts"],
       "@code-workers.io/angular-kit/coercing": ["libs/angular-kit/coercing/src/index.ts"],
       "@code-workers.io/angular-kit/query": ["libs/angular-kit/query/src/index.ts"],
+      "@code-workers.io/angular-kit/rx/effect": ["libs/angular-kit/rx/effect/src/index.ts"],
       "@code-workers.io/angular-kit/rx/signal": ["libs/angular-kit/rx/signal/src/index.ts"],
       "@code-workers.io/angular-kit/stream": ["libs/angular-kit/stream/src/index.ts"],
       "@code-workers.io/angular-kit/types": ["libs/angular-kit/types/src/index.ts"]
