@@ -1,18 +1,20 @@
 import { ElementRef } from '@angular/core';
 import { debounceTime, distinctUntilChanged, Observable, ReplaySubject, SchedulerLike, share } from 'rxjs';
 
-const DEFAULT_THROTTLE_TIME = 125;
+const DEFAULT_THROTTLE_TIME = 50;
 
 export function supportsResizeObserver() {
   return typeof window.ResizeObserver !== 'undefined';
 }
 
+export type ResizeObserverConfig = {
+  throttleMs?: number;
+  scheduler?: SchedulerLike;
+};
+
 export function createResizeObserver(
   observeElement: ElementRef,
-  cfg?: {
-    throttleMs?: number;
-    scheduler?: SchedulerLike;
-  }
+  cfg?: ResizeObserverConfig
 ): Observable<ResizeObserverEntry[]> {
   if (!supportsResizeObserver()) {
     throw new Error('[AngularKit] ResizeObserver is not supported in this browser');
