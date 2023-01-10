@@ -19,6 +19,7 @@ npm install @code-workers.io/angular-kit
 - [types](./libs/angular-kit/types/README.md) - a collection of types which will reflect strict types
 - [coercing](./libs/angular-kit/coercing/README.md) - a collection of coercion helpers
 - [rx/signal](./libs/angular-kit/rx/signal/README.md) - reduce boilerplate when dealing with subjects
+- [rx/effect](./libs/angular-kit/rx/effect/README.md) - subscribe to observables without the need to take care of subscriptions
 
 ## Version compatibility
 
