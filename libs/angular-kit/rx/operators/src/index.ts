@@ -1,3 +1,4 @@
-export * from './lib/filter-null';
-export * from './lib/filter-undefined';
-export * from './lib/filter-for-value';
+export * from './lib/rx-filter-null';
+export * from './lib/rx-filter-undefined';
+export * from './lib/rx-filter-for-value';
+export * from './lib/rx-distinct-until-changed';

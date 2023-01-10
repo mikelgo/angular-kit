@@ -6,9 +6,13 @@ A set of powerful RxJS operators for building reactive Angular applications.
 
 ### Filter operators
 
-- `filterNull`: Filters out nullish values
-- `filterUndefined`: Filters out undefined values
-- `filterForValue`: Filters out nullish values and undefined values
+- `rxFilterNull`: Filters out nullish values
+- `rxFilterUndefined`: Filters out undefined values
+- `rxFilterForValue`: Filters out nullish values and undefined values
+
+### Other operators
+
+- `rxDistinctUntilChanged`: A distinctUntilChanged operator that deeply compares any values
 
 > 🔥
 > The filter operators will also ensure correct type inference. When using the default
