@@ -7,6 +7,6 @@ function isNotNull<T>(value: T | undefined): value is T {
 /**
  * Filters out null values.
  */
-export function filterNull<T>(): OperatorFunction<T, T> {
+export function rxFilterNull<T>(): OperatorFunction<T, T> {
   return filter(isNotNull);
 }

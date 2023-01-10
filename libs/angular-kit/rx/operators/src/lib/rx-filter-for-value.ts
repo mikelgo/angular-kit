@@ -7,6 +7,6 @@ function isDefined<T>(value: T | undefined): value is T {
 /**
  * Filters out null and undefined values.
  */
-export function filterForValue<T>(): OperatorFunction<T, T> {
+export function rxFilterForValue<T>(): OperatorFunction<T, T> {
   return filter(isDefined);
 }

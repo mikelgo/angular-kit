@@ -1,11 +1,11 @@
 import { of } from 'rxjs';
 import { subscribeSpyTo } from '@hirez_io/observer-spy';
-import { filterForValue } from './filter-for-value';
+import { rxFilterForValue } from './rx-filter-for-value';
 
-describe('filterForValue', () => {
+describe('rxFilterForValue', () => {
   it('should filter null and undefined', () => {
     const source$ = of(1, null, 2, null, 3, undefined);
-    const result$ = subscribeSpyTo(source$.pipe(filterForValue()));
+    const result$ = subscribeSpyTo(source$.pipe(rxFilterForValue()));
 
     expect(result$.getValues()).toEqual([1, 2, 3]);
   });

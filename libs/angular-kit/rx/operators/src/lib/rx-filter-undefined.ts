@@ -7,6 +7,6 @@ function isNotUndefined<T>(value: T | undefined): value is T {
 /**
  * Filters out undefined values.
  */
-export function filterUndefined<T>(): OperatorFunction<T, T> {
+export function rxFilterUndefined<T>(): OperatorFunction<T, T> {
   return filter(isNotUndefined);
 }
