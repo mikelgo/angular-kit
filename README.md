@@ -4,7 +4,7 @@
 
 A Angular lib providing a set of 🔥 tools.
 
-- 🍃 fully tree-shakable as we leverage secondary entry points
+- 🍃 fully tree-shakable as we leverage secondary entry points for each package
 
 ## Installation
 
@@ -12,7 +12,7 @@ A Angular lib providing a set of 🔥 tools.
 npm install @code-workers.io/angular-kit
 ```
 
-## Included
+## 	📦 Included packages
 
 - [stream](./libs/angular-kit/stream/README.md) - the better async pipe
 - [query$](./libs/angular-kit/query/README.md) - wrap http-observables and expose loading, refreshing and error states
