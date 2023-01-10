@@ -4,6 +4,12 @@ A set of powerful RxJS operators for building reactive Angular applications.
 
 ## 🔋 Included
 
+## Creation functions
+
+- 'rxSource': create a new hot and lazy observable from a source observable or value
+
+## Operators
+
 ### Filter operators
 
 - `rxFilterNull`: Filters out nullish values
