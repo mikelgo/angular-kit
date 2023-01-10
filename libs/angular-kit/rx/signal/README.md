@@ -4,6 +4,7 @@ Reduce boilerplate code when working with RxJS subjects.
 
 - 🦥 lazy by default
 - ✅ reduce boilerplate
+- ✅  [no late subscriber problem](https://trilon.io/blog/dealing-with-late-subscribers-in-rxjs)
 
 ## Usage
 
