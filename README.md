@@ -20,6 +20,7 @@ npm install @code-workers.io/angular-kit
 - [coercing](./libs/angular-kit/coercing/README.md) - a collection of coercion helpers
 - [rx/signal](./libs/angular-kit/rx/signal/README.md) - reduce boilerplate when dealing with subjects
 - [rx/effect](./libs/angular-kit/rx/effect/README.md) - subscribe to observables without the need to take care of subscriptions
+- [rx/operators](./libs/angular-kit/rx/operators/README.md) - powerful RxJs operators
 
 ## Version compatibility
 
