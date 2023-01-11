@@ -1,7 +1,7 @@
 import { distinctUntilChanged, filter, Observable, ReplaySubject, share, ShareConfig } from 'rxjs';
 
 export interface Signal<T> {
-  next: (val: T) => void;
+  send: (val: T) => void;
   $: Observable<T>;
 }
 
@@ -26,7 +26,7 @@ export function createSignal<T>(cfg?: SignalConfig<T>): Signal<T> {
   );
 
   return {
-    next: (val) => signal.next(val),
+    send: (val) => signal.next(val),
     $,
   };
 }

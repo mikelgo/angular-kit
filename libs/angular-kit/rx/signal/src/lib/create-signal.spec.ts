@@ -1,6 +1,5 @@
 import { createSignal, Signal, SignalConfig } from './create-signal';
 import { subscribeSpyTo } from '@hirez_io/observer-spy';
-import { tap } from 'rxjs';
 
 describe('createSignal', () => {
   it('should filter out undefined values', () => {
@@ -8,8 +7,8 @@ describe('createSignal', () => {
 
     const result = subscribeSpyTo(signal.$);
 
-    signal.next(undefined);
-    signal.next(10);
+    signal.send(undefined);
+    signal.send(10);
 
     expect(result.getValues()).toEqual([10]);
   });
@@ -19,9 +18,9 @@ describe('createSignal', () => {
 
     const result = subscribeSpyTo(signal.$);
 
-    signal.next(undefined);
-    signal.next(null);
-    signal.next(10);
+    signal.send(undefined);
+    signal.send(null);
+    signal.send(10);
 
     expect(result.getValues()).toEqual([10]);
   });
@@ -31,13 +30,13 @@ describe('createSignal', () => {
 
     const result = subscribeSpyTo(signal.$);
 
-    signal.next(10);
-    signal.next(10);
+    signal.send(10);
+    signal.send(10);
 
-    signal.next(5);
+    signal.send(5);
 
-    signal.next(10);
-    signal.next(10);
+    signal.send(10);
+    signal.send(10);
 
     expect(result.getValues()).toEqual([10, 5, 10]);
   });

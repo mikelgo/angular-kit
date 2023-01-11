@@ -4,7 +4,7 @@ Reduce boilerplate code when working with RxJS subjects.
 
 - 🦥 lazy by default
 - ✅ reduce boilerplate
-- ✅  [no late subscriber problem](https://trilon.io/blog/dealing-with-late-subscribers-in-rxjs)
+- ✅ [no late subscriber problem](https://trilon.io/blog/dealing-with-late-subscribers-in-rxjs)
 
 ## Usage
 
@@ -16,7 +16,7 @@ import { scan } from 'rxjs';
 @Component({
   selector: 'app-root',
   template: `
-    <button (click)="signal.next(1)">Click me</button>
+    <button (click)="signal.send(1)">Click me</button>
 
     <div *ngIf="signalValue$ | async as value">
       {{ value }}
@@ -49,7 +49,7 @@ export class SomeComponent {
 
   @Input()
   set value(value: number) {
-    this.signal.next(value);
+    this.signal.send(value);
   }
 }
 ```
