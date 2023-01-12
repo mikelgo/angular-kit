@@ -110,3 +110,7 @@ So the whole component (sub)-tree gets re-rendered. So not only the complete tem
 ### Comparison of dirty checks: `async`-pipe vs `*stream`-directive
 
 ![dirty checks comparison](./docs/dirty-checks-comparison.gif)
+
+## Versioning
+* [Semantic Versioning 2.0.0](http://semver.org/)
+* Version 1.x.x is compatible with Angular 11.x.x

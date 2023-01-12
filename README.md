@@ -1,4 +1,4 @@
-<img src="../../docs/images/logo.svg" width="200">
+<img src="docs/images/logo.svg" width="200">
 
 # @code-workers.io/angular-kit
 
@@ -13,8 +13,5 @@ A set of 🔥 Angular packages tools.
 
 - [stream](./libs/stream/README.md) - the better async pipe
 - [rx](./libs/rx/README.md) - reactive tools
-- [cdk](./libs/cdk/README.md) - cdk
+- [cdk](./libs/cdk/README.md) - common tools
 
-## Version compatibility
-
-- v1.x.x is compatible with Angular >= 11.0.0

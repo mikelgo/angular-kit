@@ -5,3 +5,7 @@
 - [rx/effect](./effect/README.md) - subscribe to observables without the need to take care of subscriptions
 - [rx/operators](./operators/README.md) - powerful RxJs operators
 - [rx/platform](./platform/README.md) - platform extensions
+
+## Versioning
+* [Semantic Versioning 2.0.0](http://semver.org/)
+* Version 1.x.x is compatible with Angular 11.x.x
