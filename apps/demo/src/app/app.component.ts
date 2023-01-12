@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Injectable } from '@angular/core';
+import {ChangeDetectionStrategy, Component, Injectable} from '@angular/core';
 import {
   BehaviorSubject,
   delay,
@@ -16,7 +16,8 @@ import {
   takeUntil,
   throwError,
 } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
+
 interface Foo {
   bar?: {
     label?: string;
@@ -62,6 +63,10 @@ export class AppComponent {
       delay(5000),
       map((x) => (x as any[]).slice(0, Math.random() > 0.5 ? 10 : 20))
     );
+  }
+
+  onResize($event: ResizeObserverEntry[]) {
+    console.log($event);
   }
 }
 @Injectable({ providedIn: 'root' })

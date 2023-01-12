@@ -1,8 +1,8 @@
-import { Directive, ElementRef, Input, NgModule, OnDestroy, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Subscription } from 'rxjs';
-import { createResizeObserver, ResizeObserverConfig } from '../create-resize-observer';
-import { createSignal } from '@code-workers.io/angular-kit/rx/signal';
+import {Directive, ElementRef, Input, NgModule, OnDestroy, Output} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {Subscription} from 'rxjs';
+import {createResizeObserver, ResizeObserverConfig} from '../create-resize-observer';
+import {createSignal} from '@code-workers.io/angular-kit/rx/signal';
 
 @Directive({
   selector: '[observeResize]',
@@ -12,7 +12,7 @@ export class ObserveResizeDirective implements OnDestroy {
   private configSignal = createSignal<ResizeObserverConfig | null>();
 
   @Input() set resizeObserverConfig(config: ResizeObserverConfig | null) {
-    this.configSignal.next(config);
+    this.configSignal.send(config);
   }
 
   private resizeObserver$ = createResizeObserver(this.element);

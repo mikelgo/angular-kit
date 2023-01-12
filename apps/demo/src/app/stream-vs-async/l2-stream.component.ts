@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { Observable } from 'rxjs';
+import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'angular-kit-l2-stream',
@@ -8,9 +8,9 @@ import { Observable } from 'rxjs';
       <ngx-dirty-checker></ngx-dirty-checker>
       <span>L2 Component</span>
     </div>
-    <p *stream="value; let v; let count = count" class="embedded">
+    <p *stream="value; let v;" class="embedded">
       Value from L2: {{ v }}
-      <span class="count">{{ count }}</span>
+
     </p>
   `,
   styles: [

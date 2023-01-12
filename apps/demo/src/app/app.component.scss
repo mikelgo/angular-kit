@@ -2,3 +2,12 @@
   display: grid;
   place-items: center;
 }
+
+.resizable {
+  width: 600px;
+  height: 400px;
+  border: 1px solid #ccc;
+  background-color: #eee;
+  resize: both;
+  overflow: auto;
+}
