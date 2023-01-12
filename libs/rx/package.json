@@ -1,0 +1,28 @@
+{
+  "name": "@code-workers.io/angular-kit/rx",
+  "version": "1.0.0",
+  "peerDependencies": {
+    "@angular/common": ">=11.0.0",
+    "@angular/core": ">=11.0.0",
+    "rxjs": ">=6.5.5"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "license": "MIT",
+  "description": "A set of powerful RxJs tools for Angular",
+  "keywords": [
+    "angular",
+    "rxjs",
+    "subscription handling",
+    "rxjs operators",
+    "rxjs query",
+    "signal"
+  ],
+  "author": "Michael Berger",
+  "homepage": "https://github.com/code-workers-io/angular-kit/libs/rx#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/code-workers-io/angular-kit"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "@code-workers.io/angular-kit/cdk",
+  "version": "1.0.0",
+  "peerDependencies": {
+    "@angular/common": ">=11.0.0",
+    "@angular/core": ">=11.0.0",
+    "rxjs": ">=6.5.5"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "license": "MIT",
+  "description": "A set of powerful tools for Angular",
+  "keywords": [
+    "angular",
+    "coercing",
+    "types"
+  ],
+  "author": "Michael Berger",
+  "homepage": "https://github.com/code-workers-io/angular-kit/libs/cdk#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/code-workers-io/angular-kit"
+  }
+}

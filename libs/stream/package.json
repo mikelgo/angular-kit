@@ -1,0 +1,26 @@
+{
+  "name": "@code-workers.io/angular-kit/stream",
+  "version": "1.0.0",
+  "peerDependencies": {
+    "@angular/common": ">=11.0.0",
+    "@angular/core": ">=11.0.0",
+    "rxjs": ">=6.5.5"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "license": "MIT",
+  "description": "The better async pipe for Angular",
+  "keywords": [
+    "angular",
+    "optimized async pipe",
+    "better async pipe",
+    "async pipe"
+  ],
+  "author": "Michael Berger",
+  "homepage": "https://github.com/code-workers-io/angular-kit/libs/stream#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/code-workers-io/angular-kit"
+  }
+}
