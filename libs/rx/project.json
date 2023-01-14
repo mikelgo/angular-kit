@@ -48,6 +48,12 @@
           "libs/rx/signal/**/*.html"
         ]
       }
+    },
+    "version": {
+      "executor": "@jscutlery/semver:version",
+      "options": {
+        "preset": "angular"
+      }
     }
   },
   "tags": []

@@ -35,6 +35,12 @@
       "options": {
         "lintFilePatterns": ["libs/stream/**/*.ts", "libs/stream/**/*.html"]
       }
+    },
+    "version": {
+      "executor": "@jscutlery/semver:version",
+      "options": {
+        "preset": "angular"
+      }
     }
   },
   "tags": []
