@@ -1,5 +1,5 @@
 {
-  "name": "@code-workers.io/angular-kit/rx",
+  "name": "rx",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/rx/src",
