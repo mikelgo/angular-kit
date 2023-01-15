@@ -1,5 +1,5 @@
 {
-  "name": "@code-workers.io/angular-kit/cdk",
+  "name": "@angular-kit/cdk",
   "version": "1.0.1",
   "publishConfig": {
     "access": "public"

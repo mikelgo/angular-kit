@@ -1,7 +1,7 @@
 import {Observable, ReplaySubject, share, ShareConfig} from 'rxjs';
 import {rxDistinctUntilChanged} from '../rx-distinct-until-changed';
 import {rxFilterUndefined} from '../rx-filter-undefined';
-import {coerceObservable} from '@code-workers.io/angular-kit/cdk/coercing';
+import {coerceObservable} from '@angular-kit/cdk/coercing';
 
 export function rxSource<T>(
   source: Observable<T> | T,

@@ -1,4 +1,4 @@
-import {BooleanType} from "@code-workers.io/angular-kit/cdk/types";
+import {BooleanType} from "@angular-kit/cdk/types";
 
 
 export function coerceBoolean(value: BooleanType | string): boolean {

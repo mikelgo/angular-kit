@@ -21,34 +21,34 @@
       "@angular-kit/testing": [
         "libs/testing/src/index.ts"
       ],
-      "@code-workers.io/angular-kit/cdk": [
+      "@angular-kit/cdk": [
         "libs/cdk/src/index.ts"
       ],
-      "@code-workers.io/angular-kit/cdk/coercing": [
+      "@angular-kit/cdk/coercing": [
         "libs/cdk/coercing/src/index.ts"
       ],
-      "@code-workers.io/angular-kit/cdk/types": [
+      "@angular-kit/cdk/types": [
         "libs/cdk/types/src/index.ts"
       ],
-      "@code-workers.io/angular-kit/rx": [
+      "@angular-kit/rx": [
         "libs/rx/src/index.ts"
       ],
       "@code-workers.io/angular-kit/rx/effect": [
         "libs/rx/effect/src/index.ts"
       ],
-      "@code-workers.io/angular-kit/rx/operators": [
+      "@angular-kit/rx/operators": [
         "libs/rx/operators/src/index.ts"
       ],
-      "@code-workers.io/angular-kit/rx/platform": [
+      "@angular-kit/rx/platform": [
         "libs/rx/platform/src/index.ts"
       ],
-      "@code-workers.io/angular-kit/rx/query": [
+      "@angular-kit/rx/query": [
         "libs/rx/query/src/index.ts"
       ],
-      "@code-workers.io/angular-kit/rx/signal": [
+      "@angular-kit/rx/signal": [
         "libs/rx/signal/src/index.ts"
       ],
-      "@code-workers.io/angular-kit/stream": [
+      "@angular-kit/stream": [
         "libs/stream/src/index.ts"
       ]
     }
