@@ -45,7 +45,6 @@ export function rxWrap<T, R>(
       // CUSTOM LOGIC HERE
       (o: Observable<T>): Observable<T | R> => {
         if (isOperateFnArrayGuard(optionalDerive)) {
-          // @ts-ignore
           return o.pipe(pipeFromArray(optionalDerive));
         }
         return o;

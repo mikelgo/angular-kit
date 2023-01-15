@@ -250,6 +250,7 @@ describe('StreamDirective', () => {
       expect(fixture.debugElement.query(By.css('div')).nativeElement?.innerHTML).toContain('Loading... context ');
     }));
     // todo
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     xit('should show complete component', () => {});
   });
 });
@@ -323,6 +324,7 @@ export class ValueProvider {
 }
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'test',
   template: `
     <div
@@ -352,6 +354,7 @@ export class TestHostComponent {
 }
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'loading',
   template: ` <div>Loading... context {{ context?.loading }}</div> `,
 })
@@ -360,6 +363,7 @@ export class LoadingComponent {
 }
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'error',
   template: ` <div>Error: context {{ context?.error }}</div> `,
 })

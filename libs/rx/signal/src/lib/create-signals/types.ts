@@ -21,6 +21,7 @@ type FunctionParamsOrValueType<U, K, F> = InferArguments<Select<U, K>> extends n
   ? [F]
   : InferArguments<Select<U, K>>;
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 export type Signals = {};
 
 // eslint-disable-next-line @typescript-eslint/ban-types

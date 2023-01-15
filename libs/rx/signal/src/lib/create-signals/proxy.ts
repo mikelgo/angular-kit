@@ -2,6 +2,7 @@ import {merge, ReplaySubject, Subject, throwError} from 'rxjs';
 import {KeysOf, RxSignals, ValuesOf} from './types';
 
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 export function actionProxyHandler<T extends object, U extends {}>(
   subjects: { [K in keyof T]: Subject<ValuesOf<T>> },
   transforms?: U,

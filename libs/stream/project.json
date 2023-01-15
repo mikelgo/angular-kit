@@ -47,7 +47,7 @@
       "options": {
         "commands": [
           {
-            "command": "npm publish dist/libs/cdk"
+            "command": "npm publish dist/libs/stream"
           }
         ]
       },
