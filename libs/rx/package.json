@@ -1,6 +1,6 @@
 {
   "name": "@code-workers.io/angular-kit/rx",
-  "version": "1.2.0",
+  "version": "1.0.0",
   "peerDependencies": {
     "@angular/common": ">=11.0.0",
     "@angular/core": ">=11.0.0",
