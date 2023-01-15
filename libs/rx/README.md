@@ -2,6 +2,12 @@
 
 A set of powerful packages for building reactive Angular applications.
 
+# Installation
+
+```bash
+npm install @angular-kit/rx
+```
+
 - [rx/query](./query/README.md) - wrap http-observables and expose loading, refreshing and error states
 - [rx/signal](./signal/README.md) - reduce boilerplate when dealing with subjects
 - [rx/effect](./effect/README.md) - subscribe to observables without the need to take care of subscriptions
