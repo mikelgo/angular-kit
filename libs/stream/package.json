@@ -5,7 +5,6 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@angular/common": ">=11.0.0",
     "@angular/core": ">=11.0.0",
     "rxjs": ">=6.5.5"
   },
