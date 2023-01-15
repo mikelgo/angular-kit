@@ -1,10 +1,8 @@
 import {
   distinctUntilChanged,
   filter,
-  map,
   noop,
   Observable,
-  of,
   OperatorFunction,
   ReplaySubject,
   share,
@@ -39,29 +37,18 @@ export function rxWrap<T, R>(
 ): OperatorFunction<T, NonUndefined<T> | NonUndefined<R>> {
   return (s: Observable<T>): Observable<NonUndefined<T> | NonUndefined<R>> => {
     return s.pipe(
-      // distinct same base-state objects (e.g. a default emission of default switch cases, incorrect mutable handling
-      // of data) @TODO evaluate benefits vs. overhead
       distinctUntilChanged(),
-      // CUSTOM LOGIC HERE
+      // users operator
       (o: Observable<T>): Observable<T | R> => {
         if (isOperateFnArrayGuard(optionalDerive)) {
           return o.pipe(pipeFromArray(optionalDerive));
         }
         return o;
       },
-      // initial emissions, undefined is no base-state, pollution with skip(1)
       filter((v): v is NonUndefined<typeof v> => v !== undefined),
-      // distinct same derivation value
       distinctUntilChanged(),
       // reuse custom operations result for multiple subscribers and reemit the last calculated value.
       share({ connector: () => new ReplaySubject(1) })
     );
   };
 }
-
-const test = of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).pipe(
-  rxWrap(
-    map((state) => state * 2),
-    map((state) => state * 2)
-  )
-);
