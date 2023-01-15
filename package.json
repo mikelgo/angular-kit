@@ -4,7 +4,22 @@
   "license": "MIT",
   "scripts": {
     "ng": "nx",
-    "postinstall": "node ./decorate-angular-cli.js"
+    "postinstall": "node ./decorate-angular-cli.js",
+    "build": "nx build",
+    "test": "nx test",
+    "test:coverage": "nx test --code-coverage",
+    "lint": "nx workspace-lint && nx lint",
+    "affected:apps": "nx affected:apps",
+    "affected:libs": "nx affected:libs",
+    "affected:build": "nx affected:build",
+    "affected:e2e": "nx affected:e2e",
+    "affected:test": "nx affected:test",
+    "affected:lint": "nx affected:lint",
+    "affected:dep-graph": "nx affected:dep-graph",
+    "affected": "nx affected",
+    "cdk:publish": "nx run cdk:publish",
+    "rx:publish": "nx run rx:publish",
+    "stream:publish": "nx run stream:publish"
   },
   "private": true,
   "dependencies": {
