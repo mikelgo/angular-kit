@@ -8,7 +8,7 @@
 # Installation
 
 ```bash
-npm install @code-workers.io/angular-kit/stream
+npm install @angular-kit/stream
 ```
 
 ## Usage
