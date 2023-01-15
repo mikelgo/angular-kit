@@ -6,7 +6,13 @@ Reduce boilerplate code when working with RxJS subjects.
 - ✅ reduce boilerplate
 - ✅ [no late subscriber problem](https://trilon.io/blog/dealing-with-late-subscribers-in-rxjs)
 
+The package includes two functions for creating signals:
+- `createSignal` - creates a signal with a single value
+- `createSignals` - creates multiple signals from a type definition
+
 ## Usage
+
+### `createSignal`
 
 ```typescript
 import { createSignal } from '@code-workers.io/angular-kit/signal';
@@ -51,5 +57,32 @@ export class SomeComponent {
   set value(value: number) {
     this.signal.send(value);
   }
+}
+```
+
+### `createSignals`
+
+```typescript
+import { createSignals } from '@code-workers.io/angular-kit/signal';
+import { Component } from '@angular/core';
+import { scan } from 'rxjs';
+
+interface SomeSignals {
+  value: number;
+}
+@Component({
+  selector: 'app-root',
+  template: `
+    <button (click)="signals.value(1)">Click me</button>
+
+    <div *ngIf="signalValue$ | async as value">
+      {{ value }}
+    </div>
+  `,
+})
+export class AppComponent {
+  signals = createSignals<SomeSignals>();
+
+  signalValue$ = this.signals.value$.pipe(scan((acc, value) => acc + value, 0));
 }
 ```
