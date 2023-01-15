@@ -18,6 +18,7 @@
       "@angular-kit/cdk": ["libs/cdk/src/index.ts"],
       "@angular-kit/cdk/coercing": ["libs/cdk/coercing/src/index.ts"],
       "@angular-kit/cdk/memoize": ["libs/cdk/memoize/src/index.ts"],
+      "@angular-kit/cdk/pipes": ["libs/cdk/pipes/src/index.ts"],
       "@angular-kit/cdk/types": ["libs/cdk/types/src/index.ts"],
       "@angular-kit/rx": ["libs/rx/src/index.ts"],
       "@angular-kit/rx/operators": ["libs/rx/operators/src/index.ts"],

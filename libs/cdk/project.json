@@ -41,7 +41,9 @@
           "libs/cdk/types/**/*.ts",
           "libs/cdk/types/**/*.html",
           "libs/cdk/memoize/**/*.ts",
-          "libs/cdk/memoize/**/*.html"
+          "libs/cdk/memoize/**/*.html",
+          "libs/cdk/pipes/**/*.ts",
+          "libs/cdk/pipes/**/*.html"
         ]
       }
     },
