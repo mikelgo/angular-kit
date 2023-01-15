@@ -2,6 +2,12 @@
 
 Powerful development kit for Angular.
 
+# Installation
+
+```bash
+npm install @angular-kit/cdk
+```
+
 ## 🔋 Included
 
 - [types](./types/README.md) - a collection of types which will reflect strict types
