@@ -1,9 +1,9 @@
-import {createSignal, Signal, SignalConfig} from './create-signal';
+import {createSignal} from './create-signal';
 import {subscribeSpyTo} from '@hirez_io/observer-spy';
 
 describe('createSignal', () => {
   it('should filter out undefined values', () => {
-    const signal = createTestSignal();
+    const signal = createSignal()
 
     const result = subscribeSpyTo(signal.$);
 
@@ -14,7 +14,7 @@ describe('createSignal', () => {
   });
 
   it('should filter out null values, when configured', () => {
-    const signal = createTestSignal({ filterNull: true });
+    const signal = createSignal({ filterNull: true })
 
     const result = subscribeSpyTo(signal.$);
 
@@ -26,7 +26,7 @@ describe('createSignal', () => {
   });
 
   it('should emit only distinct values', () => {
-    const signal = createTestSignal();
+    const signal = createSignal()
 
     const result = subscribeSpyTo(signal.$);
 
@@ -40,8 +40,24 @@ describe('createSignal', () => {
 
     expect(result.getValues()).toEqual([10, 5, 10]);
   });
+
+  it('should emit initial value', () => {
+    const signal = createSignal(10);
+
+    const result = subscribeSpyTo(signal.$);
+
+    expect(result.getValues()).toEqual([10]);
+  })
+
+  it('should allow initial value and config', () => {
+    const signal = createSignal<number | null>(10, { filterNull: true });
+
+    const result = subscribeSpyTo(signal.$);
+
+    signal.send(null);
+
+    expect(result.getValues()).toEqual([10]);
+  })
 });
 
-function createTestSignal(cfg?: SignalConfig<number | undefined | null>): Signal<number | undefined | null> {
-  return createSignal<number | undefined | null>(cfg);
-}
+
