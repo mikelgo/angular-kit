@@ -27,7 +27,7 @@ async function create() {
         <h1
           id="resize_elem"
           style="position: absolute; top: 200px; height: 200px;"
-          observeResize
+          rxObserveResize
           (resizeEvent)="onResize()"
         >
           I'm being observed

@@ -6,7 +6,7 @@ import {createSignal} from '@angular-kit/rx/signal';
 import {Nullable} from '@angular-kit/cdk/types';
 
 @Directive({
-  selector: '[observeResize]',
+  selector: '[rxObserveResize]',
 })
 export class ObserveResizeDirective implements OnDestroy {
   private subscription = new Subscription();
