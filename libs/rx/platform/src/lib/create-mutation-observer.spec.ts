@@ -1,6 +1,6 @@
 import {createMutationObserver} from './create-mutation-observer';
 import {subscribeSpyTo} from '@hirez_io/observer-spy';
-import {createElementRef, mockMutationObserver} from '@angular-kit/testing';
+import {createElementRef, mockMutationObserver} from '@angular-kit/test-helpers';
 import {fakeAsync, tick} from '@angular/core/testing';
 
 describe('createMutationObserver', () => {

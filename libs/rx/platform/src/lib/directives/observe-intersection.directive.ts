@@ -2,7 +2,7 @@ import {Directive, NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 
 @Directive({
-  selector: '[angularKitObserveIntersection]',
+  selector: '[observeIntersection]',
 })
 export class ObserveIntersectionDirective {
   // todo

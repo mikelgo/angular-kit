@@ -1,13 +1,23 @@
 import {ObserveResizeDirective, ObserveResizeDirectiveModule} from './observe-resize.directive';
-import {Component} from '@angular/core';
-import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {mockResizeObserver} from '@angular-kit/testing';
+import {Component, ViewChild} from '@angular/core';
+import {ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing';
+import {mockResizeObserver} from '@angular-kit/test-helpers';
+import {subscribeSpyTo} from "@hirez_io/observer-spy";
 
 describe('ObserveResizeDirective', () => {
   it('should create an instance', async () => {
     const { testComponent } = await create();
     expect(testComponent).toBeTruthy();
   });
+
+  it('should emit on resize', fakeAsync (async () => {
+    const {testComponent, fixture} = await create();
+    const result = subscribeSpyTo(testComponent.directive.resizeEvent);
+
+    fixture.nativeElement.dispatchEvent(new Event('resize'));
+    tick(1000)
+    expect(result.getValues().length).toEqual(1)
+  }));
 });
 
 async function create() {
@@ -26,6 +36,7 @@ async function create() {
     `,
   })
   class TestComponent {
+    @ViewChild(ObserveResizeDirective, {static: true}) directive!: ObserveResizeDirective;
     onResize = jest.fn();
     observe = true;
   }

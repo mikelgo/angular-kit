@@ -1,5 +1,5 @@
 {
-  "name": "@angular-kit/testing",
+  "name": "@angular-kit/test-helpers",
   "version": "0.0.1",
   "peerDependencies": {
     "@angular/common": "^15.0.0",

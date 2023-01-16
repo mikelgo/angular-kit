@@ -2,8 +2,8 @@ import {Directive, ElementRef, Input, NgModule, OnDestroy, Output} from '@angula
 import {CommonModule} from '@angular/common';
 import {Subscription} from 'rxjs';
 import {createResizeObserver, ResizeObserverConfig} from '../create-resize-observer';
-import {createSignal} from '@code-workers.io/angular-kit/rx/signal';
-import {Nullable} from '@code-workers.io/angular-kit/cdk/types';
+import {createSignal} from '@angular-kit/rx/signal';
+import {Nullable} from '@angular-kit/cdk/types';
 
 @Directive({
   selector: '[observeResize]',
