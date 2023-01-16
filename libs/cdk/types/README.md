@@ -12,8 +12,9 @@ Tired of writing e.g. `@Input() arg: string | null | undefined` over and over ag
 - `DateType`
 - `ArrayType`
 - `ObjectType`
-- `Nullable<T>`
-- `Optional<T>`
+- `Nullable<T>`: `T | null`
+- `Undefinable<T>`: `T | undefined`
+- `Optional<T>`: `T | null |undefined`
 
 ## Util types
 - `KeysOf`: Get the keys of an object type
