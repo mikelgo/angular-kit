@@ -46,7 +46,7 @@ export function createSignal<T>(initialValueOrConfig?: T | SignalConfig<T>, cfg?
   }
 
   const signal: Subject<T> = initialvalue ? new BehaviorSubject<T>(initialvalue):  new ReplaySubject<T>(1);
-  const $ = (signal.asObservable() as Observable<T>).pipe(
+  const $ = signal.asObservable() .pipe(
     filter((v) => v !== undefined && (config?.filterNull ? v !== null : true)),
     distinctUntilChanged(),
     share(config?.shareCfg ?? defaultShareCfg)
