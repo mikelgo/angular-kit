@@ -65,7 +65,7 @@ export class AppComponent {
     );
   }
 
-  onResize($event: ResizeObserverEntry[]) {
+  onResize($event: any) {
     console.log($event);
   }
 }
