@@ -43,7 +43,11 @@
           "libs/cdk/memoize/**/*.ts",
           "libs/cdk/memoize/**/*.html",
           "libs/cdk/pipes/**/*.ts",
-          "libs/cdk/pipes/**/*.html"
+          "libs/cdk/pipes/**/*.html",
+          "libs/cdk/supported/**/*.ts",
+          "libs/cdk/supported/**/*.html",
+          "libs/cdk/token/**/*.ts",
+          "libs/cdk/token/**/*.html"
         ]
       }
     },
