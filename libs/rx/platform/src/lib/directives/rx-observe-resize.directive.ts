@@ -8,7 +8,7 @@ import {Nullable} from '@angular-kit/cdk/types';
 @Directive({
   selector: '[rxObserveResize]',
 })
-export class ObserveResizeDirective implements OnDestroy {
+export class RxObserveResizeDirective implements OnDestroy {
   private subscription = new Subscription();
   private configSignal = createSignal<ResizeObserverConfig | null>();
 
@@ -35,7 +35,7 @@ export class ObserveResizeDirective implements OnDestroy {
 
 @NgModule({
   imports: [CommonModule],
-  declarations: [ObserveResizeDirective],
-  exports: [ObserveResizeDirective],
+  declarations: [RxObserveResizeDirective],
+  exports: [RxObserveResizeDirective],
 })
-export class ObserveResizeDirectiveModule {}
+export class RxObserveResizeDirectiveModule {}
