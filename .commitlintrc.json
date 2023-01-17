@@ -9,7 +9,8 @@
         "demos",
         "docs",
         "stream",
-        "query",
+        "cdk",
+        "rx",
         "ci"
       ]
     ],
