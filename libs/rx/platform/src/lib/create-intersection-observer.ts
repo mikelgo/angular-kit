@@ -1,5 +1,6 @@
 import {debounceTime, Observable, ReplaySubject, SchedulerLike, share} from 'rxjs';
 import {ElementRef} from '@angular/core';
+import {isElementRef} from "./utils/is-element-ref";
 
 const DEFAULT_THROTTLE_TIME = 125;
 
@@ -8,7 +9,7 @@ export function supportsIntersectionObserver() {
 }
 
 export function createIntersectionObserver(
-  observeElement: ElementRef,
+  observeElement: ElementRef | Element,
   options?: IntersectionObserverInit,
   cfg?: {
     throttleMs?: number;
@@ -23,7 +24,7 @@ export function createIntersectionObserver(
       subscriber.next(entries);
     }, options ?? {});
 
-    intersectionObserver.observe(observeElement.nativeElement);
+    intersectionObserver.observe(isElementRef(observeElement) ? observeElement.nativeElement : observeElement);
 
     return () => intersectionObserver.disconnect();
   });
