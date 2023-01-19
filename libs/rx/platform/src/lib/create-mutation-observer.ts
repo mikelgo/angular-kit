@@ -1,5 +1,6 @@
 import {debounceTime, Observable, ReplaySubject, SchedulerLike, share} from 'rxjs';
 import {ElementRef} from '@angular/core';
+import {isElementRef} from "./utils/is-element-ref";
 
 const DEFAULT_THROTTLE_TIME = 125;
 
@@ -8,7 +9,7 @@ export function supportsMutationObserver() {
 }
 
 export function createMutationObserver(
-  observeElement: ElementRef,
+  observeElement: ElementRef | Element,
   options?: MutationObserverInit,
   cfg?: {
     throttleMs?: number;
@@ -23,7 +24,7 @@ export function createMutationObserver(
       subscriber.next(entries);
     });
 
-    mutationObserver.observe(observeElement.nativeElement, options ?? {});
+    mutationObserver.observe(isElementRef(observeElement) ? observeElement.nativeElement : observeElement, options ?? {});
 
     return () => mutationObserver.disconnect();
   });
