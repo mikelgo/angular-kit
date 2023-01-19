@@ -9,7 +9,9 @@ export function supportsResizeObserver() {
 }
 
 export type ResizeObserverConfig = {
+  /**throttle emissions, defaults to 50*/
   throttleMs?: number;
+  /** scheduler to use for throttling */
   scheduler?: SchedulerLike;
 };
 

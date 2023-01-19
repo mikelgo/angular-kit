@@ -2,19 +2,23 @@ import {debounceTime, Observable, ReplaySubject, SchedulerLike, share} from 'rxj
 import {ElementRef} from '@angular/core';
 import {isElementRef} from "./utils/is-element-ref";
 
-const DEFAULT_THROTTLE_TIME = 125;
+const DEFAULT_THROTTLE_TIME = 50;
 
 export function supportsMutationObserver() {
   return typeof window.MutationObserver !== 'undefined';
 }
 
+export type MutationObserverConfig = {
+  /**throttle emissions, defaults to 50*/
+  throttleMs?: number;
+  /** scheduler to use for throttling */
+  scheduler?: SchedulerLike;
+}
+
 export function createMutationObserver(
   observeElement: ElementRef | Element,
   options?: MutationObserverInit,
-  cfg?: {
-    throttleMs?: number;
-    scheduler?: SchedulerLike;
-  }
+  cfg?: MutationObserverConfig
 ): Observable<MutationRecord[]> {
   if (!supportsMutationObserver()) {
     throw new Error('[AngularKit] MutationObserver is not supported in this browser');

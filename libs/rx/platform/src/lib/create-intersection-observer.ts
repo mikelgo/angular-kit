@@ -2,19 +2,23 @@ import {debounceTime, Observable, ReplaySubject, SchedulerLike, share} from 'rxj
 import {ElementRef} from '@angular/core';
 import {isElementRef} from "./utils/is-element-ref";
 
-const DEFAULT_THROTTLE_TIME = 125;
+const DEFAULT_THROTTLE_TIME = 50;
 
 export function supportsIntersectionObserver() {
   return typeof window.IntersectionObserver !== 'undefined';
 }
 
+export type IntersectionObserverConfig = {
+  /**throttle emissions, defaults to 50*/
+  throttleMs?: number;
+  /** scheduler to use for throttling */
+  scheduler?: SchedulerLike;
+}
+
 export function createIntersectionObserver(
   observeElement: ElementRef | Element,
   options?: IntersectionObserverInit,
-  cfg?: {
-    throttleMs?: number;
-    scheduler?: SchedulerLike;
-  }
+  cfg?: IntersectionObserverConfig
 ): Observable<IntersectionObserverEntry[]> {
   if (!supportsIntersectionObserver()) {
     throw new Error('[AngularKit] IntersectionObserver is not supported in this browser');
