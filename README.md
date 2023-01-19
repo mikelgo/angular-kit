@@ -1,6 +1,6 @@
 <img src="docs/images/logo.svg" width="200">
 
-# @code-workers.io/angular-kit
+# @angular-kit
 
 A set of 🔥 Angular packages tools.
 
