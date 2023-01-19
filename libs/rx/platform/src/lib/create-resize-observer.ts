@@ -1,5 +1,6 @@
 import {ElementRef} from '@angular/core';
 import {debounceTime, distinctUntilChanged, Observable, ReplaySubject, SchedulerLike, share} from 'rxjs';
+import {isElementRef} from "./utils/is-element-ref";
 
 const DEFAULT_THROTTLE_TIME = 50;
 
@@ -13,7 +14,7 @@ export type ResizeObserverConfig = {
 };
 
 export function createResizeObserver(
-  observeElement: ElementRef,
+  observeElement: ElementRef | Element,
   cfg?: ResizeObserverConfig
 ): Observable<ResizeObserverEntry[]> {
   if (!supportsResizeObserver()) {
@@ -24,7 +25,7 @@ export function createResizeObserver(
       subscriber.next(entries);
     });
 
-    resizeObserver.observe(observeElement.nativeElement);
+    resizeObserver.observe(isElementRef(observeElement) ? observeElement.nativeElement : observeElement);
 
     return () => resizeObserver.disconnect();
   });
@@ -40,3 +41,5 @@ export function createResizeObserver(
     })
   );
 }
+
+
