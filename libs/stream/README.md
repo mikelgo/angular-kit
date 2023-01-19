@@ -15,6 +15,36 @@ npm install @angular-kit/stream
 
 ### Basic example
 
+❌ Instead of doing this
+```html
+<ng-container *ngIf="source | async as value">
+  {{ value  }}
+</ng-container>
+```
+
+✅ Do this: 
+
+```html
+<ng-container
+  *stream="
+    source$;
+    let value;
+  "
+>
+  {{ value }}
+</ng-container>
+
+```
+
+```typescript
+@Component({})
+export class MyComponent {
+  source$ = this.http.get('https://jsonplaceholder.typicode.com/posts/1');
+}
+```
+
+### Advanced example
+
 ```html
 <ng-container
   *stream="
@@ -96,7 +126,7 @@ export class MyLoadingComponent {
 
 _Note_ When using components and passing templates, the templates will be used instead.
 
-## Comparision of `async`-pipe vs `*stream`-directive
+## Comparison of `async`-pipe vs `*stream`-directive
 
 If we compare a highly optimized application where all components are using `OnPush` change detection strategy we can observe that the
 usage of the `async`-pipe is still quite expensive at it is internally calling `markForCheck` which marks the component itself and all of its parents for change detection.
@@ -106,7 +136,11 @@ So the whole component (sub)-tree gets re-rendered. So not only the complete tem
 ![async-pipe vs stream-directive](./docs/stream-vs-async.png)
 
 ### Comparison of dirty checks: `async`-pipe vs `*stream`-directive
+The numbers in the green circels cound the render-cycles. Please not on the right side where only the tiny template 
+piece within `L2 Component` gets updated (the number on the left besides this name does not increase). 
 
+Whereas on the left side all values do increase. There's no counter in the tiny template piece on the left because the 
+`async`-pipe does trigger change detection on the whole component - therefore we only have a counter on component level.
 ![dirty checks comparison](./docs/dirty-checks-comparison.gif)
 
 ## Versioning
