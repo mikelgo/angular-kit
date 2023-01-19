@@ -1,4 +1,4 @@
-# @code-workers.io/angular-kit/operators
+# @angular-kit/operators
 
 A set of powerful RxJS operators for building reactive Angular applications.
 

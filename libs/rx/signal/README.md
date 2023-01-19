@@ -1,4 +1,4 @@
-# @code-workers.io/angular-kit/signal
+# @angular-kit/signal
 
 Reduce boilerplate code when working with RxJS subjects.
 

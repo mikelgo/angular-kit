@@ -1,4 +1,4 @@
-# @code-workers.io/angular-kit/effect
+# @angular-kit/effect
 
 You don't longer need to worry about handling subscriptions!
 

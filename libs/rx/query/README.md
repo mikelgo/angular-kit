@@ -1,4 +1,4 @@
-# @code-workers-io/angular-kit/query$
+# @angular-kit/query
 
 This package provides a nice way to fetch data from an endpoint and
 expose certain states like a `isLoading` and `isRefreshing` state.
