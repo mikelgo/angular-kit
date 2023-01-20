@@ -10,6 +10,33 @@ A set of powerful RxJS operators for building reactive Angular applications.
 
 ## Operators
 
+### Flattening operators
+
+#### `rxSwitchMap`
+
+`switchMap`-operator from `RxJs` with a default error handling strategy.
+
+Strategies:
+tbd
+
+#### `rxMergeMap`
+`mergeMap`-operator from `RxJs` with a default error handling strategy.
+
+Strategies:
+tbd
+
+#### `rxConcatMap`
+`concatMap`-operator from `RxJs` with a default error handling strategy.
+
+Strategies:
+tbd
+#### `rxExhaustMap`
+`exhaustMap`-operator from `RxJs` with a default error handling strategy.
+
+Strategies:
+tbd
+
+
 ### Filter operators
 
 - `rxFilterNull`: Filters out nullish values
