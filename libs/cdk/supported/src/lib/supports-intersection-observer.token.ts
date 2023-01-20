@@ -3,5 +3,5 @@ import {WINDOW} from "../../../token/src";
 
 export const SUPPORTS_INTERSECTION_OBSERVER = new InjectionToken<boolean>('ResizeObserver supported', {
   providedIn: 'root',
-  factory: () => typeof inject(WINDOW)['IntersectionObserver'] !== 'undefined'
+  factory: () => typeof (inject(WINDOW) as any)['IntersectionObserver'] !== 'undefined'
 })
