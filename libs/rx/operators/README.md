@@ -25,6 +25,11 @@ A set of powerful RxJS operators for building reactive Angular applications.
 
  ### Other operators
 
+#### `rxPluck`
+Same as the former `pluck` operator from RxJS which got deprecated in RxJS v7.
+
+![rxPluck marble](../../../docs/images/marbles/rx-pluck.png)
+
 #### `rxDistinctUntilChanged` 
 A distinctUntilChanged operator that deeply compares any values efficiently
 

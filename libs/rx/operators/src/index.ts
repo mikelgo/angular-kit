@@ -5,3 +5,4 @@ export * from './lib/rx-distinct-until-changed';
 export {rxWrap} from './lib/rx-wrap.operator';
 
 export * from './lib/creational/rx-source';
+export * from './lib/rx-pluck';
