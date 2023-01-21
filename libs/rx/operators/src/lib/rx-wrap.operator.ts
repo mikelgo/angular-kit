@@ -9,7 +9,7 @@ import {
   UnaryFunction,
 } from 'rxjs';
 
-// todo überarbeiten
+
 export function isOperateFnArrayGuard<T, R = T>(op: any[]): op is OperatorFunction<T, R>[] {
   if (!Array.isArray(op)) {
     return false;

@@ -1,5 +1,5 @@
 import {OperatorFunction, RetryConfig} from "rxjs";
-import {ErrorHandlingStrategy} from "./types";
+import {ErrorHandlingStrategy} from "../types";
 
 export function isRetryConfigGuard(arg: any): arg is RetryConfig {
   return arg && arg?.count && arg?.delay;
