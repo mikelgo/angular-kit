@@ -5,3 +5,5 @@ import {Observable} from "rxjs";
  * like rxSwitchMap, rxMergeMap, rxConcatMap, rxExhaustMap
  */
 export type ProjectFn<T, R> = (value: T, index: number) => Observable<R>;
+
+export type ErrorHandlingStrategy =  'swallow' | 'retry-default' ;

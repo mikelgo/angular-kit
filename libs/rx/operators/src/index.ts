@@ -12,3 +12,4 @@ export * from './lib/flattening/rx-switchmap';
 export * from './lib/flattening/rx-concatmap';
 export * from './lib/flattening/rx-mergemap';
 export * from './lib/flattening/rx-exhaustmap';
+

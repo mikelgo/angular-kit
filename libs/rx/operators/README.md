@@ -11,30 +11,34 @@ A set of powerful RxJS operators for building reactive Angular applications.
 ## Operators
 
 ### Flattening operators
+- `rxSwitchMap`: `switchMap` with error handling
+- `rxMergeMap`: `mergeMap` with error handling
+- `rxConcatMap`: `concatMap` with error handling
+- `rxExhaustMap`: `exhaustMap` with error handling
 
-#### `rxSwitchMap`
+#### Usage
 
-`switchMap`-operator from `RxJs` with a default error handling strategy.
+```typescript
+import { rxSwitchMap } from '@angular-kit/rx/operators';
 
-Strategies:
-tbd
 
-#### `rxMergeMap`
-`mergeMap`-operator from `RxJs` with a default error handling strategy.
+this.source$.pipe(
+  // ❌ instead of 
+  // switchMap(value => this.service.get(value).pipe(
+  // catchError(error => of(error))
+  // ✅ do this: 
+  rxSwitchMap((value) => this.service.get(value))
+).subscribe();
+```
+Each operator does support different error handling strategies. By default
+the error is catched and returned. 
 
-Strategies:
-tbd
+Other strategies can be used by passing a second argument to the operator:
+- `rxSwitchMap(v => this.service.get(v), 'swallow')'`: will swallow the error and just continue
+- `rxSwitchMap(v => this.service.get(v), 'retry-default')'`: will retry up to two times with a delay of 1s. On success the counter is reset.
+- `rxSwitchMap(v => this.service.get(v), {)'`: you can pass an own `RetryConfig` object to customize the retry behavior. See [Rxjs docs](https://rxjs.dev/api/index/interface/RetryConfig) for more information.
+- `rxSwitchMap(v => this.service.get(v), catchError(err => whatever)'`: apply a totally custom error handling strategy by passing Rxjs Operators.
 
-#### `rxConcatMap`
-`concatMap`-operator from `RxJs` with a default error handling strategy.
-
-Strategies:
-tbd
-#### `rxExhaustMap`
-`exhaustMap`-operator from `RxJs` with a default error handling strategy.
-
-Strategies:
-tbd
 
 
 ### Filter operators
