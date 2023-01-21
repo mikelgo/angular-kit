@@ -12,7 +12,7 @@ export class RxObserveResizeDirective implements OnDestroy {
   private subscription = new Subscription();
   private configSignal = createSignal<ResizeObserverConfig | null>();
 
-  @Input() set resizeObserverConfig(config: ResizeObserverConfig | null) {
+  @Input() set rxObserveResizeConfig(config: ResizeObserverConfig | null) {
     this.configSignal.send(config);
   }
 
