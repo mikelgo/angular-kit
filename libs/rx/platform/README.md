@@ -87,6 +87,53 @@ export type MutationObserverConfig = {
 ### Directives
 
 #### `rxObserveResize`
+This directive wraps the `ResizeObserver` API and emits `ResizeObserverEntry` objects.
+
+Usage example:
+```html
+<div rxObserveResize (resize)="onResize($event)"></div>
+```
+
+Inputs
+- `rxObserveResizeConfig`: `ResizeObserverConfig` - optional configuration for the `ResizeObserver`
+
+
 #### `rxObserveIntersection`
+This directive wraps the `IntersectionObserver` API and emits `IntersectionObserverEntry` objects.
+
+Usage example:
+```html
+<div rxObserveIntersection (intersect)="onIntersection($event)"></div>
+```
+
+Inputs
+_ `rxObserveIntersectionDebounce`: `number` - debounce time in ms
+- `rxObserveIntersectionRootMargin`: root margin in px, see [MDN](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/IntersectionObserver)
+- `rxObserveIntersectionThreshold`: threshold, see [MDN](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/IntersectionObserver)
+- `rxObserveIntersectionRoot`:  root element, see [MDN](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/IntersectionObserver)
+- `rxObserveIntersectionScheduler`:  RxJs Scheduler to use for debouncing
+
+Outputs
+- `intersect`: `IntersectionObserverEntry[]` - emits when the observed element intersects with the root element
+
 #### `rxObserveVisibility`
-#### `rxRenderInViewport`
+This directive wraps the `IntersectionObserver` API and is an alternative for `rxObserveIntersection`.
+
+Usage example:
+```html
+<div rxObserveVisibility (intersectStatusChange)="onVisible($event)"></div>
+```
+
+Inputs
+_ `rxObserveVisibilityDebounce`: `number` - debounce time in ms
+- `rxObserveVisibilityRootMargin`: root margin in px, see [MDN](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/IntersectionObserver)
+- `rxObserveVisibilityThreshold`: threshold, see [MDN](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/IntersectionObserver)
+- `rxObserveVisibilityRoot`:  root element, see [MDN](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/IntersectionObserver)
+- `rxObserveVisibilityScheduler`:  RxJs Scheduler to use for debouncing
+
+Outputs
+- `intersectStatusChange`: `IntersectionStatus` - emits when the observed element intersects with the root element
+
+```ts
+type IntersectionStatus = 'Visible' | 'Hidden';
+```
