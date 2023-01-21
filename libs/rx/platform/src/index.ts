@@ -4,5 +4,4 @@ export * from './lib/create-mutation-observer';
 
 export * from './lib/directives/rx-observe-resize.directive';
 export * from './lib/directives/observe-intersection.directive';
-
-export * from './lib/directives/rx-observe-visibility.directive';
+export * from './lib/directives/observe-intersection.directive';

@@ -1,4 +1,0 @@
-// todo
-describe('InViewDirective', () => {
-
-});

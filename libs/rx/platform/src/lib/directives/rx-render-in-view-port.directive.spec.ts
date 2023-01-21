@@ -1,0 +1,4 @@
+// todo
+describe('RxRenderInViewDirective', () => {
+
+});
