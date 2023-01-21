@@ -65,7 +65,7 @@ Same as the former `pluck` operator from RxJS which got deprecated in RxJS v7.
 A distinctUntilChanged operator that deeply compares any values efficiently
 
 #### `rxWrap`: 
-A util-operator which ensures a shared and distinct observable is used. This operator combines under 
+A util-operator which ensures a shared and distinct observable is used which is also hot. This operator combines under 
 the hood `distinctUntilChanged`, `rxFilterUndefined` and `share`.
 
 Example
