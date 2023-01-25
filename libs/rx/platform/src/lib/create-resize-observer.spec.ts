@@ -1,7 +1,7 @@
 import {createResizeObserver} from './create-resize-observer';
 import {fakeAsync, tick} from '@angular/core/testing';
 import {subscribeSpyTo} from '@hirez_io/observer-spy';
-import {createElementRef, mockResizeObserver} from '@angular-kit/test-helpers';
+import {createElementRef, mockResizeObserver} from '@test-helpers';
 
 describe('createResizeObserver', () => {
   describe('supported', () => {

@@ -1,6 +1,6 @@
 import {TestScheduler} from 'rxjs/internal/testing/TestScheduler';
 // eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
-import {observableMatcher} from '@angular-kit/test-helpers';
+import {observableMatcher} from '@test-helpers';
 import {rxDistinctUntilChanged} from './rx-distinct-until-changed';
 
 describe('rxDistinctUntilChanged', () => {

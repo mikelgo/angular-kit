@@ -1,6 +1,6 @@
 import {of} from 'rxjs';
 import {subscribeSpyTo} from '@hirez_io/observer-spy';
-import {createError, createErrorSource, createSourceTrigger} from '@angular-kit/test-helpers';
+import {createError, createErrorSource, createSourceTrigger} from '@test-helpers';
 import {rxConcatmap} from './rx-concatmap';
 
 describe('rxConcatMap', () => {

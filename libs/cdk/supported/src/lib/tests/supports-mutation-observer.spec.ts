@@ -1,5 +1,5 @@
 import {TestBed} from "@angular/core/testing";
-import {mockMutationObserver} from "@angular-kit/test-helpers"
+import {mockMutationObserver} from "@test-helpers"
 import {SUPPORTS_MUTATION_OBSERVER} from "../supports-mutation-observer.token";
 
 describe('SUPPORTS_MUTATION_OBSERVER', () => {

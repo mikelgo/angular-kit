@@ -1,7 +1,7 @@
 import {of} from 'rxjs';
 import {subscribeSpyTo} from '@hirez_io/observer-spy';
 import {rxMergeMap} from './rx-mergemap';
-import {createError, createErrorSource, createSourceTrigger} from '@angular-kit/test-helpers';
+import {createError, createErrorSource, createSourceTrigger} from '@test-helpers';
 
 describe('rxMergeMap', () => {
   it('should catch error and continue', () => {

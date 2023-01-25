@@ -1,5 +1,5 @@
 import {TestBed} from "@angular/core/testing";
-import {mockResizeObserver} from "@angular-kit/test-helpers"
+import {mockResizeObserver} from "@test-helpers"
 import {SUPPORTS_RESIZE_OBSERVER} from "../supports-resize-observer.token";
 
 describe('SUPPORTS_RESIZE_OBSERVER', () => {

@@ -1,7 +1,7 @@
 import {RxObserveIntersectionDirective, RxObserveIntersectionDirectiveModule} from './observe-intersection.directive';
 import {Component, ViewChild} from "@angular/core";
 import {ComponentFixture, fakeAsync, TestBed, tick} from "@angular/core/testing";
-import {mockIntersectionObserver} from '@angular-kit/test-helpers';
+import {mockIntersectionObserver} from '@test-helpers';
 import {subscribeSpyTo} from "@hirez_io/observer-spy";
 
 describe('ObserveIntersectionDirective', () => {

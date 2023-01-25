@@ -1,6 +1,6 @@
 import {TestBed} from "@angular/core/testing";
 import {SUPPORTS_INTERSECTION_OBSERVER} from "../supports-intersection-observer.token";
-import {mockIntersectionObserver} from "@angular-kit/test-helpers"
+import {mockIntersectionObserver} from "@test-helpers"
 
 describe('SUPPORTS_INTERSECTION_OBSERVER', () => {
   it('should be true when the API is supported', () => {

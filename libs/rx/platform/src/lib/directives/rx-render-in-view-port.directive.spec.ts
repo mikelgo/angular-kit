@@ -3,7 +3,7 @@ import {Component, ViewChild} from "@angular/core";
 import {RxRenderInViewportDirective, RxRenderInViewportDirectiveModule} from "./rx-render-in-view-port.directive";
 import {By} from "@angular/platform-browser";
 
-import {mockIntersectionObserver} from '@angular-kit/test-helpers';
+import {mockIntersectionObserver} from '@test-helpers';
 
 describe('RxRenderInViewportDirective', () => {
   it('should create an instance', async () => {

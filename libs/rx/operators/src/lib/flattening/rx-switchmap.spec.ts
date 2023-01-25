@@ -2,7 +2,7 @@
 
 import {rxSwitchMap} from './rx-switchmap';
 import {TestScheduler} from 'rxjs/internal/testing/TestScheduler';
-import {createError, createErrorSource, createSourceTrigger, observableMatcher} from '@angular-kit/test-helpers';
+import {createError, createErrorSource, createSourceTrigger, observableMatcher} from '@test-helpers';
 import {map, of} from 'rxjs';
 import {subscribeSpyTo} from '@hirez_io/observer-spy';
 

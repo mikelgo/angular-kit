@@ -1,7 +1,7 @@
 import {TestScheduler} from 'rxjs/internal/testing/TestScheduler';
 import {map, mergeMap, take} from 'rxjs/operators';
 import {Observable, of} from 'rxjs';
-import {observableMatcher} from "@angular-kit/test-helpers";
+import {observableMatcher} from "@test-helpers";
 import {rxPluck} from "./rx-pluck";
 
 
