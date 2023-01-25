@@ -4,6 +4,10 @@ This file was generated using [@jscutlery/semver](https://github.com/jscutlery/s
 
 ## [1.1.3](https://github.com/code-workers-io/angular-kit/compare/cdk-1.1.2...cdk-1.1.3) (2023-01-25)
 
+
+
+## [1.1.3](https://github.com/code-workers-io/angular-kit/compare/cdk-1.1.2...cdk-1.1.3) (2023-01-25)
+
 * internal improvements
 
 ## [1.1.2](https://github.com/code-workers-io/angular-kit/compare/cdk-1.1.1...cdk-1.1.2) (2023-01-21)
