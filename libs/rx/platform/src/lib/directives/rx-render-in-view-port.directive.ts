@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {combineLatest, mergeMap, SchedulerLike, startWith, Subscription} from 'rxjs';
-import {createSignal} from '../../../../signal/src';
+import {createSignal} from '@angular-kit/rx/signal';
 import {createIntersectionObserver} from '../create-intersection-observer';
 
 @Directive({
