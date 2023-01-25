@@ -137,3 +137,19 @@ Outputs
 ```ts
 type IntersectionStatus = 'Visible' | 'Hidden';
 ```
+
+#### `rxRenderInViewport`
+This directives leverages the `IntersectionObserver` API and renders the content only when the observed element is in the viewport.
+
+Usage example:
+```html
+<div *rxRenderInViewport="'0px'"></div>
+```
+
+Inputs
+- `rxRenderInViewport`: default input - corresponds to the `rootMargin` input of the `IntersectionObserver` API
+- `debounce`: `number` - debounce time in ms to debounce the intersection status
+- `scheduler`: RxJs Scheduler to use for debouncing
+- `root`:  root element, see [MDN](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/IntersectionObserver)
+- `threshold`: threshold, see [MDN](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/IntersectionObserver)
+
