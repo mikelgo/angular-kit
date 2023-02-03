@@ -9,7 +9,7 @@ refresh is done.
 ## Usage
 
 ```typescript
-import { query$ } from '@code-workers.io/angular-kit/query';
+import { rxQuery$, RxQuery } from '@angular-kit/rx/query';
 @Component({
   template: `
     <button (click)="refreshCommand$.next(null)">refresh</button>
@@ -26,7 +26,7 @@ export class SomeComponent implements OnInit {
   private http: HttpClient = inject(HttpClient);
   refreshCommand$ = new Subject();
 
-  query$: Observable<Query<any>> = query$(this.fetch(10), this.refreshCommand$);
+  query$: Observable<RxQuery<any>> = rxQuery$(this.fetch(10), this.refreshCommand$);
 
   fetch(count: number) {
     return this.http.get('https://jsonplaceholder.typicode.com/posts').pipe(
@@ -39,6 +39,4 @@ export class SomeComponent implements OnInit {
 
 Note: the example above passes a refreshCommand$, however it is optional.
 
-## Compatibility
 
-- Version 1.x.x is compatible with Angular >= 12.0.0
