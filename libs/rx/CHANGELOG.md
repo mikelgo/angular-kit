@@ -2,6 +2,10 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.2.2](https://github.com/code-workers-io/angular-kit/compare/rx-1.2.1...rx-1.2.2) (2023-02-03)
+
+
+
 # [1.2.0](https://github.com/code-workers-io/angular-kit/compare/rx-1.1.0...rx-1.2.0) (2023-01-25)
 ### Features
 * **rx:** increase test coverage for RxRenderInViewPortDirective ([ad99b11](https://github.com/code-workers-io/angular-kit/commit/ad99b11e64397ba817dc16b7775d528fdb1e78ac))
