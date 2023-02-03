@@ -11,8 +11,15 @@ import {NgxDirtyCheckerModule} from '@code-workers.io/ngx-dirty-checker';
 import {StreamVsAsyncComponent} from './stream-vs-async/stream-vs-async.component';
 import {L1StreamComponent} from './stream-vs-async/l1-stream.component';
 import {L2StreamComponent} from './stream-vs-async/l2-stream.component';
-import {RxObserveIntersectionDirectiveModule, RxObserveResizeDirectiveModule} from "@angular-kit/rx/platform";
+import {
+  RxObserveIntersectionDirectiveModule,
+  RxObserveResizeDirectiveModule,
+  RxRenderInViewportDirectiveModule
+} from "@angular-kit/rx/platform";
 import {StreamDirectiveModule} from "@angular-kit/stream";
+import {
+  RxObserveVisibilityDirectiveModule
+} from "../../../../libs/rx/platform/src/lib/directives/rx-observe-visibility.directive";
 
 @NgModule({
   declarations: [
@@ -24,14 +31,17 @@ import {StreamDirectiveModule} from "@angular-kit/stream";
     L1StreamComponent,
     L2StreamComponent,
   ],
-    imports: [
-        BrowserModule,
-        StreamDirectiveModule,
-        HttpClientModule,
-        NgxDirtyCheckerModule,
-        RxObserveResizeDirectiveModule,
-        RxObserveIntersectionDirectiveModule,
-    ],
+  imports: [
+    BrowserModule,
+    StreamDirectiveModule,
+    HttpClientModule,
+    NgxDirtyCheckerModule,
+    RxObserveResizeDirectiveModule,
+    RxObserveIntersectionDirectiveModule,
+    RxObserveVisibilityDirectiveModule,
+    RxObserveVisibilityDirectiveModule,
+    RxRenderInViewportDirectiveModule,
+  ],
   providers: [],
   bootstrap: [AppComponent],
 })

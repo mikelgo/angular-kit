@@ -68,7 +68,8 @@
 
 <angular-kit-stream-vs-async></angular-kit-stream-vs-async>
 
-<div class="space"></div>
+<div class="space" rxObserveResize ></div>
 
+<div class="resizable" *rxRenderInViewport="'0px'"></div>
 
-<div class="resizable" rxObserveIntersection (intersect)="onResize($event)"></div>
+<div class="resizable" rxObserveVisibility  (intersectStatusChange)="onResize($event)"></div>
