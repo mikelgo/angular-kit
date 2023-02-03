@@ -28,8 +28,7 @@
       "@angular-kit/rx/query": ["libs/rx/query/src/index.ts"],
       "@angular-kit/rx/signal": ["libs/rx/signal/src/index.ts"],
       "@angular-kit/stream": ["libs/stream/src/index.ts"],
-      "@test-helpers": ["libs/test-helpers/src/index.ts"],
-      "@code-workers.io/angular-kit/rx/effect": ["libs/rx/effect/src/index.ts"]
+      "@angular-kit/rx/effect": ["libs/rx/effect/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
