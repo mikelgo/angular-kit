@@ -1,7 +1,7 @@
 import {RxObserveResizeDirective, RxObserveResizeDirectiveModule} from './rx-observe-resize.directive';
 import {Component, ViewChild} from '@angular/core';
 import {ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing';
-import {mockResizeObserver} from '@test-helpers';
+import {mockResizeObserver} from '../../../../__test-utils/platform.testing';
 import {subscribeSpyTo} from "@hirez_io/observer-spy";
 
 describe('RxObserveResizeDirective', () => {

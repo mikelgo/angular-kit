@@ -1,7 +1,7 @@
 import {createMutationObserver} from './create-mutation-observer';
 import {subscribeSpyTo} from '@hirez_io/observer-spy';
-import {createElementRef, mockMutationObserver} from '@test-helpers';
 import {fakeAsync, tick} from '@angular/core/testing';
+import {createElementRef, mockMutationObserver} from "../../../__test-utils/platform.testing";
 
 describe('createMutationObserver', () => {
   describe('supported', () => {

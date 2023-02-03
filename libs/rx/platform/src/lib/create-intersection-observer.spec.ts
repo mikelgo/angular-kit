@@ -1,7 +1,7 @@
-import {createElementRef, mockIntersectionObserver} from '@test-helpers';
 import {createIntersectionObserver} from './create-intersection-observer';
 import {subscribeSpyTo} from '@hirez_io/observer-spy';
 import {fakeAsync, tick} from '@angular/core/testing';
+import {createElementRef, mockIntersectionObserver} from "../../../__test-utils/platform.testing";
 
 describe('createIntersectionObserver', () => {
   describe('supported', () => {

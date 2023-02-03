@@ -1,10 +1,9 @@
-// create marble tests for rxSwitchMap operator
-
 import {rxSwitchMap} from './rx-switchmap';
 import {TestScheduler} from 'rxjs/internal/testing/TestScheduler';
-import {createError, createErrorSource, createSourceTrigger, observableMatcher} from '@test-helpers';
+import {createError, createErrorSource, createSourceTrigger} from "../../../../__test-utils/create-observables";
 import {map, of} from 'rxjs';
 import {subscribeSpyTo} from '@hirez_io/observer-spy';
+import {observableMatcher} from "../../../../__test-utils/observable-testing";
 
 describe('rxSwitchMap', () => {
   describe('marble tests', () => {

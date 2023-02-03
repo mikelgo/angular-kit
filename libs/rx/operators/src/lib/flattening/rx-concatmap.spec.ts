@@ -1,7 +1,7 @@
 import {of} from 'rxjs';
 import {subscribeSpyTo} from '@hirez_io/observer-spy';
-import {createError, createErrorSource, createSourceTrigger} from '@test-helpers';
 import {rxConcatmap} from './rx-concatmap';
+import {createError, createErrorSource, createSourceTrigger} from "../../../../__test-utils/create-observables";
 
 describe('rxConcatMap', () => {
   it('should catch error and continue', () => {
