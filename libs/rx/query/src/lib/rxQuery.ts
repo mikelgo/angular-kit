@@ -1,4 +1,17 @@
-import {catchError, map, merge, Observable, of, ReplaySubject, scan, share, startWith, Subject, switchMap,} from 'rxjs';
+import {
+  catchError,
+  distinctUntilChanged,
+  map,
+  merge,
+  Observable,
+  of,
+  ReplaySubject,
+  scan,
+  share,
+  startWith,
+  Subject,
+  switchMap,
+} from 'rxjs';
 
 export interface RxQuery<T, E> {
   value: T | null | undefined;
@@ -37,8 +50,12 @@ export function rxQuery$<T, E>(source$: Observable<T>, refreshCommand$?: Subject
       },
       { isLoading: false, isRefreshing: false, value: undefined, error: undefined }
     ),
+    distinctUntilChanged(),
     share({
       connector: () => new ReplaySubject(1),
+      resetOnError: false,
+      resetOnComplete: false,
+      resetOnRefCountZero: false,
     })
   );
 }
