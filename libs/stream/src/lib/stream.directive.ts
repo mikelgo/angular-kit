@@ -33,6 +33,12 @@ export interface StreamDirectiveContext<T> {
   loading: boolean;
 }
 
+export interface RenderContext<T> {
+  value: T | null;
+  error: any;
+  renderCycle: 'before-next' | 'next' | 'error' | 'complete';
+}
+
 @Directive({
   selector: '[stream]',
 })
@@ -40,6 +46,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
   private source$$ = new ReplaySubject<Observable<any>>(1);
   private refreshEffect$$ = new ReplaySubject<Subject<any>>(1);
   private loadingTemplate$$ = new ReplaySubject<TemplateRef<StreamDirectiveContext<T>>>(1);
+  private renderCallback$$: ReplaySubject<RenderContext<T>> | undefined;
 
   private detach = true;
 
@@ -58,6 +65,11 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
   @Input() set streamLoadingTemplate(tpl: TemplateRef<StreamDirectiveContext<T>>) {
     if (tpl) {
       this.loadingTemplate$$.next(tpl);
+    }
+  }
+  @Input() set streamRenderCallback(cb: ReplaySubject<RenderContext<T>>) {
+    if (cb) {
+      this.renderCallback$$ = cb;
     }
   }
 
@@ -114,6 +126,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
         }
 
         this.embeddedView.detectChanges();
+        this.renderCallback$$?.next({renderCycle: 'before-next', value: this.context.$implicit, error: this.context.error});
       });
     this.subscription = this.source$$
       .pipe(
@@ -127,11 +140,12 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
           this.context.$implicit = v;
           this.context.stream = v;
           this.context.loading = false;
-          this.viewContainerRef.clear();
 
+          this.viewContainerRef.clear();
           this.embeddedView = this.viewContainerRef.createEmbeddedView(this.templateRef, this.context);
 
           this.embeddedView.detectChanges();
+          this.renderCallback$$?.next({renderCycle: 'next', value: this.context.$implicit, error: this.context.error})
         },
         error: (err) => {
           this.context.error = err;
@@ -148,6 +162,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
           }
 
           this.embeddedView.detectChanges();
+          this.renderCallback$$?.next({renderCycle: 'error', value: this.context.$implicit, error: this.context.error})
         },
         complete: () => {
           this.context.completed = true;
@@ -164,6 +179,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
           }
 
           this.embeddedView.detectChanges();
+          this.renderCallback$$?.next({renderCycle: 'complete', value: this.context.$implicit, error: this.context.error})
         },
       });
   }

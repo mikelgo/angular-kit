@@ -1,4 +1,4 @@
-import {StreamDirective, StreamDirectiveContext} from './stream.directive';
+import {RenderContext, StreamDirective, StreamDirectiveContext} from './stream.directive';
 import {createHostFactory, SpectatorHost} from '@ngneat/spectator';
 import {
   BehaviorSubject,
@@ -20,6 +20,7 @@ import {HttpClient} from '@angular/common/http';
 import {STREAM_DIR_CONFIG, STREAM_DIR_CONTEXT} from './stream-directive-config';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {By} from '@angular/platform-browser';
+import {subscribeSpyTo} from '@hirez_io/observer-spy';
 
 describe('StreamDirective', () => {
   describe('Basic', () => {
@@ -223,6 +224,50 @@ describe('StreamDirective', () => {
 
         expect(html(host)).not.toContain('Value: 1');
       }));
+    });
+
+    describe('renderCallback', () => {
+      it('should call renderCallback when value is emitted', () => {
+        const renderCallback = new ReplaySubject<RenderContext<TestModel>>();
+        const source = new Subject<TestModel>();
+        const refreshSignal = new ReplaySubject<boolean>(1);
+
+        const value = createValue();
+        const host = hostFactory(
+          `
+          <div *stream="
+          source;
+          let value;
+          renderCallback: renderCallback;
+             refreshSignal: refreshSignal;
+          ">
+          </div>
+          `,
+          {
+            hostProps: {
+              source: source.asObservable(),
+              renderCallback,
+              refreshSignal,
+            },
+          }
+        );
+        const result = subscribeSpyTo(renderCallback.asObservable());
+        source.next(value);
+        refreshSignal.next(true);
+
+        expect(result.getValues()).toEqual([
+          {
+            value: value,
+            error: undefined,
+            renderCycle: 'next',
+          },
+          {
+            value: value,
+            error: undefined,
+            renderCycle: 'before-next',
+          },
+        ]);
+      });
     });
   });
 
