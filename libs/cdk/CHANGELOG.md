@@ -2,6 +2,20 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.2.0](https://github.com/code-workers-io/angular-kit/compare/cdk-1.1.2...cdk-1.2.0) (2023-03-04)
+
+
+### Bug Fixes
+
+* **cdk:** remove cdkModule ([17c7369](https://github.com/code-workers-io/angular-kit/commit/17c7369319b3e0f4aea536c4dbfad4feae3c76f4)), closes [#24](https://github.com/code-workers-io/angular-kit/issues/24)
+
+
+### Features
+
+* **cdk:** add pipe and service for lazy loading any js lib ([a54d530](https://github.com/code-workers-io/angular-kit/commit/a54d530795d296eb050f9bd2d3fef0cd9f3b8f5f))
+
+
+
 ## [1.1.3](https://github.com/code-workers-io/angular-kit/compare/cdk-1.1.2...cdk-1.1.3) (2023-01-25)
 
 
