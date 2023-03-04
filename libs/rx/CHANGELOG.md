@@ -2,6 +2,24 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.3.0](https://github.com/code-workers-io/angular-kit/compare/rx-1.2.2...rx-1.3.0) (2023-03-04)
+
+
+### Bug Fixes
+
+* **rx:** remove rxModule ([4693530](https://github.com/code-workers-io/angular-kit/commit/46935301d41919829068e6c76b6f5eeac4f55016)), closes [#23](https://github.com/code-workers-io/angular-kit/issues/23)
+
+
+### Features
+
+* **rx:** add create-effect function ([6836782](https://github.com/code-workers-io/angular-kit/commit/6836782049a59c9ff1ff2b6ef3436b382a4e58ab))
+* **rx:** createEffect supports now callback arguments ([ee0e4fa](https://github.com/code-workers-io/angular-kit/commit/ee0e4faee8ebe30912c31f0a6b2b07feb04dcbed))
+* **rx:** enhance rxQuery with a configuration object to define if values should be kept on refresh ([fbf2454](https://github.com/code-workers-io/angular-kit/commit/fbf2454307e312668b1747fdf458bff14a83c548)), closes [#20](https://github.com/code-workers-io/angular-kit/issues/20)
+* **rx:** improve typing of rxQuery an add generic to type error response ([9ef6b88](https://github.com/code-workers-io/angular-kit/commit/9ef6b88915864dc944722432a1549f623303d37b))
+* **rx:** let rxQuery only emit distinct values ([71c7576](https://github.com/code-workers-io/angular-kit/commit/71c75762c344b725befdf2d7bee14c0bd6eba99d))
+
+
+
 ## [1.2.2](https://github.com/code-workers-io/angular-kit/compare/rx-1.2.1...rx-1.2.2) (2023-02-03)
 
 
