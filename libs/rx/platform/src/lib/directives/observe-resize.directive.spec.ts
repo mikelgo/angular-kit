@@ -1,8 +1,8 @@
 import {RxObserveResizeDirective, RxObserveResizeDirectiveModule} from './rx-observe-resize.directive';
 import {Component, ViewChild} from '@angular/core';
-import {ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing';
+import {fakeAsync, TestBed, tick} from '@angular/core/testing';
 import {mockResizeObserver} from '../../../../__test-utils/platform.testing';
-import {subscribeSpyTo} from "@hirez_io/observer-spy";
+import {subscribeSpyTo} from '@hirez_io/observer-spy';
 
 describe('RxObserveResizeDirective', () => {
   it('should create an instance', async () => {
@@ -10,13 +10,13 @@ describe('RxObserveResizeDirective', () => {
     expect(testComponent).toBeTruthy();
   });
 
-  it('should emit on resize', fakeAsync (async () => {
-    const {testComponent, fixture} = await create();
+  it('should emit on resize', fakeAsync(async () => {
+    const { testComponent, fixture } = await create();
     const result = subscribeSpyTo(testComponent.directive.resizeEvent);
 
     fixture.nativeElement.dispatchEvent(new Event('resize'));
-    tick(1000)
-    expect(result.getValues().length).toEqual(1)
+    tick(1000);
+    expect(result.getValues().length).toEqual(1);
   }));
 });
 
@@ -36,21 +36,18 @@ async function create() {
     `,
   })
   class TestComponent {
-    @ViewChild(RxObserveResizeDirective, {static: true}) directive!: RxObserveResizeDirective;
+    @ViewChild(RxObserveResizeDirective, { static: true }) directive!: RxObserveResizeDirective;
     onResize = jest.fn();
     observe = true;
   }
-
-  let fixture: ComponentFixture<TestComponent>;
-  let testComponent: TestComponent;
 
   TestBed.configureTestingModule({
     imports: [RxObserveResizeDirectiveModule],
     declarations: [TestComponent],
   });
   mockResizeObserver();
-  fixture = TestBed.createComponent(TestComponent);
-  testComponent = fixture.componentInstance;
+  const fixture = TestBed.createComponent(TestComponent);
+  const testComponent = fixture.componentInstance;
   fixture.detectChanges();
 
   return { fixture, testComponent };

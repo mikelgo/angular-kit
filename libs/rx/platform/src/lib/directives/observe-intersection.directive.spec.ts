@@ -1,8 +1,8 @@
 import {RxObserveIntersectionDirective, RxObserveIntersectionDirectiveModule} from './observe-intersection.directive';
-import {Component, ViewChild} from "@angular/core";
-import {ComponentFixture, fakeAsync, TestBed, tick} from "@angular/core/testing";
-import {subscribeSpyTo} from "@hirez_io/observer-spy";
-import {mockIntersectionObserver} from "../../../../__test-utils/platform.testing";
+import {Component, ViewChild} from '@angular/core';
+import {fakeAsync, TestBed, tick} from '@angular/core/testing';
+import {subscribeSpyTo} from '@hirez_io/observer-spy';
+import {mockIntersectionObserver} from '../../../../__test-utils/platform.testing';
 
 describe('ObserveIntersectionDirective', () => {
   it('should create an instance', async () => {
@@ -10,16 +10,15 @@ describe('ObserveIntersectionDirective', () => {
     expect(testComponent).toBeTruthy();
   });
 
-  it('should emit on intersection', fakeAsync (async () => {
-    const {testComponent, fixture} = await create();
+  it('should emit on intersection', fakeAsync(async () => {
+    const { testComponent, fixture } = await create();
     const result = subscribeSpyTo(testComponent.directive.intersect);
 
     fixture.nativeElement.dispatchEvent(new Event('intersect'));
-    tick(1000)
-    expect(result.getValues().length).toEqual(1)
+    tick(1000);
+    expect(result.getValues().length).toEqual(1);
   }));
 });
-
 
 async function create() {
   @Component({
@@ -30,7 +29,6 @@ async function create() {
           style="position: absolute; top: 200px; height: 200px;"
           rxObserveIntersection
           (intersect)="onChange()"
-
         >
           I'm being observed
         </h1>
@@ -38,21 +36,18 @@ async function create() {
     `,
   })
   class TestComponent {
-    @ViewChild(RxObserveIntersectionDirective, {static: true}) directive!: RxObserveIntersectionDirective;
+    @ViewChild(RxObserveIntersectionDirective, { static: true }) directive!: RxObserveIntersectionDirective;
     onChange = jest.fn();
     observe = true;
   }
-
-  let fixture: ComponentFixture<TestComponent>;
-  let testComponent: TestComponent;
 
   TestBed.configureTestingModule({
     imports: [RxObserveIntersectionDirectiveModule],
     declarations: [TestComponent],
   });
   mockIntersectionObserver();
-  fixture = TestBed.createComponent(TestComponent);
-  testComponent = fixture.componentInstance;
+  const fixture = TestBed.createComponent(TestComponent);
+  const testComponent = fixture.componentInstance;
   fixture.detectChanges();
 
   return { fixture, testComponent };
