@@ -1,5 +1,9 @@
 # @angular-kit/signal
 
+> **Warning**
+> The term `signal` which is used here does nothing have in common with Angular's signals shipping with version 16! 
+> The `signal` in this package is an abstraction of RxJs subjects.
+
 Reduce boilerplate code when working with RxJS subjects.
 
 - 🦥 lazy by default
