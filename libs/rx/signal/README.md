@@ -15,7 +15,7 @@ The package includes two functions for creating signals:
 ### `createSignal`
 
 ```typescript
-import { createSignal } from '@code-workers.io/angular-kit/signal';
+import { createSignal } from '@angular-kit/signal';
 import { Component } from '@angular/core';
 import { scan } from 'rxjs';
 
@@ -39,7 +39,7 @@ export class AppComponent {
 ### Use `createSignal` together with @Input()
 
 ```typescript
-import { createSignal } from '@code-workers.io/angular-kit/signal';
+import { createSignal } from '@angular-kit/signal';
 import { Component, Input } from '@angular/core';
 
 @Component({
@@ -63,7 +63,7 @@ export class SomeComponent {
 ### `createSignals`
 
 ```typescript
-import { createSignals } from '@code-workers.io/angular-kit/signal';
+import { createSignals } from '@angular-kit/signal';
 import { Component } from '@angular/core';
 import { scan } from 'rxjs';
 
