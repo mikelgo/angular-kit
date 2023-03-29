@@ -2,10 +2,6 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
-## [1.3.1](https://github.com/code-workers-io/angular-kit/compare/rx-1.3.0...rx-1.3.1) (2023-03-29)
-
-
-
 # [2.0.0](https://github.com/code-workers-io/angular-kit/compare/rx-1.3.0...rx-2.0.0) (2023-03-29)
 
 ### Breaking Changes
