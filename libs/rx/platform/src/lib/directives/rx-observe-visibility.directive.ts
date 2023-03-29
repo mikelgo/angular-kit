@@ -1,7 +1,7 @@
 import {Directive, ElementRef, EventEmitter, Input, NgModule, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {combineLatest, mergeMap, SchedulerLike, startWith, Subscription} from "rxjs";
-import {createSignal} from '@angular-kit/rx/signal';
+import {createStream} from '@angular-kit/rx/streams';
 import {createIntersectionObserver} from "../create-intersection-observer";
 
 
@@ -12,11 +12,11 @@ export type IntersectionStatus = 'Visible' | 'Hidden';
 })
 export class RxObserveVisibilityDirective {
   private sub = new Subscription();
-  private rxObserveVisibilityDebounceSignal = createSignal(0);
-  private rxObserveVisibilityRootMarginSignal = createSignal('0px');
-  private rxObserveVisibilityRootSignal =  createSignal<HTMLElement | undefined>(undefined);
-  private rxObserveVisibilityThresholdSignal =  createSignal<number | number[]>(0);
-  private rxObserveVisibilitySchedulerSignal =  createSignal<SchedulerLike | undefined>(undefined);
+  private rxObserveVisibilityDebounceSignal = createStream(0);
+  private rxObserveVisibilityRootMarginSignal = createStream('0px');
+  private rxObserveVisibilityRootSignal =  createStream<HTMLElement | undefined>(undefined);
+  private rxObserveVisibilityThresholdSignal =  createStream<number | number[]>(0);
+  private rxObserveVisibilitySchedulerSignal =  createStream<SchedulerLike | undefined>(undefined);
 
   @Input() set rxObserveVisibilityDebounce(debounceInMs: number){
     this.rxObserveVisibilityDebounceSignal.send(debounceInMs);

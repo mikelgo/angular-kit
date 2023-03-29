@@ -1,12 +1,12 @@
 import {merge, ReplaySubject, Subject, throwError} from 'rxjs';
-import {KeysOf, RxSignals, ValuesOf} from './types';
+import {KeysOf, RxStreams, ValuesOf} from './types';
 
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export function actionProxyHandler<T extends object, U extends {}>(
   subjects: { [K in keyof T]: Subject<ValuesOf<T>> },
   transforms?: U,
-): ProxyHandler<RxSignals<T, U>> {
+): ProxyHandler<RxStreams<T, U>> {
   type KeysOfT = KeysOf<T>;
   type ValuesOfT = ValuesOf<T>;
 
@@ -25,7 +25,7 @@ export function actionProxyHandler<T extends object, U extends {}>(
   type K = keyof T;
   return {
     // shorthand setter for multiple signals e.g. signals({propA: 1, propB: 2})
-    apply(_: RxSignals<T, U>, __: any, props: [T]): any {
+    apply(_: RxStreams<T, U>, __: any, props: [T]): any {
       props.forEach((slice) =>
         Object.entries(slice).forEach(([k, v]) =>
           dispatch(v as any, k as any as KeysOfT)

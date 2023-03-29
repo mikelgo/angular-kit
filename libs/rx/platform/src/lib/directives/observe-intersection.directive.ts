@@ -2,18 +2,18 @@ import {Directive, ElementRef, EventEmitter, Input, NgModule, OnDestroy, Output}
 import {CommonModule} from '@angular/common';
 import {combineLatest, mergeMap, SchedulerLike, startWith, Subscription} from 'rxjs';
 import {createIntersectionObserver} from '../create-intersection-observer';
-import {createSignal} from '@angular-kit/rx/signal';
+import {createStream} from '@angular-kit/rx/streams';
 
 @Directive({
   selector: '[rxObserveIntersection]',
 })
 export class RxObserveIntersectionDirective implements OnDestroy {
   private sub = new Subscription();
-  private rxObserveIntersectionDebounceSignal = createSignal<number>(0);
-  private rxObserveIntersectionRootMarginSignal = createSignal<string>('0px');
-  private rxObserveIntersectionRootSignal = createSignal<HTMLElement | undefined>(undefined);
-  private rxObserveIntersectionThresholdSignal = createSignal<number | number[]>(0);
-  private rxObserveIntersectionSchedulerSignal = createSignal<SchedulerLike | undefined>(undefined);
+  private rxObserveIntersectionDebounceSignal = createStream<number>(0);
+  private rxObserveIntersectionRootMarginSignal = createStream<string>('0px');
+  private rxObserveIntersectionRootSignal = createStream<HTMLElement | undefined>(undefined);
+  private rxObserveIntersectionThresholdSignal = createStream<number | number[]>(0);
+  private rxObserveIntersectionSchedulerSignal = createStream<SchedulerLike | undefined>(undefined);
 
   @Input() set rxObserveIntersectionDebounce(debounceInMs: number) {
     this.rxObserveIntersectionDebounceSignal.send(debounceInMs);

@@ -22,28 +22,28 @@ type FunctionParamsOrValueType<U, K, F> = InferArguments<Select<U, K>> extends n
   : InferArguments<Select<U, K>>;
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export type Signals = {};
+export type Streams = {};
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export type SignalTransformation<T extends {}> = Partial<{
+export type StreamTransformation<T extends {}> = Partial<{
   [K in keyof T]: (...args: any[]) => T[K];
 }>;
 
-export type SignalDispatchFn<O extends unknown[]> = (
+export type StreamDispatchFn<O extends unknown[]> = (
   ...value: InstanceOrType<O>
 ) => void;
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export type SignalDispatchers<T extends Signals, U extends {}> = {
-  [K in keyof T]: SignalDispatchFn<FunctionParamsOrValueType<U, K, Select<T, K>>>;
+export type StreamDispatchers<T extends Streams, U extends {}> = {
+  [K in keyof T]: StreamDispatchFn<FunctionParamsOrValueType<U, K, Select<T, K>>>;
 };
 
-export type SignalObservables<T extends Signals> = {
+export type StreamObservables<T extends Streams> = {
   [K in ExtractString<T> as `${K}$`]: Observable<InstanceOrType<T[K]>>;
 };
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export type RxSignals<T extends Signals, U extends {} = T> = SignalDispatchers<T, U> &
-  SignalObservables<T> &
+export type RxStreams<T extends Streams, U extends {} = T> = StreamDispatchers<T, U> &
+  StreamObservables<T> &
   ((slice: Partial<T>) => void) &
   {$:(props: (keyof T)[]) => Observable<ValuesOf<T>>};

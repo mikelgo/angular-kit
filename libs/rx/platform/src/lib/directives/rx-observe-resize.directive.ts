@@ -2,7 +2,7 @@ import {Directive, ElementRef, Input, NgModule, OnDestroy, Output} from '@angula
 import {CommonModule} from '@angular/common';
 import {Subscription} from 'rxjs';
 import {createResizeObserver, ResizeObserverConfig} from '../create-resize-observer';
-import {createSignal} from '@angular-kit/rx/signal';
+import {createStream} from '@angular-kit/rx/streams';
 import {Nullable} from '@angular-kit/cdk/types';
 
 @Directive({
@@ -10,7 +10,7 @@ import {Nullable} from '@angular-kit/cdk/types';
 })
 export class RxObserveResizeDirective implements OnDestroy {
   private subscription = new Subscription();
-  private configSignal = createSignal<ResizeObserverConfig | null>();
+  private configSignal = createStream<ResizeObserverConfig | null>();
 
   @Input() set rxObserveResizeConfig(config: ResizeObserverConfig | null) {
     this.configSignal.send(config);

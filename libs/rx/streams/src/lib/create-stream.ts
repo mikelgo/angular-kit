@@ -9,23 +9,23 @@ import {
   Subject
 } from 'rxjs';
 
-export interface Signal<T> {
+export interface Stream<T> {
   send: (val: T) => void;
   $: Observable<T>;
 }
 
-export interface SignalConfig<T> {
+export interface StreamConfig<T> {
   filterNull?: boolean;
   shareCfg?: ShareConfig<T>;
 }
 
 
 // cfg throttleMs, filterNull, distinctComparatorFn, shareCfg
-export function createSignal<T>(): Signal<T>;
-export function createSignal<T>(cfg: SignalConfig<T>): Signal<T>;
-export function createSignal<T>(initialValue: T): Signal<T>
-export function createSignal<T>(initialValue: T, cfg: SignalConfig<T>): Signal<T>
-export function createSignal<T>(initialValueOrConfig?: T | SignalConfig<T>, cfg?: SignalConfig<T>): Signal<T> {
+export function createStream<T>(): Stream<T>;
+export function createStream<T>(cfg: StreamConfig<T>): Stream<T>;
+export function createStream<T>(initialValue: T): Stream<T>
+export function createStream<T>(initialValue: T, cfg: StreamConfig<T>): Stream<T>
+export function createStream<T>(initialValueOrConfig?: T | StreamConfig<T>, cfg?: StreamConfig<T>): Stream<T> {
   const defaultShareCfg: ShareConfig<T> = {
     connector: () => new ReplaySubject(1),
     resetOnComplete: false,
@@ -33,12 +33,12 @@ export function createSignal<T>(initialValueOrConfig?: T | SignalConfig<T>, cfg?
     resetOnRefCountZero: false,
   };
 
-  const initialvalue: T | undefined = !isSignalConfig(initialValueOrConfig) ? initialValueOrConfig as T : undefined;
-  let config: SignalConfig<T> | undefined
-  if(isSignalConfig(initialValueOrConfig)) {
+  const initialvalue: T | undefined = !isStreamConfig(initialValueOrConfig) ? initialValueOrConfig as T : undefined;
+  let config: StreamConfig<T> | undefined
+  if(isStreamConfig(initialValueOrConfig)) {
     config = initialValueOrConfig;
   }else {
-    if (isSignalConfig(cfg)) {
+    if (isStreamConfig(cfg)) {
       config = cfg;
     } else {
       config = undefined;
@@ -59,7 +59,7 @@ export function createSignal<T>(initialValueOrConfig?: T | SignalConfig<T>, cfg?
 }
 
 // type guard for SignalConfig<T>
-function isSignalConfig<T>(obj: any): obj is SignalConfig<T> {
+function isStreamConfig<T>(obj: any): obj is StreamConfig<T> {
   // eslint-disable-next-line no-prototype-builtins
   return obj?.hasOwnProperty("filterNull") || obj?.hasOwnProperty("shareCfg");
 }
