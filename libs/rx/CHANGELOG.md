@@ -2,6 +2,12 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [2.0.0](https://github.com/code-workers-io/angular-kit/compare/rx-1.3.0...rx-2.0.0) (2023-03-29)
+
+### Breaking Changes
+* package `signals` was renamed to `streams` and all functions accordingly to not cause confusion with Angular signals.
+
+
 # [1.3.0](https://github.com/code-workers-io/angular-kit/compare/rx-1.2.2...rx-1.3.0) (2023-03-04)
 
 
