@@ -49,7 +49,9 @@
           "libs/cdk/token/**/*.ts",
           "libs/cdk/token/**/*.html",
           "libs/cdk/lazy/**/*.ts",
-          "libs/cdk/lazy/**/*.html"
+          "libs/cdk/lazy/**/*.html",
+          "libs/cdk/template/**/*.ts",
+          "libs/cdk/template/**/*.html"
         ]
       }
     },
