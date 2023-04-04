@@ -11,19 +11,33 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 import {
+  BehaviorSubject,
+  debounceTime,
   distinctUntilChanged,
   filter,
+  map,
   mergeAll,
   Observable,
+  of,
+  pipe,
   ReplaySubject,
   startWith,
   Subject,
   Subscription,
+  switchMap,
+  throttleTime,
   Unsubscribable,
   withLatestFrom,
 } from 'rxjs';
 
 import {STREAM_DIR_CONFIG, STREAM_DIR_CONTEXT, StreamDirectiveConfig} from './stream-directive-config';
+import {
+  isDebounceRenderStrategy,
+  isThrottleRenderStrategy,
+  isViewportRenderStrategy,
+  RenderStrategies,
+} from './render-strategies';
+import {coerceObservable} from './util/coerce-observable';
 
 export interface StreamDirectiveContext<T> {
   $implicit: T | null;
@@ -47,6 +61,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
   private refreshEffect$$ = new ReplaySubject<Subject<any>>(1);
   private loadingTemplate$$ = new ReplaySubject<TemplateRef<StreamDirectiveContext<T>>>(1);
   private renderCallback$$: ReplaySubject<RenderContext<T>> | undefined;
+  private renderStrategy$$ = new BehaviorSubject<Observable<RenderStrategies>>(of({ type: 'default' }));
 
   private detach = true;
 
@@ -73,6 +88,12 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
     }
   }
 
+  @Input() set streamRenderStrategy(strategy: RenderStrategies | Observable<RenderStrategies>) {
+    if (strategy) {
+      this.renderStrategy$$.next(coerceObservable(strategy));
+    }
+  }
+
   @Input() streamErrorTemplate: TemplateRef<StreamDirectiveContext<T>> | undefined;
   @Input() streamCompleteTemplate: TemplateRef<StreamDirectiveContext<T>> | undefined;
   @Input() streamKeepValueOnLoading = false;
@@ -88,6 +109,27 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
     completed: false,
     loading: false,
   };
+
+  readonly renderStrategyOperator$ = this.setupOperator$(this.renderStrategy$$);
+  readonly source$ = this.source$$.pipe(distinctUntilChanged());
+
+  readonly sourceWithOperator$ = this.renderStrategyOperator$.pipe(
+    withLatestFrom(this.source$),
+    /**
+     * unsubscribe from previous source and subscribe to new source
+     * apply operator from renderStrategy.
+     *
+     * when unsubscribe from previous source, the last value will be lost.
+     * We can fix this by providing context also via observable and
+     * withLatestFrom it here.
+     */
+    switchMap(([o, source$]) => {
+      return source$.pipe(
+        o
+        //takeUntil(this.renderStrategyOperator$.pipe(skip(1)))
+      );
+    })
+  );
 
   static ngTemplateContextGuard<T>(
     directive: StreamDirective<T>,
@@ -126,17 +168,20 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
         }
 
         this.embeddedView.detectChanges();
-        this.renderCallback$$?.next({renderCycle: 'before-next', value: this.context.$implicit, error: this.context.error});
+        this.renderCallback$$?.next({
+          renderCycle: 'before-next',
+          value: this.context.$implicit,
+          error: this.context.error,
+        });
       });
-    this.subscription = this.source$$
+
+    this.subscription = this.sourceWithOperator$
       .pipe(
-        distinctUntilChanged(),
-        mergeAll(),
         distinctUntilChanged(),
         filter((v) => v !== undefined)
       )
       .subscribe({
-        next: (v) => {
+        next: (v: any) => {
           this.context.$implicit = v;
           this.context.stream = v;
           this.context.loading = false;
@@ -145,7 +190,11 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
           this.embeddedView = this.viewContainerRef.createEmbeddedView(this.templateRef, this.context);
 
           this.embeddedView.detectChanges();
-          this.renderCallback$$?.next({renderCycle: 'next', value: this.context.$implicit, error: this.context.error})
+          this.renderCallback$$?.next({
+            renderCycle: 'next',
+            value: this.context.$implicit,
+            error: this.context.error,
+          });
         },
         error: (err) => {
           this.context.error = err;
@@ -162,7 +211,11 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
           }
 
           this.embeddedView.detectChanges();
-          this.renderCallback$$?.next({renderCycle: 'error', value: this.context.$implicit, error: this.context.error})
+          this.renderCallback$$?.next({
+            renderCycle: 'error',
+            value: this.context.$implicit,
+            error: this.context.error,
+          });
         },
         complete: () => {
           this.context.completed = true;
@@ -179,7 +232,11 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
           }
 
           this.embeddedView.detectChanges();
-          this.renderCallback$$?.next({renderCycle: 'complete', value: this.context.$implicit, error: this.context.error})
+          this.renderCallback$$?.next({
+            renderCycle: 'complete',
+            value: this.context.$implicit,
+            error: this.context.error,
+          });
         },
       });
   }
@@ -211,5 +268,26 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
     if (this.detach) {
       this.embeddedView.detach();
     }
+  }
+
+  private setupOperator$(renderStrategy$$: BehaviorSubject<Observable<RenderStrategies>>) {
+    return renderStrategy$$.pipe(
+      mergeAll(),
+      distinctUntilChanged(),
+      filter((strategy) => !isViewportRenderStrategy(strategy)),
+      map((strategy) => {
+        if (isThrottleRenderStrategy(strategy)) {
+          return of(throttleTime(strategy.throttleInMs));
+        }
+
+        if (isDebounceRenderStrategy(strategy)) {
+          // @ts-ignore todo fix typing issue
+          return of(debounceTime(strategy.debounceInMs));
+        }
+
+        return of(pipe());
+      }),
+      mergeAll()
+    );
   }
 }
