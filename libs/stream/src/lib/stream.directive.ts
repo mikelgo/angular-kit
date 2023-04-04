@@ -128,6 +128,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
     if (!this.embeddedView) {
       this.createEmbeddedView();
     }
+    // todo refactor into smaller chunks
     this.refreshEffect$$
       .pipe(distinctUntilChanged(), mergeAll(), withLatestFrom(this.loadingTemplate$$.pipe(startWith(null))))
       .subscribe(([_, loadingTemplate]) => {
@@ -155,6 +156,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
         });
       });
 
+    // todo refactor into smaller chunks
     this.subscription = this.sourceWithOperator$
       .pipe(
         distinctUntilChanged(),
