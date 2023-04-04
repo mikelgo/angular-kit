@@ -1,4 +1,4 @@
-import {RenderContext, StreamDirective, StreamDirectiveContext} from './stream.directive';
+import {StreamDirective} from './stream.directive';
 import {createHostFactory, SpectatorHost} from '@ngneat/spectator';
 import {
   BehaviorSubject,
@@ -21,6 +21,8 @@ import {STREAM_DIR_CONFIG, STREAM_DIR_CONTEXT} from './stream-directive-config';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {By} from '@angular/platform-browser';
 import {subscribeSpyTo} from '@hirez_io/observer-spy';
+import {RenderContext} from "./types/render-context";
+import {StreamDirectiveContext} from "./types/stream-directive-context";
 
 describe('StreamDirective', () => {
   describe('Basic', () => {

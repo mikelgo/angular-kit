@@ -1,5 +1,5 @@
-import {InjectionToken, Type} from '@angular/core';
-import {StreamDirectiveContext} from './stream.directive';
+import { InjectionToken, Type } from '@angular/core';
+import { StreamDirectiveContext } from './types/stream-directive-context';
 
 export interface StreamDirectiveConfig {
   loadingComponent?: Type<any>;

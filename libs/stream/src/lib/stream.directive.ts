@@ -12,46 +12,25 @@ import {
 } from '@angular/core';
 import {
   BehaviorSubject,
-  debounceTime,
   distinctUntilChanged,
   filter,
-  map,
   mergeAll,
   Observable,
   of,
-  pipe,
   ReplaySubject,
   startWith,
   Subject,
   Subscription,
   switchMap,
-  throttleTime,
   Unsubscribable,
   withLatestFrom,
 } from 'rxjs';
-
 import {STREAM_DIR_CONFIG, STREAM_DIR_CONTEXT, StreamDirectiveConfig} from './stream-directive-config';
-import {
-  isDebounceRenderStrategy,
-  isThrottleRenderStrategy,
-  isViewportRenderStrategy,
-  RenderStrategies,
-} from './render-strategies';
+import {RenderStrategies} from './types/render-strategies';
 import {coerceObservable} from './util/coerce-observable';
-
-export interface StreamDirectiveContext<T> {
-  $implicit: T | null;
-  stream: T | null;
-  error: any;
-  completed: boolean;
-  loading: boolean;
-}
-
-export interface RenderContext<T> {
-  value: T | null;
-  error: any;
-  renderCycle: 'before-next' | 'next' | 'error' | 'complete';
-}
+import {RenderContext} from './types/render-context';
+import {StreamDirectiveContext} from './types/stream-directive-context';
+import {setupOperator$} from './util/setup-operator';
 
 @Directive({
   selector: '[stream]',
@@ -108,9 +87,10 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
     error: undefined,
     completed: false,
     loading: false,
+    renderCount: 0,
   };
 
-  readonly renderStrategyOperator$ = this.setupOperator$(this.renderStrategy$$);
+  readonly renderStrategyOperator$ = setupOperator$(this.renderStrategy$$);
   readonly source$ = this.source$$.pipe(distinctUntilChanged());
 
   readonly sourceWithOperator$ = this.renderStrategyOperator$.pipe(
@@ -185,6 +165,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
           this.context.$implicit = v;
           this.context.stream = v;
           this.context.loading = false;
+          this.context.renderCount++;
 
           this.viewContainerRef.clear();
           this.embeddedView = this.viewContainerRef.createEmbeddedView(this.templateRef, this.context);
@@ -268,26 +249,5 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
     if (this.detach) {
       this.embeddedView.detach();
     }
-  }
-
-  private setupOperator$(renderStrategy$$: BehaviorSubject<Observable<RenderStrategies>>) {
-    return renderStrategy$$.pipe(
-      mergeAll(),
-      distinctUntilChanged(),
-      filter((strategy) => !isViewportRenderStrategy(strategy)),
-      map((strategy) => {
-        if (isThrottleRenderStrategy(strategy)) {
-          return of(throttleTime(strategy.throttleInMs));
-        }
-
-        if (isDebounceRenderStrategy(strategy)) {
-          // @ts-ignore todo fix typing issue
-          return of(debounceTime(strategy.debounceInMs));
-        }
-
-        return of(pipe());
-      }),
-      mergeAll()
-    );
   }
 }
