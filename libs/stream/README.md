@@ -4,6 +4,7 @@
 - ✅ Lazy by default
 - ✅ Loading, error and complete states
 - ✅ Easy customization via templates or components
+- ✅ no third-party dependencies
 
 # Installation
 
