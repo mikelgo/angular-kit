@@ -3,7 +3,7 @@
 - ✅ Optimized change detection in comparison to `async` pipe
 - ✅ Lazy by default
 - ✅ Loading, error and complete states
-- ✅ Easy customization via templates or components
+- ✅ Easy template customization via templates or components for e.g. spinners
 - ✅ no third-party dependencies
 
 # Installation
