@@ -1,4 +1,4 @@
-# angular-kit/stream
+# @angular-kit/stream
 
 - ✅ Optimized change detection in comparison to `async` pipe
 - ✅ Lazy by default
