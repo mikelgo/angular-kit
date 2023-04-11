@@ -12,25 +12,30 @@ import {
 } from '@angular/core';
 import {
   BehaviorSubject,
+  combineLatestWith,
   distinctUntilChanged,
   filter,
+  map,
   mergeAll,
   Observable,
   of,
   ReplaySubject,
+  skip,
   startWith,
   Subject,
   Subscription,
   switchMap,
+  takeUntil,
   Unsubscribable,
   withLatestFrom,
 } from 'rxjs';
 import {STREAM_DIR_CONFIG, STREAM_DIR_CONTEXT, StreamDirectiveConfig} from './stream-directive-config';
-import {RenderStrategies} from './types/render-strategies';
+import {isViewportRenderStrategy, RenderStrategies} from './types/render-strategies';
 import {coerceObservable} from './util/coerce-observable';
 import {RenderContext} from './types/render-context';
 import {StreamDirectiveContext} from './types/stream-directive-context';
 import {setupOperator$} from './util/setup-operator';
+import {createIntersectionObserver} from "@angular-kit/rx/platform";
 
 @Directive({
   selector: '[stream]',
@@ -90,8 +95,37 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
     renderCount: 0,
   };
 
+  readonly isViewPortStrategy$ = this.renderStrategy$$.pipe(
+    mergeAll(),
+    map((strategy) => strategy.type === 'viewport'),
+  );
   readonly renderStrategyOperator$ = setupOperator$(this.renderStrategy$$);
   readonly source$ = this.source$$.pipe(distinctUntilChanged());
+
+  /**
+   * Again problem that e.g above observable chain is not finished when switching strategies
+   * at runtime.
+   * also this observable is not unusbscirbed.
+   */
+   viewPortObserver$: Observable<IntersectionObserverEntry[] | null> = this.renderStrategy$$.pipe(
+    mergeAll(),
+    switchMap((strategy) => {
+      if (isViewportRenderStrategy(strategy)){
+        return createIntersectionObserver(this.viewContainerRef.element.nativeElement.parentElement, {
+          threshold: strategy.threshold,
+          rootMargin: strategy.rootMargin,
+          root: strategy.root,
+        })
+          .pipe(
+          takeUntil(this.renderStrategy$$.pipe(skip(1)))
+        )
+      }
+
+      return of(null);
+    })
+  );
+  visible$ = this.viewPortObserver$.pipe(
+    map((entries) => entries?.some((entry) => entry.isIntersecting)))
 
   readonly sourceWithOperator$ = this.renderStrategyOperator$.pipe(
     withLatestFrom(this.source$),
@@ -105,8 +139,8 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
      */
     switchMap(([o, source$]) => {
       return source$.pipe(
-        o
-        //takeUntil(this.renderStrategyOperator$.pipe(skip(1)))
+        o,
+        //takeUntil(this.renderStrategy$$.pipe(skip(1)))
       );
     })
   );
@@ -122,12 +156,15 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
     private readonly templateRef: TemplateRef<StreamDirectiveContext<T>>,
     private readonly viewContainerRef: ViewContainerRef,
     @Optional() @Inject(STREAM_DIR_CONFIG) private readonly config: StreamDirectiveConfig
-  ) {}
+  ) {
+
+  }
 
   ngOnInit(): void {
     if (!this.embeddedView) {
       this.createEmbeddedView();
     }
+
     // todo refactor into smaller chunks
     this.refreshEffect$$
       .pipe(distinctUntilChanged(), mergeAll(), withLatestFrom(this.loadingTemplate$$.pipe(startWith(null))))
@@ -160,24 +197,30 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
     this.subscription = this.sourceWithOperator$
       .pipe(
         distinctUntilChanged(),
-        filter((v) => v !== undefined)
+        filter((v) => v !== undefined),
+        combineLatestWith(this.visible$)
       )
       .subscribe({
-        next: (v: any) => {
-          this.context.$implicit = v;
-          this.context.stream = v;
-          this.context.loading = false;
-          this.context.renderCount++;
+        next: (val) => {
+          console.log('next', val)
+          const v = val[0] as any;
+          const visible = val[1] ?? true;
+          if (visible) {
+            this.context.$implicit = v;
+            this.context.stream = v;
+            this.context.loading = false;
+            this.context.renderCount++;
 
-          this.viewContainerRef.clear();
-          this.embeddedView = this.viewContainerRef.createEmbeddedView(this.templateRef, this.context);
+            this.viewContainerRef.clear();
+            this.embeddedView = this.viewContainerRef.createEmbeddedView(this.templateRef, this.context);
 
-          this.embeddedView.detectChanges();
-          this.renderCallback$$?.next({
-            renderCycle: 'next',
-            value: this.context.$implicit,
-            error: this.context.error,
-          });
+            this.embeddedView.detectChanges();
+            this.renderCallback$$?.next({
+              renderCycle: 'next',
+              value: this.context.$implicit,
+              error: this.context.error,
+            });
+          }
         },
         error: (err) => {
           this.context.error = err;

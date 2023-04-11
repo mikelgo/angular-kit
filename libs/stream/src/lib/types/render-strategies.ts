@@ -8,6 +8,7 @@ export interface DefaultRenderStategy extends RenderStrategy {
 
 export interface ViewportRenderStrategy extends RenderStrategy {
   type: 'viewport';
+  root?: HTMLElement
   rootMargin?: string;
   threshold?: number | number[];
 }
