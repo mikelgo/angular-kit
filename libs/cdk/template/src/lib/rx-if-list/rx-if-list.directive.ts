@@ -3,17 +3,22 @@ import {
   EmbeddedViewRef,
   Input,
   NgModule,
+  OnDestroy,
   TemplateRef,
   ViewContainerRef,
   ɵstringify as stringify
 } from '@angular/core';
 import {CommonModule} from '@angular/common';
+import {distinctUntilChanged, mergeAll, Observable, ReplaySubject, Subscription} from "rxjs";
+import {coerceObservable} from "@angular-kit/cdk/coercing";
 
 @Directive({
   // eslint-disable-next-line @angular-eslint/directive-selector
   selector: '[rxIfList]',
 })
-export class RxIfListDirective {
+export class RxIfListDirective implements OnDestroy{
+  private readonly sub = new Subscription();
+  private readonly valueSource$$ = new ReplaySubject<Observable<ArrayLike<unknown> | null | undefined> >(1);
   private _context: RxIfListContext = new RxIfListContext();
   private _thenTemplateRef: TemplateRef<RxIfListContext>|null = null;
   private _elseTemplateRef: TemplateRef<RxIfListContext>|null = null;
@@ -45,15 +50,27 @@ export class RxIfListDirective {
 
   constructor(private _viewContainer: ViewContainerRef, templateRef: TemplateRef<RxIfListContext>) {
     this._thenTemplateRef = templateRef;
+    this.sub.add(
+      this.valueSource$$.asObservable().pipe(
+        distinctUntilChanged(),
+        mergeAll(),
+        distinctUntilChanged()
+      ).subscribe(value => {
+        this._context.$implicit = this._context.rxIfList = value;
+        this._updateView(this._context);
+      })
+    )
+  }
+  ngOnDestroy() {
+    this.sub.unsubscribe();
   }
 
   /**
    * The Boolean expression to evaluate as the condition for showing a template.
    */
   @Input()
-  set rxIfList(value: ArrayLike<unknown> | null | undefined) {
-    this._context.$implicit = this._context.rxIfList = value;
-    this._updateView();
+  set rxIfList(value: ArrayLike<unknown> | Observable<ArrayLike<unknown>> | null | undefined) {
+    this.valueSource$$.next(coerceObservable(value));
   }
 
   /**
@@ -64,7 +81,7 @@ export class RxIfListDirective {
     assertTemplate('rxIfListThen', templateRef);
     this._thenTemplateRef = templateRef;
     this._thenViewRef = null;  // clear previous view if any.
-    this._updateView();
+    this._updateView(this._context);
   }
 
   /**
@@ -75,17 +92,17 @@ export class RxIfListDirective {
     assertTemplate('rxIfListElse', templateRef);
     this._elseTemplateRef = templateRef;
     this._elseViewRef = null;  // clear previous view if any.
-    this._updateView();
+    this._updateView(this._context);
   }
 
-  private _updateView() {
-    if (this._context.$implicit && (((this._context.$implicit as ArrayLike<any>)?.length ?? []) > 0)){
+  private _updateView(ctx: RxIfListContext) {
+    if (ctx.$implicit && (((ctx.$implicit as ArrayLike<any>)?.length ?? []) > 0)){
       if (!this._thenViewRef) {
         this._viewContainer.clear();
         this._elseViewRef = null;
         if (this._thenTemplateRef) {
           this._thenViewRef =
-            this._viewContainer.createEmbeddedView(this._thenTemplateRef, this._context);
+            this._viewContainer.createEmbeddedView(this._thenTemplateRef, ctx);
         }
       }
     }  else {
@@ -94,7 +111,7 @@ export class RxIfListDirective {
         this._thenViewRef = null;
         if (this._elseTemplateRef) {
           this._elseViewRef =
-            this._viewContainer.createEmbeddedView(this._elseTemplateRef, this._context);
+            this._viewContainer.createEmbeddedView(this._elseTemplateRef, ctx);
         }
       }
     }
