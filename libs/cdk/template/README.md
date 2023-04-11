@@ -21,7 +21,7 @@ Similar to `ngIf` `rxIfList` supports templates for `then` and `else`:
 <ul>
   <li *rxIfList="[1,2,3]; then thenTpl else emptyListTpl"></li>
 </ul>
-<ng-template #thenTpl>List is not empty</ng-template>
+<ng-template #thenTpl let-value >List is not empty. Value: {{value}}</ng-template>
 <ng-template #emptyListTpl>List is empty.</ng-template>
 ```
 #### `RunFnPipe`
