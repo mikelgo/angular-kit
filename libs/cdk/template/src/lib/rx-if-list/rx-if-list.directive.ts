@@ -52,7 +52,7 @@ export class RxIfListDirective {
    */
   @Input()
   set rxIfList(value: ArrayLike<unknown> | null | undefined) {
-    this._context.$implicit = this._context.rxIfList = ((value?.length ?? []) > 0);
+    this._context.$implicit = this._context.rxIfList = value;
     this._updateView();
   }
 
@@ -79,7 +79,7 @@ export class RxIfListDirective {
   }
 
   private _updateView() {
-    if (this._context.$implicit) {
+    if (this._context.$implicit && (((this._context.$implicit as ArrayLike<any>)?.length ?? []) > 0)){
       if (!this._thenViewRef) {
         this._viewContainer.clear();
         this._elseViewRef = null;
@@ -88,7 +88,7 @@ export class RxIfListDirective {
             this._viewContainer.createEmbeddedView(this._thenTemplateRef, this._context);
         }
       }
-    } else {
+    }  else {
       if (!this._elseViewRef) {
         this._viewContainer.clear();
         this._thenViewRef = null;
@@ -107,8 +107,8 @@ export class RxIfListDirective {
  * @publicApi
  */
 export class RxIfListContext {
-   $implicit = false;
-   rxIfList = false;
+   $implicit: ArrayLike<any> | null | undefined = null;
+   rxIfList: ArrayLike<any> | null | undefined = null;
 }
 
 function assertTemplate(property: string, templateRef: TemplateRef<any>|null): void {
