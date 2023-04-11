@@ -6,7 +6,7 @@ A package providing some useful Angular ehancements for templates.
 * `*rxIfList` - `*ngIf` for lists.
 * `runFn` - a pipe to run any function in the template without triggering change detection on every CD cycle.
 
-### `rxIfList`
+### `*rxIfList`
 A structural directive that works like `*ngIf` but for lists. It will only render the template if the list is not empty.
 
 The term list does include: arrays and interables.
@@ -24,6 +24,8 @@ Similar to `ngIf` `rxIfList` supports templates for `then` and `else`:
 <ng-template #thenTpl let-value >List is not empty. Value: {{value}}</ng-template>
 <ng-template #emptyListTpl>List is empty.</ng-template>
 ```
+`*rxIfList` does accept also `observables` as argument: `*rxIfList="list$"`, where `list = of([1,2,3])`.
+
 #### `RunFnPipe`
 This pipe will run any function of your component and
 make use of Angular's memoization to prevent unnecessary
