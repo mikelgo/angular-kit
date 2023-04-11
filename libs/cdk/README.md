@@ -14,6 +14,7 @@ npm install @angular-kit/cdk
 - [coercing](./coercing/README.md) - a collection of coercion helpers
 - [memoize](./memoize/README.md) - a package offering memoization functionality
 - [pipes](./pipes/README.md) - a package offering some helpful pipes
+- [template](./template/README.md) - a collection of pipes and directives for efficient template handling
 
 ## Versioning
 * [Semantic Versioning 2.0.0](http://semver.org/)
