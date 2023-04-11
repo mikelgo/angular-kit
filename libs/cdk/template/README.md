@@ -14,8 +14,16 @@ The term list does include: arrays and interables.
 <ul>
   <li *rxIfList="[1,2,3]">List is not empty</li>
 </ul>
-```
 
+```
+Similar to `ngIf` `rxIfList` supports templates for `then` and `else`:
+```html
+<ul>
+  <li *rxIfList="[1,2,3]; then thenTpl else emptyListTpl"></li>
+</ul>
+<ng-template #thenTpl>List is not empty</ng-template>
+<ng-template #emptyListTpl>List is empty.</ng-template>
+```
 #### `RunFnPipe`
 This pipe will run any function of your component and
 make use of Angular's memoization to prevent unnecessary
