@@ -19,7 +19,6 @@
       "@angular-kit/cdk/coercing": ["libs/cdk/coercing/src/index.ts"],
       "@angular-kit/cdk/lazy": ["libs/cdk/lazy/src/index.ts"],
       "@angular-kit/cdk/memoize": ["libs/cdk/memoize/src/index.ts"],
-      "@angular-kit/cdk/pipes": ["libs/cdk/pipes/src/index.ts"],
       "@angular-kit/cdk/supported": ["libs/cdk/supported/src/index.ts"],
       "@angular-kit/cdk/template": ["libs/cdk/template/src/index.ts"],
       "@angular-kit/cdk/token": ["libs/cdk/token/src/index.ts"],
