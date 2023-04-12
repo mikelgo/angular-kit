@@ -167,14 +167,28 @@ A `RenderStrategy` can be used to minimize change detection cycles. There are fo
 #### `DefaultRenderStrategy`
 ![default render strategy](./docs/default-render-strategy.gif)
 
+##### Configuration
+No Options available.
+
 ### `ThrottleRenderStrategy`
 ![throttle render strategy](./docs/throttle-render-strategy.gif)
 
+##### Configuration
+* `throttleInMs` - the time interval in milliseconds to throttle the change detection cycles.
 ### `DebounceRenderStrategy`
 ![debounce render strategy](./docs/debounce-render-strategy.gif)
 
+##### Configuration
+* `debounceInMs` - the time interval in milliseconds to debounce the change detection cycles.
 ### `ViewPortRenderStrategy`
 ![viewport render strategy](./docs/viewport-render-strategy.gif)
+
+##### Configuration
+This strategy is based on the `IntersectionObserver` API. If the browser does not support this API the strategy falls back to `DefaultRenderStrategy`.
+
+- `rootMargin`: root margin in px, see [MDN](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/IntersectionObserver)
+- `threshold`: threshold, see [MDN](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/IntersectionObserver)
+- `root`:  root element, see [MDN](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/IntersectionObserver)
 
 ## Comparison of `async`-pipe vs `*stream`-directive
 
