@@ -2,8 +2,9 @@
 
 - ✅ Optimized change detection in comparison to `async` pipe
 - ✅ Lazy by default
-- ✅ Loading, error and complete states
-- ✅ Easy template customization via templates or components for e.g. spinners
+- ✅ Render strategies to further push change detection optimization
+- ✅ Loading, error and complete state
+- ✅ Easy template customization via ng-templates or components for e.g. spinners
 - ✅ no third-party dependencies
 
 # Installation
@@ -57,7 +58,8 @@ export class MyComponent {
     loadingTemplate: loadingTemplate;
     errorTemplate: errorTemplate;
     completeTemplate: completeTemplate;
-    keepValueOnLoading: true
+    keepValueOnLoading: true;
+    renderStrategy: {type: 'throttle', throttleInMs: 250}
   "
 >
   {{ value }}
@@ -111,6 +113,7 @@ export class MyComponent {
 - `completeTemplate` - Template that will be used to render complete state.
 - `lazyViewCreation` - If `true` the view will be created only when the observable emits. If `false` the view will be created on init. Default value is `true`.
 - `renderCallback` - can be configured by passing a `Subject` and this will emit everytime a `RenderContext`-value whenever a rendering happens. `RenderContext` contains the `value`, `error` and the render context. The render context does contain a information when the re-rendering has happened: `before-next`: before the next value arrives; `next`: when the next value has arrived; `error`: when an error occoured.
+- `renderStrategy` - a configuration to further push change detection. See `render strategy` section below 
 
 #### Context variables
 
@@ -149,6 +152,17 @@ export class MyLoadingComponent {
 ```
 
 _Note_ When using components and passing templates, the templates will be used instead.
+
+### Render strategies
+A `RenderStrategy` can be used to minimize change detection cycles. There are four strategies supported:
+* `DefaultRenderStrategy` - the default strategy ( a local change detection strategy).
+* `ThrottleRenderStrategy` - a strategy which throttles the change detections by a defined time interval.
+* `DebounceRenderStrategy` - strategy which debounces the change detection cycles by a given time interval.
+* `ViewPortRenderStrategy` - this strategy does only trigger change detection when an element is visible within the viewport. If the element is visible within the viewport, the element uses the `DefaultRenderStrategy` as long as it is visible.
+
+
+> **Warning**
+> The `RenderStrategy` can be switched on runtime. However there is currently some unexpected behaivor: When using `ThrottleRenderStrategy` or `DebounceRenderStrategy` and then switching to `ViewPortRenderStrategy`, the strategies are accumulated. Means the change detections are throttled/debounced and only detected when visible within the viewport. Only a switch to `DefaultRenderStrategy` in between does result in a correct behaivor. This is a bug and will be fixed in a future version!
 
 ## Comparison of `async`-pipe vs `*stream`-directive
 
