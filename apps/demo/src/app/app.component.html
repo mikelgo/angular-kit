@@ -1,4 +1,5 @@
 <button (click)="completeSignal$$.next(1)">complete</button>
+<button (click)="refreshCommand$.next(1)">refresh</button>
 <ng-container
   *stream="
     complete$;
@@ -7,6 +8,7 @@
     let complete = completed;
     errorTemplate: errorTemplate;
     completeTemplate: completeTemplate
+
   "
 >
   Complete {{ complete }} Value: {{ v | json }}
@@ -27,10 +29,12 @@
 <br />
 <hr />
 <button (click)="nextPost.next(1)">reload</button>
+<button (click)="sourceProvider.provideRefreshSource()">refresh source</button>
+<button (click)="sourceProvider.provideErrorSource()">error source</button>
 
 <ng-container
   *stream="
-    sourceProvider.source$;
+    rxRequest$;
     let v;
     let error = error;
     let complete = completed;
@@ -40,6 +44,7 @@
     errorTemplate: errorTemplate;
     completeTemplate: completeTemplate;
     keepValueOnLoading: true
+    renderCallback: render$$
   "
 >
   Complete {{ complete }}

@@ -48,10 +48,18 @@ export class AppComponent {
   refreshCommand$ = new Subject();
 
   v: undefined | { f: string };
+  render$$ = new ReplaySubject<any>();
 
   constructor(private http: HttpClient, public sourceProvider: ValueProvider) {
     //this.query$.subscribe()
     this.sourceProvider.provideErrorSource();
+
+   /* rxQuery$(this.fetch(0), {
+      refreshTrigger$: this.refreshCommand$,
+      keepValueOnRefresh: false,
+    }).subscribe(console.log)*/
+
+    //this.render$$.subscribe(x => console.log('rendered value', x));
   }
 
   getPost(n: number) {
@@ -60,13 +68,13 @@ export class AppComponent {
 
   fetch(count: number) {
     return this.http.get('https://jsonplaceholder.typicode.com/posts').pipe(
-      delay(5000),
+      delay(1000),
       map((x) => (x as any[]).slice(0, Math.random() > 0.5 ? 10 : 20))
     );
   }
 
   onResize($event: any) {
-    console.log($event);
+    //console.log($event);
   }
 }
 @Injectable({ providedIn: 'root' })

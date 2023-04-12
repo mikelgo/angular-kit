@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
-import { scan, Subject } from 'rxjs';
+import {ChangeDetectionStrategy, Component, ViewEncapsulation} from '@angular/core';
+import {scan, Subject} from 'rxjs';
 
 @Component({
   selector: 'angular-kit-stream-vs-async',
@@ -10,7 +10,11 @@ import { scan, Subject } from 'rxjs';
         <button (click)="value$$.next(1)">update value</button>
       </div>
       <br />
+      <div class="resizable">
+        Push off viewport
+      </div>
       <div class="demo-container">
+
         <div>
           <h3>Async-Pipe</h3>
           <div>
