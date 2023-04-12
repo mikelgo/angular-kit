@@ -33,8 +33,8 @@ import {coerceObservable} from './util/coerce-observable';
 import {RenderContext} from './types/render-context';
 import {StreamDirectiveContext} from './types/stream-directive-context';
 import {setupOperator$} from './util/setup-operator';
-import {createIntersectionObserver} from "@angular-kit/rx/platform";
-import {supportsIntersectionObserver} from "./util/supports-intersection-observer";
+import {createIntersectionObserver} from '@angular-kit/rx/platform';
+import {supportsIntersectionObserver} from './util/supports-intersection-observer';
 
 @Directive({
   selector: '[stream]',
@@ -44,7 +44,9 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
   private refreshEffect$$ = new ReplaySubject<Subject<any>>(1);
   private loadingTemplate$$ = new ReplaySubject<TemplateRef<StreamDirectiveContext<T>>>(1);
   private renderCallback$$: ReplaySubject<RenderContext<T>> | undefined;
-  private renderStrategy$$ = new BehaviorSubject<Observable<RenderStrategies>>(of({ type: 'default' }));
+  private renderStrategy$$ = new BehaviorSubject<Observable<RenderStrategies>>(
+    of(this.config?.renderStrategy ?? { type: 'default' })
+  );
 
   private detach = true;
 
@@ -123,7 +125,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
    *
    * Default: false
    */
-  @Input() streamKeepValueOnLoading = false;
+  @Input() streamKeepValueOnLoading = this.config?.keepValueOnLoading ?? false;
   /**
    * @description
    * A flag to control if the view should be created lazily or not.
@@ -131,7 +133,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
    *
    * Default: false
    */
-  @Input() streamLazyViewCreation = false;
+  @Input() streamLazyViewCreation = this.config?.lazyViewCreation ?? false;
 
   private subscription: Unsubscribable = new Subscription();
   private embeddedView!: EmbeddedViewRef<StreamDirectiveContext<T>>;
@@ -147,7 +149,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
 
   readonly isViewPortStrategy$ = this.renderStrategy$$.pipe(
     mergeAll(),
-    map((strategy) => strategy.type === 'viewport'),
+    map((strategy) => strategy.type === 'viewport')
   );
   readonly renderStrategyOperator$ = setupOperator$(this.renderStrategy$$);
   readonly source$ = this.source$$.pipe(distinctUntilChanged());
@@ -159,19 +161,19 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
    *
    * when switching to/from viewPort strategy emit a signal and end respective observables
    */
-   viewPortObserver$: Observable<IntersectionObserverEntry[] | null> = this.renderStrategy$$.pipe(
+  viewPortObserver$: Observable<IntersectionObserverEntry[] | null> = this.renderStrategy$$.pipe(
     mergeAll(),
     switchMap((strategy) => {
-      if (isViewportRenderStrategy(strategy)){
-        if (!supportsIntersectionObserver()){
+      if (isViewportRenderStrategy(strategy)) {
+        if (!supportsIntersectionObserver()) {
           return of(null);
         }
         return createIntersectionObserver(this.viewContainerRef.element.nativeElement.parentElement, {
           threshold: strategy.threshold,
           rootMargin: strategy.rootMargin,
           root: strategy.root,
-        })
-     /*     .pipe(
+        });
+        /*     .pipe(
           takeUntil(this.renderStrategy$$.pipe(skip(1)))
         )*/
       }
@@ -179,8 +181,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
       return of(null);
     })
   );
-  visible$ = this.viewPortObserver$.pipe(
-    map((entries) => entries?.some((entry) => entry.isIntersecting)))
+  visible$ = this.viewPortObserver$.pipe(map((entries) => entries?.some((entry) => entry.isIntersecting)));
 
   readonly sourceWithOperator$ = this.renderStrategyOperator$.pipe(
     withLatestFrom(this.source$),
@@ -194,7 +195,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
      */
     switchMap(([o, source$]) => {
       return source$.pipe(
-        o,
+        o
         //takeUntil(this.renderStrategy$$.pipe(skip(1)))
       );
     })
@@ -211,9 +212,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
     private readonly templateRef: TemplateRef<StreamDirectiveContext<T>>,
     private readonly viewContainerRef: ViewContainerRef,
     @Optional() @Inject(STREAM_DIR_CONFIG) private readonly config: StreamDirectiveConfig
-  ) {
-
-  }
+  ) {}
 
   ngOnInit(): void {
     if (!this.embeddedView) {
