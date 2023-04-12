@@ -261,7 +261,10 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
         next: (val) => {
           const v = val[0] as any;
           const visible = val[1] ?? true;
-          if (visible) {
+          /**
+           * only update the view if the value has changed and the view is visible
+           */
+          if (visible && v !== this.context.$implicit) {
             this.context.$implicit = v;
             this.context.stream = v;
             this.context.loading = false;
