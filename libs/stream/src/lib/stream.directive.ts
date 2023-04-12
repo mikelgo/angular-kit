@@ -34,6 +34,7 @@ import {RenderContext} from './types/render-context';
 import {StreamDirectiveContext} from './types/stream-directive-context';
 import {setupOperator$} from './util/setup-operator';
 import {createIntersectionObserver} from "@angular-kit/rx/platform";
+import {supportsIntersectionObserver} from "./util/supports-intersection-observer";
 
 @Directive({
   selector: '[stream]',
@@ -162,6 +163,9 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
     mergeAll(),
     switchMap((strategy) => {
       if (isViewportRenderStrategy(strategy)){
+        if (!supportsIntersectionObserver()){
+          return of(null);
+        }
         return createIntersectionObserver(this.viewContainerRef.element.nativeElement.parentElement, {
           threshold: strategy.threshold,
           rootMargin: strategy.rootMargin,
