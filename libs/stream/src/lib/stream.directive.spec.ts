@@ -15,14 +15,17 @@ import {
   throwError,
 } from 'rxjs';
 import {TestBed, waitForAsync} from '@angular/core/testing';
-import {Component, Inject, Injectable} from '@angular/core';
+import {Component, Inject, Injectable, TemplateRef, ViewContainerRef} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {STREAM_DIR_CONFIG, STREAM_DIR_CONTEXT} from './stream-directive-config';
+import {STREAM_DIR_CONFIG, STREAM_DIR_CONTEXT, StreamDirectiveConfig} from './stream-directive-config';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {By} from '@angular/platform-browser';
 import {subscribeSpyTo} from '@hirez_io/observer-spy';
 import {RenderContext} from "./types/render-context";
 import {StreamDirectiveContext} from "./types/stream-directive-context";
+import {TestViewContainerRef} from "../__test__/utils/mock-vcr";
+import {TestTemplateRef} from "../__test__/utils/mock-templateref";
+import {ThrottleRenderStrategy} from "./types/render-strategies";
 
 describe('StreamDirective', () => {
   describe('Basic', () => {
@@ -275,20 +278,20 @@ describe('StreamDirective', () => {
 
   describe('Component Configurations', () => {
     it('should create setup', async () => {
-      const { component } = await createSetup();
+      const { component } = await createSetup(createConfig());
 
       expect(component).toBeDefined();
     });
 
     it('should show error component', waitForAsync(async () => {
-      const { valueProvider, fixture } = await createSetup();
+      const { valueProvider, fixture } = await createSetup(createConfig());
       valueProvider.provideErrorSource();
       fixture.detectChanges();
       expect(fixture.debugElement.query(By.css('div')).nativeElement?.innerHTML).toContain('Error: 🔥');
     }));
     // todo
     xit('should show loading component', waitForAsync(async () => {
-      const { valueProvider, fixture } = await createSetup();
+      const { valueProvider, fixture } = await createSetup(createConfig());
 
       valueProvider.provideRefreshSource();
 
@@ -300,6 +303,57 @@ describe('StreamDirective', () => {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     xit('should show complete component', () => {});
   });
+
+  describe('Config', () => {
+    describe('keepValueOnLoading', () => {
+      it('should be false if config is not set', async () => {
+        const { directive } = await setupDirective(createConfig());
+
+        expect(directive.streamKeepValueOnLoading).toEqual(false);
+      });
+      it('should have config value', async () => {
+        const { directive } = await setupDirective(createConfig({keepValueOnLoading: true}));
+
+        expect(directive.streamKeepValueOnLoading).toEqual(true);
+      });
+    })
+    describe('lazyViewCreation', () => {
+      it('should be false if config is not set', async () => {
+        const { directive } = await setupDirective(createConfig());
+
+        expect(directive.streamLazyViewCreation).toEqual(false);
+      });
+      it('should have config value', async () => {
+        const { directive } = await setupDirective(createConfig({lazyViewCreation: true}));
+
+        expect(directive.streamLazyViewCreation).toEqual(true);
+      });
+    })
+    describe('renderStrategy', () => {
+      it('should be DefaultRenderStrategy if config is not set', async () => {
+        const { directive } = await setupDirective(createConfig());
+
+        const result = subscribeSpyTo(directive.renderStrategy$);
+
+        expect(result.getLastValue()).toEqual({type: 'default'});
+      });
+
+      it('should have config value', async () => {
+        const renderStrategy: ThrottleRenderStrategy = {
+          type: 'throttle',
+          throttleInMs: 100
+        }
+        const { directive } = await setupDirective(createConfig({renderStrategy}));
+
+
+        const result = subscribeSpyTo(directive.renderStrategy$);
+
+        expect(result.getLastValue()).toEqual(renderStrategy);
+      });
+
+    })
+
+  })
 });
 
 function createSource(cfg?: { data?: Partial<TestModel>; completeSignal?: Subject<boolean> }): Observable<TestModel> {
@@ -322,17 +376,25 @@ function html(host: SpectatorHost<any>) {
   return host.query('div')?.innerHTML;
 }
 
-async function createSetup() {
+function createConfig(cfg?: StreamDirectiveConfig): StreamDirectiveConfig{
+  const baseConfig = {
+    loadingComponent: LoadingComponent,
+    errorComponent: ErrorComponent,
+  };
+
+  const mergedConfig = {...baseConfig, ...cfg};
+
+  return mergedConfig;
+}
+
+async function createSetup(config?: StreamDirectiveConfig) {
   await TestBed.configureTestingModule({
     declarations: [StreamDirective, TestHostComponent],
     imports: [HttpClientTestingModule],
     providers: [
       {
         provide: STREAM_DIR_CONFIG,
-        useValue: {
-          loadingComponent: LoadingComponent,
-          errorComponent: ErrorComponent,
-        },
+        useValue: config,
       },
       ValueProvider,
     ],
@@ -346,6 +408,35 @@ async function createSetup() {
     fixture,
     component,
     valueProvider,
+  };
+}
+
+async function setupDirective(config?: StreamDirectiveConfig) {
+  await TestBed.configureTestingModule({
+    declarations: [StreamDirective],
+    imports: [HttpClientTestingModule],
+    providers: [
+      StreamDirective,
+      {
+        provide: STREAM_DIR_CONFIG,
+        useValue: config,
+      },
+      {
+        provide: ViewContainerRef,
+        useValue: new TestViewContainerRef(),
+      },
+      {
+        provide: TemplateRef,
+        useValue: new TestTemplateRef(),
+      }
+    ],
+  }).compileComponents();
+
+
+  const directive = TestBed.inject(StreamDirective)
+
+  return {
+    directive
   };
 }
 
@@ -396,6 +487,7 @@ export class ValueProvider {
   `,
 })
 export class TestHostComponent {
+
   source$ = this.valueProvider.source$;
   constructor(public valueProvider: ValueProvider) {}
 }
@@ -417,3 +509,5 @@ export class LoadingComponent {
 export class ErrorComponent {
   constructor(@Inject(STREAM_DIR_CONTEXT) public readonly context: StreamDirectiveContext<TestModel>) {}
 }
+
+

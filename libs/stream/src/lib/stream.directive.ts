@@ -147,11 +147,15 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
     renderCount: 0,
   };
 
-  readonly isViewPortStrategy$ = this.renderStrategy$$.pipe(
+  readonly renderStrategy$ = this.renderStrategy$$.asObservable().pipe(
+    distinctUntilChanged(),
     mergeAll(),
+    distinctUntilChanged()
+  );
+  readonly isViewPortStrategy$ = this.renderStrategy$.pipe(
     map((strategy) => strategy.type === 'viewport')
   );
-  readonly renderStrategyOperator$ = setupOperator$(this.renderStrategy$$);
+  readonly renderStrategyOperator$ = setupOperator$(this.renderStrategy$);
   readonly source$ = this.source$$.pipe(distinctUntilChanged());
 
   /**
@@ -161,8 +165,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
    *
    * when switching to/from viewPort strategy emit a signal and end respective observables
    */
-  viewPortObserver$: Observable<IntersectionObserverEntry[] | null> = this.renderStrategy$$.pipe(
-    mergeAll(),
+  viewPortObserver$: Observable<IntersectionObserverEntry[] | null> = this.renderStrategy$.pipe(
     switchMap((strategy) => {
       if (isViewportRenderStrategy(strategy)) {
         if (!supportsIntersectionObserver()) {

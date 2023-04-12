@@ -1,15 +1,4 @@
-import {
-  BehaviorSubject,
-  debounceTime,
-  distinctUntilChanged,
-  filter,
-  map,
-  mergeAll,
-  Observable,
-  of,
-  pipe,
-  throttleTime,
-} from 'rxjs';
+import {debounceTime, distinctUntilChanged, filter, map, mergeAll, Observable, of, pipe, throttleTime,} from 'rxjs';
 import {
   isDebounceRenderStrategy,
   isThrottleRenderStrategy,
@@ -22,9 +11,8 @@ import {
  * @description
  * Derive the operator for the render strategy.
  */
-export function setupOperator$(renderStrategy$$: BehaviorSubject<Observable<RenderStrategies>>) {
+export function setupOperator$(renderStrategy$$: Observable<RenderStrategies>) {
   return renderStrategy$$.pipe(
-    mergeAll(),
     distinctUntilChanged(),
     filter((strategy) => !isViewportRenderStrategy(strategy)),
     map((strategy) => {
