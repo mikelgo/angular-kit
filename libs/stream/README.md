@@ -129,7 +129,7 @@ You can configure `stream` to use defined components for loading, error and comp
 ```typescript
 @NgModule({
   imports: [
-    StreamModule.forRoot({
+    StreamModule.withConfig({
       loadingComponent: MyLoadingComponent,
       errorComponent: MyErrorComponent,
       completeComponent: MyCompleteComponent,
@@ -152,6 +152,15 @@ export class MyLoadingComponent {
 ```
 
 _Note_ When using components and passing templates, the templates will be used instead.
+
+#### `StreamDirectiveConfig` options
+
+- `loadingComponent` - Component that will be used to render loading state.
+- `errorComponent` - Component that will be used to render error state.
+- `completeComponent` - Component that will be used to render complete state.
+- `keepValueOnLoading` - config to define if the current rendered value should be kept when the value source is in a loading state or not. Default is false.
+- `lazyViewCreation` - config to define if the view should be created only when the value source emits a value. Default is `true`.
+- `renderStrategy` - a configuration to further push change detection. See `render strategy` section below.
 
 ### Render strategies
 A `RenderStrategy` can be used to minimize change detection cycles. There are four strategies supported:
