@@ -164,6 +164,18 @@ A `RenderStrategy` can be used to minimize change detection cycles. There are fo
 > **Warning**
 > The `RenderStrategy` can be switched on runtime. However there is currently some unexpected behaivor: When using `ThrottleRenderStrategy` or `DebounceRenderStrategy` and then switching to `ViewPortRenderStrategy`, the strategies are accumulated. Means the change detections are throttled/debounced and only detected when visible within the viewport. Only a switch to `DefaultRenderStrategy` in between does result in a correct behaivor. This is a bug and will be fixed in a future version!
 
+#### `DefaultRenderStrategy`
+![default render strategy](./docs/default-render-strategy.gif)
+
+### `ThrottleRenderStrategy`
+![throttle render strategy](./docs/throttle-render-strategy.gif)
+
+### `DebounceRenderStrategy`
+![debounce render strategy](./docs/debounce-render-strategy.gif)
+
+### `ViewPortRenderStrategy`
+![viewport render strategy](./docs/viewport-render-strategy.gif)
+
 ## Comparison of `async`-pipe vs `*stream`-directive
 
 If we compare a highly optimized application where all components are using `OnPush` change detection strategy we can observe that the
