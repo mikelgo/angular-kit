@@ -51,7 +51,9 @@
           "libs/cdk/lazy/**/*.ts",
           "libs/cdk/lazy/**/*.html",
           "libs/cdk/template/**/*.ts",
-          "libs/cdk/template/**/*.html"
+          "libs/cdk/template/**/*.html",
+          "libs/cdk/rx-interop/**/*.ts",
+          "libs/cdk/rx-interop/**/*.html"
         ]
       }
     },
