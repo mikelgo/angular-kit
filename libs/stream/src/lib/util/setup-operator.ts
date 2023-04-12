@@ -19,6 +19,8 @@ import {
 
 /**
  * @internal
+ * @description
+ * Derive the operator for the render strategy.
  */
 export function setupOperator$(renderStrategy$$: BehaviorSubject<Observable<RenderStrategies>>) {
   return renderStrategy$$.pipe(

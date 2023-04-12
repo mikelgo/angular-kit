@@ -47,39 +47,90 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
 
   private detach = true;
 
+  /**
+   * @description
+   * The source of the values to be rendered.
+   * @param source
+   */
   @Input() set stream(source: Observable<any>) {
     if (source) {
       this.source$$.next(source);
     }
   }
 
+  /**
+   * @description
+   * A trigger to refresh the value stream.
+   * @param refreshEffect
+   */
   @Input() set streamRefreshSignal(refreshEffect: Subject<any>) {
     if (refreshEffect) {
       this.refreshEffect$$.next(refreshEffect);
     }
   }
 
+  /**
+   * @description
+   * A template to be rendered while the stream is in a loading state.
+   * @param tpl
+   */
   @Input() set streamLoadingTemplate(tpl: TemplateRef<StreamDirectiveContext<T>>) {
     if (tpl) {
       this.loadingTemplate$$.next(tpl);
     }
   }
+
+  /**
+   * @description
+   * A template to be rendered when the value source emits an error.
+   */
+  @Input() streamErrorTemplate: TemplateRef<StreamDirectiveContext<T>> | undefined;
+  /**
+   * @description
+   * A template to be rendered when the value source completes.
+   */
+  @Input() streamCompleteTemplate: TemplateRef<StreamDirectiveContext<T>> | undefined;
+
+  /**
+   * @description
+   * A trigger which emits every time the view is rendered/updated.
+   * @param cb
+   */
   @Input() set streamRenderCallback(cb: ReplaySubject<RenderContext<T>>) {
     if (cb) {
       this.renderCallback$$ = cb;
     }
   }
 
+  /**
+   * @description
+   * A render strategy to optimize change detection.
+   *
+   * Default: {@link DefaultRenderStrategy}
+   * @param strategy
+   */
   @Input() set streamRenderStrategy(strategy: RenderStrategies | Observable<RenderStrategies>) {
     if (strategy) {
       this.renderStrategy$$.next(coerceObservable(strategy));
     }
   }
 
-  @Input() streamErrorTemplate: TemplateRef<StreamDirectiveContext<T>> | undefined;
-  @Input() streamCompleteTemplate: TemplateRef<StreamDirectiveContext<T>> | undefined;
+  /**
+   * @description
+   * A flag to control whether the last value should still be displayed in the view when the value source
+   * is in a loading state or not.
+   *
+   * Default: false
+   */
   @Input() streamKeepValueOnLoading = false;
-  @Input() streamLazyViewCreation = true;
+  /**
+   * @description
+   * A flag to control if the view should be created lazily or not.
+   * Lazy does mean that no change detection will be triggered until the value source emits a value.
+   *
+   * Default: false
+   */
+  @Input() streamLazyViewCreation = false;
 
   private subscription: Unsubscribable = new Subscription();
   private embeddedView!: EmbeddedViewRef<StreamDirectiveContext<T>>;
