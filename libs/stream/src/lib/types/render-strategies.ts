@@ -50,7 +50,7 @@ export interface DebounceRenderStrategy extends RenderStrategy {
   debounceInMs: number;
 }
 
-export type RenderStrategies = DefaultRenderStategy | ViewportRenderStrategy | ThrottleRenderStrategy;
+export type RenderStrategies = DefaultRenderStategy | ViewportRenderStrategy | ThrottleRenderStrategy | DebounceRenderStrategy;
 
 /**
  * @description

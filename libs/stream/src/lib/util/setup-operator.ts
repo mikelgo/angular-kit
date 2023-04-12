@@ -21,7 +21,6 @@ export function setupOperator$(renderStrategy$$: Observable<RenderStrategies>) {
       }
 
       if (isDebounceRenderStrategy(strategy)) {
-        // @ts-ignore todo fix typing issue
         return of(debounceTime(strategy.debounceInMs));
       }
 
