@@ -20,12 +20,10 @@ import {
   Observable,
   of,
   ReplaySubject,
-  skip,
   startWith,
   Subject,
   Subscription,
   switchMap,
-  takeUntil,
   Unsubscribable,
   withLatestFrom,
 } from 'rxjs';
@@ -103,9 +101,11 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
   readonly source$ = this.source$$.pipe(distinctUntilChanged());
 
   /**
-   * Again problem that e.g above observable chain is not finished when switching strategies
-   * at runtime.
-   * also this observable is not unusbscirbed.
+   * todo
+   * when viewport strategy is used and before throttle or debounce was applied, they
+   * are somehow combined.
+   *
+   * when switching to/from viewPort strategy emit a signal and end respective observables
    */
    viewPortObserver$: Observable<IntersectionObserverEntry[] | null> = this.renderStrategy$$.pipe(
     mergeAll(),
@@ -116,9 +116,9 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
           rootMargin: strategy.rootMargin,
           root: strategy.root,
         })
-          .pipe(
+     /*     .pipe(
           takeUntil(this.renderStrategy$$.pipe(skip(1)))
-        )
+        )*/
       }
 
       return of(null);
@@ -202,7 +202,6 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (val) => {
-          console.log('next', val)
           const v = val[0] as any;
           const visible = val[1] ?? true;
           if (visible) {
