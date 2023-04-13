@@ -5,6 +5,8 @@ A package providing some useful Angular ehancements for templates.
 ##  🔋 Included
 * `*rxIfList` - `*ngIf` for lists.
 * `runFn` - a pipe to run any function in the template without triggering change detection on every CD cycle.
+* `ngForTrackById` - a directive to track `ngFor` by id.
+* `ngForTrackByProp` - a directive to track `ngFor` by property.
 
 ### `*rxIfList`
 A structural directive that works like `*ngIf` but for lists. It will only render the template if the list is not empty.
