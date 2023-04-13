@@ -77,3 +77,21 @@ export class MyComponent {
   };
 }
 ```
+
+#### `ngForTrackById`
+A directive to track `ngFor` by id which results in a shorthand for `trackBy: (index, item) => item.id`.
+
+```html
+<ul>
+  <li *ngFor="let item of items; trackBy: ngForTrackById">{{item.name}}</li>
+</ul>
+```
+
+#### `ngForTrackByProp`
+A directive to track `ngFor` by property.
+
+```html
+<ul>
+  <li *ngFor="let item of items; trackBy: ngForTrackByProp('id')">{{item.name}}</li>
+</ul>
+```
