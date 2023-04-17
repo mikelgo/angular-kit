@@ -1,7 +1,6 @@
 import {StreamDirective} from "./stream.directive";
 import {TestBed} from "@angular/core/testing";
-import {StreamDirectiveModule} from "./stream-directive.module";
-import {STREAM_DIR_CONFIG, StreamDirectiveConfig} from "./stream-directive-config";
+import {provideStreamDirectiveConfig, StreamDirectiveConfig} from "./stream-directive-config";
 import {MountConfig} from "cypress/angular";
 import {ChangeDetectionStrategy, Component, Input} from "@angular/core";
 import {BehaviorSubject, ReplaySubject, scan, Subject} from "rxjs";
@@ -83,11 +82,8 @@ async function setup(cfg?: {
   mountConfig?: MountConfig<any>,
 }) {
   await TestBed.configureTestingModule({
-    imports: [StreamDirectiveModule],
-    providers: [{
-      provide: STREAM_DIR_CONFIG,
-      useValue: cfg?.streamConfig,
-    }],
+    imports: [StreamDirective],
+    providers: [provideStreamDirectiveConfig(cfg?.streamConfig as StreamDirectiveConfig)],
     declarations: [TestHostComponent, DirtyCheckerComponent],
   })
 

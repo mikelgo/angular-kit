@@ -1,12 +1,11 @@
 import {
   Directive,
   EmbeddedViewRef,
-  Inject,
+  inject,
   Injector,
   Input,
   OnDestroy,
   OnInit,
-  Optional,
   TemplateRef,
   ViewContainerRef,
 } from '@angular/core';
@@ -27,7 +26,7 @@ import {
   Unsubscribable,
   withLatestFrom,
 } from 'rxjs';
-import {STREAM_DIR_CONFIG, STREAM_DIR_CONTEXT, StreamDirectiveConfig} from './stream-directive-config';
+import {injectStreamDirectiveConfig, STREAM_DIR_CONTEXT, StreamDirectiveConfig} from './stream-directive-config';
 import {isViewportRenderStrategy, RenderStrategies} from './types/render-strategies';
 import {coerceObservable} from './util/coerce-observable';
 import {RenderContext} from './types/render-context';
@@ -38,8 +37,13 @@ import {supportsIntersectionObserver} from './util/supports-intersection-observe
 
 @Directive({
   selector: '[stream]',
+  standalone: true,
 })
 export class StreamDirective<T> implements OnInit, OnDestroy {
+  private readonly config: StreamDirectiveConfig | null = injectStreamDirectiveConfig();
+  private readonly templateRef: TemplateRef<StreamDirectiveContext<T>> = inject(TemplateRef);
+  private readonly viewContainerRef: ViewContainerRef = inject(ViewContainerRef);
+
   private source$$ = new ReplaySubject<Observable<any>>(1);
   private refreshEffect$$ = new ReplaySubject<Subject<any>>(1);
   private loadingTemplate$$ = new ReplaySubject<TemplateRef<StreamDirectiveContext<T>>>(1);
@@ -211,11 +215,8 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
     return true;
   }
 
-  constructor(
-    private readonly templateRef: TemplateRef<StreamDirectiveContext<T>>,
-    private readonly viewContainerRef: ViewContainerRef,
-    @Optional() @Inject(STREAM_DIR_CONFIG) private readonly config: StreamDirectiveConfig
-  ) {}
+
+
 
   ngOnInit(): void {
     if (!this.embeddedView) {
@@ -333,6 +334,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
           provide: STREAM_DIR_CONTEXT,
           useValue: this.context,
         },
+
       ],
     });
   }

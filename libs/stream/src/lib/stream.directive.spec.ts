@@ -15,9 +15,13 @@ import {
   throwError,
 } from 'rxjs';
 import {TestBed, waitForAsync} from '@angular/core/testing';
-import {Component, Inject, Injectable, TemplateRef, ViewContainerRef} from '@angular/core';
+import {Component, Injectable, TemplateRef, ViewContainerRef} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {STREAM_DIR_CONFIG, STREAM_DIR_CONTEXT, StreamDirectiveConfig} from './stream-directive-config';
+import {
+  injectStreamDirectiveContext,
+  provideStreamDirectiveConfig,
+  StreamDirectiveConfig
+} from './stream-directive-config';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {By} from '@angular/platform-browser';
 import {subscribeSpyTo} from '@hirez_io/observer-spy';
@@ -389,13 +393,10 @@ function createConfig(cfg?: StreamDirectiveConfig): StreamDirectiveConfig{
 
 async function createSetup(config?: StreamDirectiveConfig) {
   await TestBed.configureTestingModule({
-    declarations: [StreamDirective, TestHostComponent],
-    imports: [HttpClientTestingModule],
+    declarations: [TestHostComponent],
+    imports: [HttpClientTestingModule, StreamDirective],
     providers: [
-      {
-        provide: STREAM_DIR_CONFIG,
-        useValue: config,
-      },
+      provideStreamDirectiveConfig(config as StreamDirectiveConfig),
       ValueProvider,
     ],
   }).compileComponents();
@@ -413,14 +414,10 @@ async function createSetup(config?: StreamDirectiveConfig) {
 
 async function setupDirective(config?: StreamDirectiveConfig) {
   await TestBed.configureTestingModule({
-    declarations: [StreamDirective],
-    imports: [HttpClientTestingModule],
+    imports: [HttpClientTestingModule, StreamDirective],
     providers: [
       StreamDirective,
-      {
-        provide: STREAM_DIR_CONFIG,
-        useValue: config,
-      },
+      provideStreamDirectiveConfig(config as StreamDirectiveConfig),
       {
         provide: ViewContainerRef,
         useValue: new TestViewContainerRef(),
@@ -498,7 +495,8 @@ export class TestHostComponent {
   template: ` <div>Loading... context {{ context?.loading }}</div> `,
 })
 export class LoadingComponent {
-  constructor(@Inject(STREAM_DIR_CONTEXT) public readonly context: StreamDirectiveContext<TestModel>) {}
+  public readonly context: StreamDirectiveContext<TestModel> = injectStreamDirectiveContext();
+
 }
 
 @Component({
@@ -507,7 +505,7 @@ export class LoadingComponent {
   template: ` <div>Error: context {{ context?.error }}</div> `,
 })
 export class ErrorComponent {
-  constructor(@Inject(STREAM_DIR_CONTEXT) public readonly context: StreamDirectiveContext<TestModel>) {}
+  public readonly context: StreamDirectiveContext<TestModel> = injectStreamDirectiveContext();
 }
 
 
