@@ -2,6 +2,24 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [2.0.0](https://github.com/code-workers-io/angular-kit/compare/stream-1.1.0...stream-2.0.0) (2023-04-17)
+
+
+### Bug Fixes
+
+* **stream:** correct typing issue when detecting DebounceRenderStrategy ([20c0a4e](https://github.com/code-workers-io/angular-kit/commit/20c0a4ea2a8219bcc2e117b313b9b18da39c457c))
+* **stream:** when element is off the viewport CD should only be triggered if element is visible and value has changed ([4249cb6](https://github.com/code-workers-io/angular-kit/commit/4249cb6611509aa0167ea9f464cb5811bb0330be)), closes [#40](https://github.com/code-workers-io/angular-kit/issues/40)
+
+
+### Features
+
+* **stream:** check if intersection observer API is supported if ViewPortStrategy is active; fallback do DefaultStrategy ([00296bb](https://github.com/code-workers-io/angular-kit/commit/00296bbc2e0451f2e582a6ef5322b40d29421f98))
+* **stream:** enhance configuration token by keepValueOnLoading, lazyViewCreation and renderStrategy option ([9512124](https://github.com/code-workers-io/angular-kit/commit/9512124c834eb434b8391e90ee76f1551c76bb2e)), closes [#33](https://github.com/code-workers-io/angular-kit/issues/33)
+* **stream:** implement ViewPortRenderStrategy to only run change detection when element is visible in the viewport ([95cec91](https://github.com/code-workers-io/angular-kit/commit/95cec91895554bb3311a7a99b3dddd08e8079cb8))
+* **stream:** introduce concept of render strategies ([d413113](https://github.com/code-workers-io/angular-kit/commit/d4131137d56ca1901a26c0e8485044b9a8334606))
+
+
+
 # [1.1.0](https://github.com/code-workers-io/angular-kit/compare/stream-1.0.1...stream-1.1.0) (2023-03-04)
 
 
