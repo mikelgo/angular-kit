@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [2.0.0](https://github.com/code-workers-io/angular-kit/compare/rx-1.3.0...rx-2.0.0) (2023-04-17)
+
+
+### Reverts
+
+* Revert "chore(rx): release version 1.3.1" ([a9a24cc](https://github.com/code-workers-io/angular-kit/commit/a9a24ccc7daafd3e29b77433656901406cc472d9))
+
+
+
 # [2.0.0](https://github.com/code-workers-io/angular-kit/compare/rx-1.3.0...rx-2.0.0) (2023-03-29)
 
 ### Breaking Changes
