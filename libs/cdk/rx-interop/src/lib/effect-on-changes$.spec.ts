@@ -32,6 +32,28 @@ describe(effectOnChanges$.name, () => {
     expect(result.getValues()).toEqual([firstChange['id'].currentValue, secondChange['id'].currentValue])
 
   });
+
+  it('should not return undefined values ', () => {
+    const change: TypedSimpleChanges<Inputs> = createSecondChange(createFirstChange());
+    const effect$ = new Subject<Partial<Inputs>>();
+
+    const result = subscribeSpyTo(effect$);
+
+    effectOnChanges$(change, (changes) => effect$.next(changes));
+  })
+  it('should not return undefined values on picked properties', () => {
+    const change: TypedSimpleChanges<Inputs> = createSecondChange(createFirstChange());
+    const effect$ = new Subject<Partial<Inputs>>();
+
+    const result = subscribeSpyTo(effect$);
+
+    effectOnChanges$(change, 'name',(changes) => effect$.next(changes));
+    effectOnChanges$(createFirstChange(), 'name',(changes) => effect$.next(changes));
+
+    expect(result.getValues()).toEqual([
+      'test'
+    ]);
+  })
 });
 
 interface Inputs{
