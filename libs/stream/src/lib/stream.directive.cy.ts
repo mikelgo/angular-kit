@@ -13,12 +13,26 @@ import {
 } from "./types/render-strategies";
 
 const TEST_ELEMENT_ID = 'test-element';
+const INCREMENT_BUTTON_ID = 'increment-button';
+const ID_DEFAULT_STRATEGY = 'btn-default-strategy'
+const ID_THROTTLE_STRATEGY = 'btn-throttle-strategy'
+const ID_DEBOUNCE_STRATEGY = 'btn-debounce-strategy'
+const ID_VIEWPORT_STRATEGY = 'btn-viewport-strategy'
+const ID_RENDER_COUNT = 'render-count'
 
 describe(StreamDirective.name, () => {
   it('renders', async () => {
     const {render} = await setup();
 
     render();
+  })
+  it('should only re-render the EmbeddedViewRef and not the whole component', async () => {
+    const {render} = await setup();
+    render();
+
+    cy.get(`#${INCREMENT_BUTTON_ID}`).click();
+
+    cy.get(`#${ID_RENDER_COUNT}`).should('contain', '2');
   })
   describe('Config', () => {
     describe('lazyViewCreation', () => {
@@ -50,10 +64,14 @@ describe(StreamDirective.name, () => {
 
 
   describe('Render strategies', () => {
-    describe('DefaultRenderStrategy', () => {})
-    describe('ThrottleRenderStrategy', () => {})
-    describe('DebounceRenderStrategy', () => {})
-    describe('ViewportRenderStrategy', () => {})
+    describe('DefaultRenderStrategy', () => {
+      it('should ', async () => {
+
+      })
+    })
+    //describe('ThrottleRenderStrategy', () => {})
+    //describe('DebounceRenderStrategy', () => {})
+    //describe('ViewportRenderStrategy', () => {})
   })
 
 
@@ -86,7 +104,7 @@ async function setup(cfg?: {
   template: `
     <div>
       <div>
-        <button (click)="value$$.next(1)">update value</button>
+        <button [id]="INCREMENT_BTN" (click)="value$$.next(1)">update value</button>
         <dirty-checker></dirty-checker>
       </div>
       <div class="resizable">
@@ -98,10 +116,10 @@ async function setup(cfg?: {
         <div>Config: {{ getRenderStrategyConfig(renderStrategy) }}</div>
       </div>
       <div class="btns">
-        <button id="btn-default-strategy" (click)="renderStrategy$$.next(DEFAULT_RENDER_STRATEGY)">DefaultStrategy</button>
-        <button id="btn-throttle-strategy" (click)="renderStrategy$$.next(THROTTLE_RENDER_STRATEGY)">ThrottleStrategy</button>
-        <button id="btn-debounce-strategy" (click)="renderStrategy$$.next(DEBOUNCE_RENDER_STRATEGY)">DebounceStrategy</button>
-        <button id="btn-viewport-strategy" (click)="renderStrategy$$.next(VIEW_PORT_STRATEGY)">ViewPortStrategy</button>
+        <button [id]="ID_DEFAULT_STRATEGY" (click)="renderStrategy$$.next(DEFAULT_RENDER_STRATEGY)">DefaultStrategy</button>
+        <button [id]="ID_THROTTLE_STRATEGY" (click)="renderStrategy$$.next(THROTTLE_RENDER_STRATEGY)">ThrottleStrategy</button>
+        <button [id]="ID_DEBOUNCE_STRATEGY" (click)="renderStrategy$$.next(DEBOUNCE_RENDER_STRATEGY)">DebounceStrategy</button>
+        <button [id]="ID_VIEWPORT_STRATEGY" (click)="renderStrategy$$.next(VIEW_PORT_STRATEGY)">ViewPortStrategy</button>
       </div>
     </div>
      <div>
@@ -120,7 +138,7 @@ async function setup(cfg?: {
          [id]="TEST_ELEMENT_ID"
          class="embedded">
           <span>Value: <span id="value">{{ value }}</span> </span>
-         <span id="render-count" class="count">{{ count }}</span>
+         <span [id]="ID_RENDER_COUNT" class="count">{{ count }}</span>
        </p>
       </div>
 
@@ -191,6 +209,12 @@ class TestHostComponent{
 
   renderCallback$$ = new ReplaySubject<any>(1)
   TEST_ELEMENT_ID = TEST_ELEMENT_ID
+  INCREMENT_BTN = INCREMENT_BUTTON_ID;
+   ID_DEFAULT_STRATEGY = ID_DEFAULT_STRATEGY
+   ID_THROTTLE_STRATEGY = ID_THROTTLE_STRATEGY
+   ID_DEBOUNCE_STRATEGY = ID_DEBOUNCE_STRATEGY
+   ID_VIEWPORT_STRATEGY = ID_VIEWPORT_STRATEGY
+  ID_RENDER_COUNT = ID_RENDER_COUNT
 
   getRenderStrategyConfig(renderStrategy: RenderStrategy) {
     if (renderStrategy.type === 'throttle') {

@@ -85,7 +85,14 @@
         "cypressConfig": "libs/stream/cypress.config.ts",
         "testingType": "component",
         "skipServe": true,
-        "devServerTarget": "demo:build"
+        "devServerTarget": "demo:build",
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/demo/src/assets",
+            "output": "src/assets"
+          }
+        ]
       }
     }
   },
