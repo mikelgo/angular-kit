@@ -2,6 +2,21 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [2.0.0](https://github.com/code-workers-io/angular-kit/compare/cdk-1.2.0...cdk-2.0.0) (2023-04-17)
+
+
+### Features
+
+* **cdk:** add effectOnChanges$ ([4650e54](https://github.com/code-workers-io/angular-kit/commit/4650e5477a226693d58d8d8dc0275b2199921bd7))
+* **cdk:** add effectOnChanges$ and OnChanges$ ([2ced23d](https://github.com/code-workers-io/angular-kit/commit/2ced23d1b8054668fd2bd7fcb6e1622a7fb7ac9d))
+* **cdk:** add rxIfList-directive ([f32bac2](https://github.com/code-workers-io/angular-kit/commit/f32bac24a7ee0998080f472a0075b05dcfb09b01)), closes [#29](https://github.com/code-workers-io/angular-kit/issues/29)
+* **cdk:** add TrackById and TrackByProp directive ([939f4f7](https://github.com/code-workers-io/angular-kit/commit/939f4f7fc33c9f4394610f0c81a63b50aad82c4c))
+* **cdk:** enhance rxIfList with a template to render in falsy case ([7883d0c](https://github.com/code-workers-io/angular-kit/commit/7883d0c2948cfb43c30b99a55e5e23fa5e12e903))
+* **cdk:** improve rxIfList context ([c2153b0](https://github.com/code-workers-io/angular-kit/commit/c2153b0786d26346e045f694284b7dad0c0fc6f0))
+* **cdk:** rxIfList does now accept also Observables as input ([92675f7](https://github.com/code-workers-io/angular-kit/commit/92675f7639a3a96d34221ebafbc973ee00a77ba2))
+
+
+
 # [1.2.0](https://github.com/code-workers-io/angular-kit/compare/cdk-1.1.2...cdk-1.2.0) (2023-03-04)
 
 
