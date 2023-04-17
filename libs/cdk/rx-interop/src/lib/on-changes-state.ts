@@ -60,11 +60,12 @@ class OnChanges<I extends Record<string, any>> {
    *  }
    * @param changes
    */
-  connect$<I>(changes: TypedSimpleChanges<I>){
-    const value = mapChanges(changes);
-    if (value === undefined) {
+  connect$<I>(changes: TypedSimpleChanges<I> | undefined){
+    if (changes === undefined) {
       return;
     }
+    const value = mapChanges(changes);
+
     if (!this.initialized$$.getValue()){
       this.initialized$$.next(true);
     }

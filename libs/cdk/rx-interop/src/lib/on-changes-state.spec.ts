@@ -38,6 +38,14 @@ describe('OnChangesState', () => {
 
       expect(result.getValues()).toEqual([mapChanges(changes)]);
     });
+    it('should not run when change is undefined', async () => {
+      const {state} = await setup();
+      const result = subscribeSpyTo(state.changes$);
+
+      state.connect$(undefined as unknown as TypedSimpleChanges<Inputs>);
+
+      expect(result.getLastValue()).toBeUndefined()
+    });
   });
 
   describe('changesState$', () => {
