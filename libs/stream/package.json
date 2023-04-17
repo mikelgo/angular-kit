@@ -5,8 +5,9 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@angular/core": ">=11.0.0",
-    "rxjs": ">=6.5.5"
+    "@angular/core": ">=14.0.0",
+    "@angular/common": ">=14.0.0",
+    "rxjs": ">=7.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"
