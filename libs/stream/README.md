@@ -128,8 +128,8 @@ You can configure `stream` to use defined components for loading, error and comp
 
 ```typescript
 @NgModule({
-  imports: [
-    StreamModule.withConfig({
+  providers: [
+    provideStreamDirectiveConfig({
       loadingComponent: MyLoadingComponent,
       errorComponent: MyErrorComponent,
       completeComponent: MyCompleteComponent,
@@ -147,7 +147,8 @@ In your custom components you have access to the context via `STREAM_DIR_CONTEXT
   template: ` <div *ngIf="loading">Loading... {{ context.loading }}</div> `,
 })
 export class MyLoadingComponent {
-  constructor(@Inject(STREAM_DIR_CONTEXT) public context: StreamDirectiveContext) {}
+  context = injectStreamDirectiveContext();
+  
 }
 ```
 
@@ -219,3 +220,4 @@ Whereas on the left side all values do increase. There's no counter in the tiny 
 ## Versioning
 * [Semantic Versioning 2.0.0](http://semver.org/)
 * Version 1.x.x is compatible with Angular 11.x.x
+* Version 2.x.x is compatible with Angular > 14.x.x
