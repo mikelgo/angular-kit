@@ -2,28 +2,20 @@ import {
   Directive,
   EmbeddedViewRef,
   Input,
-  NgModule,
   OnDestroy,
   TemplateRef,
   ViewContainerRef,
   ɵstringify as stringify
 } from '@angular/core';
-import {CommonModule} from '@angular/common';
 import {distinctUntilChanged, mergeAll, Observable, ReplaySubject, Subscription} from "rxjs";
 import {coerceObservable} from "@angular-kit/cdk/coercing";
 
 @Directive({
   // eslint-disable-next-line @angular-eslint/directive-selector
   selector: '[rxIfList]',
+  standalone: true
 })
 export class RxIfListDirective implements OnDestroy{
-  private readonly sub = new Subscription();
-  private readonly valueSource$$ = new ReplaySubject<Observable<ArrayLike<unknown> | null | undefined> >(1);
-  private _context: RxIfListContext = new RxIfListContext();
-  private _thenTemplateRef: TemplateRef<RxIfListContext>|null = null;
-  private _elseTemplateRef: TemplateRef<RxIfListContext>|null = null;
-  private _thenViewRef: EmbeddedViewRef<RxIfListContext>|null = null;
-  private _elseViewRef: EmbeddedViewRef<RxIfListContext>|null = null;
   /** @internal */
   static rxIfListUseIfTypeGuard: void;
 
@@ -36,6 +28,15 @@ export class RxIfListDirective implements OnDestroy{
    * narrow its type, which allows the strictNullChecks feature of TypeScript to work with `rxIfList`.
    */
   static ngTemplateGuard_rxIfList: 'binding';
+
+  private readonly sub = new Subscription();
+  private readonly valueSource$$ = new ReplaySubject<Observable<ArrayLike<unknown> | null | undefined> >(1);
+  private _context: RxIfListContext = new RxIfListContext();
+  private _thenTemplateRef: TemplateRef<RxIfListContext>|null = null;
+  private _elseTemplateRef: TemplateRef<RxIfListContext>|null = null;
+  private _thenViewRef: EmbeddedViewRef<RxIfListContext>|null = null;
+  private _elseViewRef: EmbeddedViewRef<RxIfListContext>|null = null;
+
 
   /**
    * Asserts the correct type of the context for the template that `rxIfList` will render.
@@ -135,9 +136,3 @@ function assertTemplate(property: string, templateRef: TemplateRef<any>|null): v
   }
 }
 
-@NgModule({
-  imports: [CommonModule],
-  declarations: [RxIfListDirective],
-  exports: [RxIfListDirective],
-})
-export class RxIfListDirectiveModule {}

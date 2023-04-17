@@ -1,10 +1,10 @@
-import {NgModule, Pipe, PipeTransform} from '@angular/core';
-import {CommonModule} from '@angular/common';
+import {Pipe, PipeTransform} from '@angular/core';
 
 export type RunFnExpression<T> = (...args: any[]) => T
 
 @Pipe({
   name: 'runFn',
+  standalone: true,
 })
 export class RunFnPipe implements PipeTransform {
   transform<T>(fn: RunFnExpression<T>, ...args: any[]): T {
@@ -14,10 +14,3 @@ export class RunFnPipe implements PipeTransform {
     return fn(...args);
   }
 }
-
-@NgModule({
-  imports: [CommonModule],
-  declarations: [RunFnPipe],
-  exports: [RunFnPipe],
-})
-export class RunFnPipeModule {}

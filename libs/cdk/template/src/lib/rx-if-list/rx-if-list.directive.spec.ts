@@ -1,4 +1,4 @@
-import {RxIfListDirective, RxIfListDirectiveModule} from './rx-if-list.directive';
+import {RxIfListDirective} from './rx-if-list.directive';
 import {TestBed} from '@angular/core/testing';
 import {Component} from '@angular/core';
 
@@ -37,7 +37,7 @@ async function setup(template: string) {
 
   await TestBed.configureTestingModule({
     declarations: [TestHostComponent],
-    imports: [RxIfListDirectiveModule],
+    imports: [RxIfListDirective],
     //providers: [RxIfListDirective]
   }).compileComponents();
 

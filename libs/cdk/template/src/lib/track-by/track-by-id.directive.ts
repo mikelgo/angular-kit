@@ -1,9 +1,10 @@
-import {Directive, Host, NgModule} from '@angular/core';
-import {CommonModule, NgForOf} from '@angular/common';
+import {Directive, Host} from '@angular/core';
+import {NgForOf} from '@angular/common';
 
 @Directive({
   // eslint-disable-next-line @angular-eslint/directive-selector
   selector: '[ngForTrackById]',
+  standalone: true,
 })
 export class TrackByIdDirective<T extends {id: unknown}> {
 
@@ -15,9 +16,3 @@ export class TrackByIdDirective<T extends {id: unknown}> {
   }
 }
 
-@NgModule({
-  imports: [CommonModule],
-  declarations: [TrackByIdDirective],
-  exports: [TrackByIdDirective],
-})
-export class TrackByIdDirectiveModule {}

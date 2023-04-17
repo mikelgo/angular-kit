@@ -1,10 +1,10 @@
-import {NgModule, Pipe, PipeTransform} from '@angular/core';
-import {CommonModule} from '@angular/common';
+import {Pipe, PipeTransform} from '@angular/core';
 import {ProviderFn, RunFnExpression} from "../types/types";
 import {from, map, Observable} from "rxjs";
 
 @Pipe({
   name: 'lazy',
+  standalone: true,
 })
 export class LazyPipe implements PipeTransform {
   transform<R>(fn: RunFnExpression<R>, providerFn: ProviderFn): Observable<R> {
@@ -12,10 +12,3 @@ export class LazyPipe implements PipeTransform {
 
   }
 }
-
-@NgModule({
-  imports: [CommonModule],
-  declarations: [LazyPipe],
-  exports: [LazyPipe],
-})
-export class LazyPipeModule {}

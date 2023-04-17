@@ -1,9 +1,10 @@
-import {Directive, Host, Input, NgModule} from '@angular/core';
-import {CommonModule, NgForOf} from '@angular/common';
+import {Directive, Host, Input} from '@angular/core';
+import {NgForOf} from '@angular/common';
 
 @Directive({
   // eslint-disable-next-line @angular-eslint/directive-selector
   selector: '[ngForTrackByProp]',
+  standalone: true
 })
 export class TrackByPropDirective<T> {
   @Input() ngForTrackByProp!: keyof T;
@@ -18,9 +19,3 @@ export class TrackByPropDirective<T> {
   }
 }
 
-@NgModule({
-  imports: [CommonModule],
-  declarations: [TrackByPropDirective],
-  exports: [TrackByPropDirective],
-})
-export class TrackByPropDirectiveModule {}
