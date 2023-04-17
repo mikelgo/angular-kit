@@ -24,7 +24,7 @@ class OnChanges<I extends Record<string, any>> {
   changes$: Observable<Partial<I>> = this.initialized$$.pipe(
     filter(initialized => !!initialized),
     switchMap(() => this.source$$),
-    distinctUntilChanged((previous: I, current: I) => {
+    distinctUntilChanged((previous: Partial<I>, current: Partial<I>) => {
       const keys = Object.keys(current);
       return keys.every((key) => {
         return current[key] === previous[key];
