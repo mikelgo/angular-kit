@@ -12,15 +12,15 @@ import {StreamVsAsyncComponent} from './stream-vs-async/stream-vs-async.componen
 import {L1StreamComponent} from './stream-vs-async/l1-stream.component';
 import {L2StreamComponent} from './stream-vs-async/l2-stream.component';
 import {
-  RxObserveIntersectionDirectiveModule,
-  RxObserveResizeDirectiveModule,
-  RxRenderInViewportDirectiveModule
-} from "@angular-kit/rx/platform";
-import {StreamDirectiveModule} from "@angular-kit/stream";
+  RxObserveIntersectionDirective,
+  RxObserveResizeDirective,
+  RxRenderInViewportDirective,
+} from '@angular-kit/rx/platform';
+import {StreamDirective} from '@angular-kit/stream';
 import {
-  RxObserveVisibilityDirectiveModule
-} from "../../../../libs/rx/platform/src/lib/directives/rx-observe-visibility.directive";
-import {DemoOnchangesComponent} from "./demo-onchanges/demo-onchanges.component";
+  RxObserveVisibilityDirective
+} from '../../../../libs/rx/platform/src/lib/directives/rx-observe-visibility.directive';
+import {DemoOnchangesComponent} from './demo-onchanges/demo-onchanges.component';
 
 @NgModule({
   declarations: [
@@ -34,14 +34,14 @@ import {DemoOnchangesComponent} from "./demo-onchanges/demo-onchanges.component"
   ],
   imports: [
     BrowserModule,
-    StreamDirectiveModule,
+    StreamDirective,
     HttpClientModule,
     NgxDirtyCheckerModule,
-    RxObserveResizeDirectiveModule,
-    RxObserveIntersectionDirectiveModule,
-    RxObserveVisibilityDirectiveModule,
-    RxObserveVisibilityDirectiveModule,
-    RxRenderInViewportDirectiveModule,
+    RxObserveResizeDirective,
+    RxObserveIntersectionDirective,
+    RxObserveVisibilityDirective,
+    RxObserveVisibilityDirective,
+    RxRenderInViewportDirective,
     DemoOnchangesComponent,
   ],
   providers: [],
