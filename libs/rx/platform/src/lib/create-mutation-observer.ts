@@ -1,4 +1,4 @@
-import {debounceTime, Observable, ReplaySubject, SchedulerLike, share} from 'rxjs';
+import {debounceTime, Observable, SchedulerLike, shareReplay} from 'rxjs';
 import {ElementRef} from '@angular/core';
 import {isElementRef} from "./utils/is-element-ref";
 
@@ -35,11 +35,6 @@ export function createMutationObserver(
 
   return obs$.pipe(
     cfg?.throttleMs ? debounceTime(cfg?.throttleMs, cfg?.scheduler) : debounceTime(DEFAULT_THROTTLE_TIME),
-    share({
-      connector: () => new ReplaySubject(1),
-      resetOnComplete: false,
-      resetOnError: false,
-      resetOnRefCountZero: false,
-    })
+    shareReplay({refCount: true, bufferSize: 1})
   );
 }

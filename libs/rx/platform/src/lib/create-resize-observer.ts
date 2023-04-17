@@ -1,5 +1,5 @@
 import {ElementRef} from '@angular/core';
-import {debounceTime, distinctUntilChanged, Observable, ReplaySubject, SchedulerLike, share} from 'rxjs';
+import {debounceTime, distinctUntilChanged, Observable, SchedulerLike, shareReplay} from 'rxjs';
 import {isElementRef} from "./utils/is-element-ref";
 
 const DEFAULT_THROTTLE_TIME = 50;
@@ -35,12 +35,7 @@ export function createResizeObserver(
   return obs$.pipe(
     distinctUntilChanged(),
     cfg?.throttleMs ? debounceTime(cfg?.throttleMs, cfg?.scheduler) : debounceTime(DEFAULT_THROTTLE_TIME),
-    share({
-      connector: () => new ReplaySubject(1),
-      resetOnComplete: false,
-      resetOnError: false,
-      resetOnRefCountZero: false,
-    })
+    shareReplay({refCount: true, bufferSize: 1})
   );
 }
 

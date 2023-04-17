@@ -1,13 +1,4 @@
-import {
-  BehaviorSubject,
-  distinctUntilChanged,
-  filter,
-  Observable,
-  ReplaySubject,
-  share,
-  ShareConfig,
-  Subject
-} from 'rxjs';
+import {BehaviorSubject, distinctUntilChanged, filter, Observable, ReplaySubject, shareReplay, Subject} from 'rxjs';
 
 export interface Stream<T> {
   send: (val: T) => void;
@@ -16,7 +7,6 @@ export interface Stream<T> {
 
 export interface StreamConfig<T> {
   filterNull?: boolean;
-  shareCfg?: ShareConfig<T>;
 }
 
 
@@ -26,13 +16,6 @@ export function createStream<T>(cfg: StreamConfig<T>): Stream<T>;
 export function createStream<T>(initialValue: T): Stream<T>
 export function createStream<T>(initialValue: T, cfg: StreamConfig<T>): Stream<T>
 export function createStream<T>(initialValueOrConfig?: T | StreamConfig<T>, cfg?: StreamConfig<T>): Stream<T> {
-  const defaultShareCfg: ShareConfig<T> = {
-    connector: () => new ReplaySubject(1),
-    resetOnComplete: false,
-    resetOnError: false,
-    resetOnRefCountZero: false,
-  };
-
   const initialvalue: T | undefined = !isStreamConfig(initialValueOrConfig) ? initialValueOrConfig as T : undefined;
   let config: StreamConfig<T> | undefined
   if(isStreamConfig(initialValueOrConfig)) {
@@ -49,7 +32,7 @@ export function createStream<T>(initialValueOrConfig?: T | StreamConfig<T>, cfg?
   const $ = signal.asObservable() .pipe(
     filter((v) => v !== undefined && (config?.filterNull ? v !== null : true)),
     distinctUntilChanged(),
-    share(config?.shareCfg ?? defaultShareCfg)
+    shareReplay({refCount: true, bufferSize: 1})
   );
 
   return {
