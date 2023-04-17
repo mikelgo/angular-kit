@@ -17,3 +17,4 @@ npm install @angular-kit/rx
 ## Versioning
 * [Semantic Versioning 2.0.0](http://semver.org/)
 * Version 1.x.x is compatible with Angular 11.x.x
+* * Version 2.x.x is compatible with Angular > 14.x.x
