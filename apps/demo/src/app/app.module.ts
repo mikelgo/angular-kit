@@ -20,6 +20,7 @@ import {StreamDirectiveModule} from "@angular-kit/stream";
 import {
   RxObserveVisibilityDirectiveModule
 } from "../../../../libs/rx/platform/src/lib/directives/rx-observe-visibility.directive";
+import {DemoOnchangesComponent} from "./demo-onchanges/demo-onchanges.component";
 
 @NgModule({
   declarations: [
@@ -41,6 +42,7 @@ import {
     RxObserveVisibilityDirectiveModule,
     RxObserveVisibilityDirectiveModule,
     RxRenderInViewportDirectiveModule,
+    DemoOnchangesComponent,
   ],
   providers: [],
   bootstrap: [AppComponent],

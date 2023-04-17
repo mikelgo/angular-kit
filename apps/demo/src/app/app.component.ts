@@ -30,6 +30,10 @@ interface Foo {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
+  name$ = new BehaviorSubject<string>('Hi');
+  id$ = new BehaviorSubject<number>(10);
+
+
   title = 'demo';
   completeSignal$$ = new Subject<any>();
   source$ = interval(1000).pipe(
@@ -75,6 +79,9 @@ export class AppComponent {
 
   onResize($event: any) {
     //console.log($event);
+  }
+  random() {
+    return Math.random();
   }
 }
 @Injectable({ providedIn: 'root' })

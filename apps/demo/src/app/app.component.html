@@ -1,3 +1,8 @@
+<button (click)="id$.next(random())"> next id</button>
+<button (click)="name$.next('Hi')"> next name</button>
+<demo-onchanges [name]="(name$ | async)!"  [value]="(id$ | async)!"></demo-onchanges>
+<br>
+<hr>
 <button (click)="completeSignal$$.next(1)">complete</button>
 <button (click)="refreshCommand$.next(1)">refresh</button>
 <ng-container
