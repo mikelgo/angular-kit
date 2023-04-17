@@ -1,4 +1,4 @@
-import {RxObserveResizeDirective, RxObserveResizeDirectiveModule} from './rx-observe-resize.directive';
+import {RxObserveResizeDirective} from './rx-observe-resize.directive';
 import {Component, ViewChild} from '@angular/core';
 import {fakeAsync, TestBed, tick} from '@angular/core/testing';
 import {mockResizeObserver} from '../../../../__test-utils/platform.testing';
@@ -42,7 +42,7 @@ async function create() {
   }
 
   TestBed.configureTestingModule({
-    imports: [RxObserveResizeDirectiveModule],
+    imports: [RxObserveResizeDirective],
     declarations: [TestComponent],
   });
   mockResizeObserver();

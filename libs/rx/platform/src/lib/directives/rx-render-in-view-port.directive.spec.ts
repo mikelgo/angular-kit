@@ -1,6 +1,6 @@
 import {fakeAsync, TestBed, tick} from "@angular/core/testing";
 import {Component, ViewChild} from "@angular/core";
-import {RxRenderInViewportDirective, RxRenderInViewportDirectiveModule} from "./rx-render-in-view-port.directive";
+import {RxRenderInViewportDirective} from "./rx-render-in-view-port.directive";
 import {By} from "@angular/platform-browser";
 import {mockIntersectionObserver} from '../../../../__test-utils/platform.testing';
 
@@ -43,7 +43,7 @@ async function create() {
   }
 
   TestBed.configureTestingModule({
-    imports: [RxRenderInViewportDirectiveModule],
+    imports: [RxRenderInViewportDirective],
     declarations: [TestComponent],
   });
   mockIntersectionObserver();

@@ -3,18 +3,17 @@ import {
   Directive,
   EmbeddedViewRef,
   Input,
-  NgModule,
   OnDestroy,
   TemplateRef,
   ViewContainerRef,
 } from '@angular/core';
-import {CommonModule} from '@angular/common';
 import {combineLatest, mergeMap, SchedulerLike, startWith, Subscription} from 'rxjs';
 import {createStream} from '@angular-kit/rx/streams';
 import {createIntersectionObserver} from '../create-intersection-observer';
 
 @Directive({
   selector: '[rxRenderInViewport]',
+  standalone: true,
 })
 export class RxRenderInViewportDirective implements AfterViewInit, OnDestroy {
   private alreadyRendered = false; // cheking if visible already
@@ -90,10 +89,3 @@ export class RxRenderInViewportDirective implements AfterViewInit, OnDestroy {
     }
   }
 }
-
-@NgModule({
-  imports: [CommonModule],
-  declarations: [RxRenderInViewportDirective],
-  exports: [RxRenderInViewportDirective],
-})
-export class RxRenderInViewportDirectiveModule {}

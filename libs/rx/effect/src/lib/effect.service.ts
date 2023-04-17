@@ -1,4 +1,4 @@
-import {ErrorHandler, Injectable, OnDestroy} from '@angular/core';
+import {ErrorHandler, inject, Injectable, OnDestroy} from '@angular/core';
 import {catchError, EMPTY, Observable, Subscription, tap} from 'rxjs';
 
 /**
@@ -60,4 +60,12 @@ export class Effect implements OnDestroy {
   ngOnDestroy(): void {
     this.sub.unsubscribe();
   }
+}
+
+export function provideEffect() {
+  return Effect;
+}
+
+export function injectEffect() {
+  return inject(Effect);
 }

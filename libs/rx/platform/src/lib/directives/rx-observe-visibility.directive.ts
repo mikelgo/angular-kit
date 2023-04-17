@@ -1,5 +1,4 @@
-import {Directive, ElementRef, EventEmitter, Input, NgModule, Output} from '@angular/core';
-import {CommonModule} from '@angular/common';
+import {Directive, ElementRef, EventEmitter, Input, Output} from '@angular/core';
 import {combineLatest, mergeMap, SchedulerLike, startWith, Subscription} from "rxjs";
 import {createStream} from '@angular-kit/rx/streams';
 import {createIntersectionObserver} from "../create-intersection-observer";
@@ -9,6 +8,7 @@ export type IntersectionStatus = 'Visible' | 'Hidden';
 
 @Directive({
   selector: '[rxObserveVisibility]',
+  standalone: true,
 })
 export class RxObserveVisibilityDirective {
   private sub = new Subscription();
@@ -68,10 +68,3 @@ export class RxObserveVisibilityDirective {
     })
   }
 }
-
-@NgModule({
-  imports: [CommonModule],
-  declarations: [RxObserveVisibilityDirective],
-  exports: [RxObserveVisibilityDirective],
-})
-export class RxObserveVisibilityDirectiveModule {}

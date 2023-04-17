@@ -1,5 +1,4 @@
-import {Directive, ElementRef, Input, NgModule, OnDestroy, Output} from '@angular/core';
-import {CommonModule} from '@angular/common';
+import {Directive, ElementRef, Input, OnDestroy, Output} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {createResizeObserver, ResizeObserverConfig} from '../create-resize-observer';
 import {createStream} from '@angular-kit/rx/streams';
@@ -7,6 +6,7 @@ import {Nullable} from '@angular-kit/cdk/types';
 
 @Directive({
   selector: '[rxObserveResize]',
+  standalone: true,
 })
 export class RxObserveResizeDirective implements OnDestroy {
   private subscription = new Subscription();
@@ -32,10 +32,3 @@ export class RxObserveResizeDirective implements OnDestroy {
     this.subscription.unsubscribe();
   }
 }
-
-@NgModule({
-  imports: [CommonModule],
-  declarations: [RxObserveResizeDirective],
-  exports: [RxObserveResizeDirective],
-})
-export class RxObserveResizeDirectiveModule {}

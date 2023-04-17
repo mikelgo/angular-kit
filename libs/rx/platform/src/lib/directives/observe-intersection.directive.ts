@@ -1,11 +1,11 @@
-import {Directive, ElementRef, EventEmitter, Input, NgModule, OnDestroy, Output} from '@angular/core';
-import {CommonModule} from '@angular/common';
+import {Directive, ElementRef, EventEmitter, Input, OnDestroy, Output} from '@angular/core';
 import {combineLatest, mergeMap, SchedulerLike, startWith, Subscription} from 'rxjs';
 import {createIntersectionObserver} from '../create-intersection-observer';
 import {createStream} from '@angular-kit/rx/streams';
 
 @Directive({
   selector: '[rxObserveIntersection]',
+  standalone: true,
 })
 export class RxObserveIntersectionDirective implements OnDestroy {
   private sub = new Subscription();
@@ -66,10 +66,3 @@ export class RxObserveIntersectionDirective implements OnDestroy {
     this.sub.unsubscribe();
   }
 }
-
-@NgModule({
-  imports: [CommonModule],
-  declarations: [RxObserveIntersectionDirective],
-  exports: [RxObserveIntersectionDirective],
-})
-export class RxObserveIntersectionDirectiveModule {}

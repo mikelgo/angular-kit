@@ -1,4 +1,4 @@
-import {RxObserveVisibilityDirective, RxObserveVisibilityDirectiveModule} from './rx-observe-visibility.directive';
+import {RxObserveVisibilityDirective} from './rx-observe-visibility.directive';
 import {Component, ViewChild} from '@angular/core';
 import {mockIntersectionObserver} from '../../../../__test-utils/platform.testing';
 import {fakeAsync, TestBed, tick} from '@angular/core/testing';
@@ -42,7 +42,7 @@ async function create() {
   }
 
   TestBed.configureTestingModule({
-    imports: [RxObserveVisibilityDirectiveModule],
+    imports: [RxObserveVisibilityDirective],
     declarations: [TestComponent],
   });
   mockIntersectionObserver();

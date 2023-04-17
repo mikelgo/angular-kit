@@ -15,11 +15,11 @@ Tooling to handle your effects (subscriptions)!
 
 @Component({
   ...
-    providers: [Effect]
+    providers: [provideEffect()]
 })
 export class Component {
-
-  constructor(private effects: Effect) {
+  private effects = injectEffect();
+  constructor() {
     this.effects.run(observable$, console.log)
     this.effects.run(observable$.subscribe(console.log))
   }
