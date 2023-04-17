@@ -62,6 +62,9 @@ class OnChanges<I extends Record<string, any>> {
    */
   connect$<I>(changes: TypedSimpleChanges<I>){
     const value = mapChanges(changes);
+    if (value === undefined) {
+      return;
+    }
     if (!this.initialized$$.getValue()){
       this.initialized$$.next(true);
     }
