@@ -38,7 +38,12 @@ export function useHostListener$<T extends Event>(eventName: string): Observable
   );
 }
 
-function useOnDestroy() {
+/**
+ * @internal
+ * @description
+ * helper
+ */
+export function useOnDestroy() {
   const onDestroy$ = new ReplaySubject<void>(1);
   const viewRef = inject(ChangeDetectorRef) as ViewRef;
 
