@@ -15,7 +15,7 @@ import {ElementRef, inject, Renderer2} from "@angular/core";
  * @param className
  * @param enabledByDefault
  */
-export function useHostBinding$(className: string, enabledByDefault: boolean) {
+export function useHostBinding(className: string, enabledByDefault: boolean) {
   const renderer2 = inject(Renderer2);
   const {nativeElement} = inject(ElementRef)
 
