@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.1.1](https://github.com/code-workers-io/angular-kit/compare/rx-2.1.0...rx-2.1.1) (2023-04-19)
+
+
+### Bug Fixes
+
+* **rx:** maintain peer dep to angular-kit/cdk correctly ([afa4e97](https://github.com/code-workers-io/angular-kit/commit/afa4e97c6e616d05af4bbe1cfbda6d37b9c6adef))
+
+
+
 # [2.1.0](https://github.com/code-workers-io/angular-kit/compare/rx-2.0.0...rx-2.1.0) (2023-04-17)
 
 
