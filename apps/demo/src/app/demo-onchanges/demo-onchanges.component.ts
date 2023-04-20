@@ -1,8 +1,14 @@
 import {Component, Input, OnChanges} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {injectOnChanges$, provideOnChanges$} from "../../../../../libs/cdk/rx-interop/src/lib/on-changes-state";
-import {TypedSimpleChanges} from "../../../../../libs/cdk/rx-interop/src/lib/effect-on-changes$";
+
 import {map} from "rxjs";
+import {
+  injectOnChanges$,
+  provideOnChanges$,
+  TypedSimpleChanges,
+  useOnChanges$,
+  useOnChangesState$
+} from "@angular-kit/cdk/rx-interop";
 
 
 interface Inputs {
@@ -30,6 +36,13 @@ interface Inputs {
     <br>
     ValueChange:
     {{ valueChange$ | async }}
+    <hr>
+    <br>
+    UseOnChanges:
+    {{ useOnChanges$ | async | json}}
+    <br>
+    UseOnChangesState:
+    {{ useOnChangesState$ | async | json}}
   `,
   styles: [`
     :host{
@@ -50,11 +63,18 @@ export class DemoOnchangesComponent implements OnChanges{
   changes$ = this.onChangesState.changes$;
   changesState$ = this.onChangesState.changesState$;
 
+  // TODO why are props no longer derived correctly??
   nameChange$ = this.onChangesState.changesState$.pipe(map(x => x.name));
   valueChange$ = this.onChangesState.changesState$.pipe(map(x => x.value));
 
+  useOnChanges$ = useOnChanges$(this)
+  useOnChangesState$ = useOnChangesState$(this)
+
+
   ngOnChanges(changes: TypedSimpleChanges<Inputs>) {
-    this.onChangesState.connect$(changes)
+    //this.onChangesState.connect$<Inputs>(changes)
+
+
   }
 
   constructor() {
