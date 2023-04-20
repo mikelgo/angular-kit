@@ -10,11 +10,12 @@ npm install @angular-kit/cdk
 
 ## 🔋 Included
 
+- [template](./template/README.md) - a collection of pipes and directives for efficient template handling
+- [rx-interop](./rx-interop/README.md) - a collection of helpful methods for better RxJs integration in Angular
 - [types](./types/README.md) - a collection of types which will reflect strict types
 - [coercing](./coercing/README.md) - a collection of coercion helpers
 - [memoize](./memoize/README.md) - a package offering memoization functionality
-- [pipes](./pipes/README.md) - a package offering some helpful pipes
-- [template](./template/README.md) - a collection of pipes and directives for efficient template handling
+
 
 ## Versioning
 * [Semantic Versioning 2.0.0](http://semver.org/)

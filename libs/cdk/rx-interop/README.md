@@ -4,12 +4,19 @@
 
 * `effectOnChanges$`
 * `OnChanges$`
+* `useOnChanges$`
+* `useOnChangesState$`
+* `useFromEvent$`
+* `useHostListener$`
+* `useHostBinding`
+
+
 
 
 #### `effectOnChanges$`
 
 * ✅ Reduces your boilerplate code 
-* ✅ Effect do not run on `undefined` values
+* ✅ Effect does not run on `undefined` values
 
 ##### 📖 Basic Usage
 
@@ -22,6 +29,8 @@ interface Inputs{
   // ...
 })
 export class SomeComponent implements OnChanges{
+    @Input() foo: string;
+    @Input() bar: string;
  
   ngOnChanges(changes: TypedSimpleChanges<Inputs>){
     effectOnChanges$(changes, (change) => { 
@@ -74,6 +83,9 @@ interface Inputs{
   providers: [provideOnChanges$()]
 })
 export class SomeComponent implements OnChanges{
+  @Input() foo: string;
+  @Input() bar: string;
+  
   private onChangesHandler = injectOnChanges$()  
   ngOnChanges(changes: TypedSimpleChanges<Inputs>){
     this.onChangesHandler.connect$(changes)
@@ -84,4 +96,118 @@ export class SomeComponent implements OnChanges{
 }
 
 
+```
+
+#### `useOnChanges$`
+`useOnChanges$` provides an easy way of leveraging `OnChanges` in an reactive way with RxJs.
+
+##### 📖 Basic Usage
+
+```ts
+
+@Component({
+  // ...
+})
+export class SomeComponent implements OnChanges {
+  @Input() foo: string;
+  @Input() bar: string;
+  
+  changes$ = useOnChanges$(this)
+  fooChange$ = useOnChanges$(this, 'foo')
+  barChange$ = this.changes$.pipe(map(change => change.bar))
+
+  ngOnChanges() {
+  }
+}
+```
+> **Warning**
+> Currently you can not use `useOnChanges$` and `effectOnChanges` as well as `OnChanges$` in the same
+> component. 
+
+
+#### `useOnChangesState$`
+`useOnChangesState$` provides an easy way of leveraging `OnChanges` in an reactive way with RxJs. It will
+emit the state of your component's changes.
+
+##### 📖 Basic Usage
+```ts
+
+@Component({
+  // ...
+})
+export class SomeComponent implements OnChanges {
+  @Input() foo: string;
+  @Input() bar: string;
+  
+  changes$ = useOnChangesState$(this)
+  foo$ = useOnChanges$(this, 'foo')
+  bar$ = this.changes$.pipe(map(change => change.bar))
+
+  ngOnChanges() {
+  }
+}
+```
+
+> **Warning**
+> Currently you can not use `useOnChangesState$` and `effectOnChanges` as well as `OnChanges$` in the same
+> component.
+
+#### `useFromEvent$`
+* ✅ simplified usage of `fromEvent`
+* ✅ Optimized change detection - runs outside of Angular's zone by default 
+
+##### 📖 Basic Usage
+
+```ts
+  // in some component
+
+@ViewChild('someElement') someElement: ElementRef;
+
+someElementClick$ = useFromEvent$(this.someElement, 'click')
+
+```
+
+
+#### `useHostListener$`
+* ✅ Optimized change detection - runs outside of Angular's zone by default
+
+##### 📖 Basic Usage
+```ts
+
+@Component({
+  // ...
+})
+export class SomeComponent {
+    clicks$ = useHostListener$(this, 'click')
+}
+```
+
+
+
+#### `useHostBinding`
+
+##### 📖 Basic Usage
+```ts
+
+@Component({
+  // ...,
+  styles: [
+    `
+    .bg {
+      background: red;
+    }
+  `,
+  ],
+})
+export class SomeComponent {
+  background = useHostBinding('bg', false);
+  clicks$ = useHostListener$(this, 'click')
+  
+  constructor() {
+    this.clicks$.subscribe(() => {
+      this.background.set(!this.background.get())
+    });
+  }
+  
+}
 ```
