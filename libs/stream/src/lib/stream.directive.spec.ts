@@ -29,7 +29,7 @@ import {RenderContext} from "./types/render-context";
 import {StreamDirectiveContext} from "./types/stream-directive-context";
 import {TestViewContainerRef} from "../__test__/utils/mock-vcr";
 import {TestTemplateRef} from "../__test__/utils/mock-templateref";
-import {ThrottleRenderStrategy} from "./types/render-strategies";
+import {ThrottleRenderStrategy, ViewportRenderStrategy} from "./types/render-strategies";
 
 describe('StreamDirective', () => {
   describe('Basic', () => {
@@ -358,6 +358,87 @@ describe('StreamDirective', () => {
     })
 
   })
+
+  describe('RenderStrategies', () => {
+    describe('renderStrategy$', () => {
+      it('should be DefaultRenderStrategy by default', async () => {
+        const { directive } = await setupDirective(createConfig());
+
+        const result = subscribeSpyTo(directive.renderStrategy$);
+
+        expect(result.getLastValue()).toEqual({type: 'default'});
+      });
+
+      it('should be derived from renderStrategy$$', async () => {
+        const { directive } = await setupDirective(createConfig());
+        const throttleRenderStrategy: ThrottleRenderStrategy = {
+          type: 'throttle',
+          throttleInMs: 100
+        }
+        const viewPortStrategy: ViewportRenderStrategy = {
+          type: 'viewport',
+          threshold: 10
+        }
+
+        const result = subscribeSpyTo(directive.renderStrategy$);
+
+        directive.streamRenderStrategy = throttleRenderStrategy;
+        directive.streamRenderStrategy = viewPortStrategy;
+
+        expect(result.getValues()).toEqual([
+          {type: 'default'},
+          throttleRenderStrategy,
+          viewPortStrategy
+        ]);
+      });
+    })
+
+    describe('isViewPortStrategy$', () => {
+      it('should be false by default', async () => {
+        const { directive } = await setupDirective(createConfig());
+
+        const result = subscribeSpyTo(directive.isViewPortStrategy$);
+
+        expect(result.getLastValue()).toEqual(false);
+      });
+      it('should be true when ViewPortStrategy is set', async () => {
+        const { directive } = await setupDirective(createConfig());
+
+        const result = subscribeSpyTo(directive.isViewPortStrategy$);
+
+        directive.streamRenderStrategy = {
+          type: 'viewport',
+          threshold: 10
+        }
+
+        expect(result.getLastValue()).toEqual(true);
+      });
+    })
+
+    describe('viewPortObserver$', () => {
+      it('should emit null by default', async () => {
+        const { directive } = await setupDirective(createConfig());
+
+        const result = subscribeSpyTo(directive.viewPortObserver$);
+
+        expect(result.getLastValue()).toEqual(null);
+      });
+  /*    it('should emit IntersectionObserver when ViewPortStrategy is set', async () => {
+        const { directive } = await setupDirective(createConfig());
+        mockIntersectionObserver();
+        const result = subscribeSpyTo(directive.viewPortObserver$);
+
+        directive.streamRenderStrategy = {
+          type: 'viewport',
+          threshold: 10
+        }
+
+        (directive as any).viewContainerRef?.element.nativeElement.parentElement.dispatchEvent(new Event('intersect'));
+
+        expect(result.getLastValue()).not.toEqual(null);
+      });*/
+    })
+  });
 });
 
 function createSource(cfg?: { data?: Partial<TestModel>; completeSignal?: Subject<boolean> }): Observable<TestModel> {
