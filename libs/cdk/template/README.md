@@ -92,6 +92,6 @@ A directive to track `ngFor` by property.
 
 ```html
 <ul>
-  <li *ngFor="let item of items; trackBy: ngForTrackByProp('id')">{{item.name}}</li>
+  <li *ngFor="let item of items; trackBy: ngForTrackByProp: 'id'">{{item.name}}</li>
 </ul>
 ```
