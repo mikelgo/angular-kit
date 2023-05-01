@@ -1,4 +1,4 @@
-import {Subject} from 'rxjs';
+import {BehaviorSubject, Subject} from 'rxjs';
 import {rxQuery$} from './rxQuery';
 import {subscribeSpyTo} from '@hirez_io/observer-spy';
 
@@ -17,21 +17,40 @@ describe('query$', () => {
     ]);
   });
 
-  it('with refresh ', () => {
-    const source$ = new Subject<number>();
-    const refresh$ = new Subject<unknown>();
-    const result = subscribeSpyTo(rxQuery$<number>(source$, { refreshTrigger$: refresh$ }));
 
-    source$.next(10);
-    refresh$.next(null);
 
-    expect(result.getValues()).toEqual([
-      { isLoading: true, isRefreshing: false, value: undefined },
-      { isLoading: false, isRefreshing: false, value: 10 },
-      { isLoading: true, isRefreshing: true, value: 10 },
-      { isLoading: false, isRefreshing: false, value: 10 },
-    ]);
-  });
+  describe('with refresh', () => {
+    it('subject ', () => {
+      const source$ = new Subject<number>();
+      const refresh$ = new Subject<unknown>();
+      const result = subscribeSpyTo(rxQuery$<number>(source$, { refreshTrigger$: refresh$ }));
+
+      source$.next(10);
+      refresh$.next(null);
+
+      expect(result.getValues()).toEqual([
+        { isLoading: true, isRefreshing: false, value: undefined },
+        { isLoading: false, isRefreshing: false, value: 10 },
+        { isLoading: true, isRefreshing: true, value: 10 },
+        { isLoading: false, isRefreshing: false, value: 10 },
+      ]);
+    });
+    it('BehaivorSubject ', () => {
+      const source$ = new Subject<number>();
+      const refresh$ = new BehaviorSubject<unknown>(null);
+      const result = subscribeSpyTo(rxQuery$<number>(source$, { refreshTrigger$: refresh$ }));
+
+      source$.next(10);
+      refresh$.next(null);
+
+      expect(result.getValues()).toEqual([
+        { isLoading: true, isRefreshing: false, value: undefined },
+        { isLoading: false, isRefreshing: false, value: 10 },
+        { isLoading: true, isRefreshing: true, value: 10 },
+        { isLoading: false, isRefreshing: false, value: 10 },
+      ]);
+    });
+  })
 
   describe('keepValueOnRefresh', () => {
     it('should keep value on refresh by default', () => {

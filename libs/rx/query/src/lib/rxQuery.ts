@@ -1,13 +1,16 @@
 import {
+  BehaviorSubject,
   catchError,
   distinctUntilChanged,
   map,
   merge,
   Observable,
   of,
+  pipe,
   ReplaySubject,
   scan,
   share,
+  skip,
   startWith,
   Subject,
   switchMap,
@@ -34,6 +37,8 @@ export function rxQuery$<T, E = unknown>(source$: Observable<T>, config?: RxQuer
     ...config
   }
 
+  const refreshTriggerIsBehaivorSubject = (config: RxQueryConfig) => config.refreshTrigger$ instanceof BehaviorSubject;
+
   const refresh$ = mergedConfig?.refreshTrigger$ ?? new Subject<unknown>();
   const sharedSource$ = source$.pipe(
     share({
@@ -49,6 +54,12 @@ export function rxQuery$<T, E = unknown>(source$: Observable<T>, config?: RxQuer
 
 
   const refreshedRequest$: Observable<Partial<RxQuery<any, any>>> = refresh$.pipe(
+    /**
+     * in case the refreshTrigger$ is a BehaviorSubject, we want to skip the first value
+     * bc otherwise the emissions are not correct. It will then emit 4 vales instead of 2.
+     * the 2 additional values come from isRefreshing which is not correct.
+     */
+    refreshTriggerIsBehaivorSubject(mergedConfig) ? skip(1) : pipe(),
     switchMap(() =>
       sharedSource$.pipe(
         map((v) => ({ value: v, isLoading: false, isRefreshing: false })),
