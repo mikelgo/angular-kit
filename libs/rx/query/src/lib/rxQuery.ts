@@ -1,9 +1,11 @@
 import {
   BehaviorSubject,
   catchError,
+  debounce,
   distinctUntilChanged,
   map,
   merge,
+  MonoTypeOperatorFunction,
   Observable,
   of,
   pipe,
@@ -81,6 +83,28 @@ export function rxQuery$<T, E = unknown>(source$: Observable<T>, config?: RxQuer
       resetOnError: false,
       resetOnComplete: false,
       resetOnRefCountZero: false,
-    })
+    }),
+    _handleSyncValue(),
   );
+}
+
+function _handleSyncValue<T>(): MonoTypeOperatorFunction<any> {
+  return (source$: Observable<T>): Observable<T> => {
+    return new Observable<T>((observer) => {
+      const isReady$$ = new ReplaySubject<unknown>(1);
+
+      const sub = source$
+        .pipe(
+          /* Wait for all synchronous processing to be done. */
+          debounce(() => isReady$$)
+        )
+        .subscribe(observer);
+
+      /* Sync emitted values have been processed now.
+       * Mark source as ready and emit last computed state. */
+      isReady$$.next(undefined);
+
+      return () => sub.unsubscribe();
+    });
+  };
 }
