@@ -29,6 +29,7 @@
       "@angular-kit/rx/operators": ["libs/rx/operators/src/index.ts"],
       "@angular-kit/rx/platform": ["libs/rx/platform/src/index.ts"],
       "@angular-kit/rx/query": ["libs/rx/query/src/index.ts"],
+      "@angular-kit/rx/rx-stateful": ["libs/rx/rx-stateful/src/index.ts"],
       "@angular-kit/rx/streams": ["libs/rx/streams/src/index.ts"],
       "@angular-kit/stream": ["libs/stream/src/index.ts"]
     }

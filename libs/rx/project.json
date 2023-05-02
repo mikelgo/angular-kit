@@ -45,7 +45,9 @@
           "libs/rx/effect/**/*.ts",
           "libs/rx/effect/**/*.html",
           "libs/rx/signal/**/*.ts",
-          "libs/rx/signal/**/*.html"
+          "libs/rx/signal/**/*.html",
+          "libs/rx/rx-stateful/**/*.ts",
+          "libs/rx/rx-stateful/**/*.html"
         ]
       }
     },
