@@ -3,6 +3,7 @@ import {
   catchError,
   debounce,
   distinctUntilChanged,
+  filter,
   map,
   merge,
   MonoTypeOperatorFunction,
@@ -30,7 +31,7 @@ export interface RxStateful<T, E>{
   value$: Observable<T | null | undefined>;
   hasValue$: Observable<boolean>;
 
-  //context$: Observable<RxStatefulContext>;
+  context$: Observable<RxStatefulContext>;
 }
 
 
@@ -48,9 +49,9 @@ export interface RxStatefulConfig {
 }
 
 
-export function rxQuery$<T, E = unknown>(source$: Observable<T>): RxStateful<T, E>;
-export function rxQuery$<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig): RxStateful<T, E>
-export function rxQuery$<T, E = unknown>(source$: Observable<T>, config?: RxStatefulConfig): RxStateful<T, E> {
+export function rxStateful$<T, E = unknown>(source$: Observable<T>): RxStateful<T, E>;
+export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig): RxStateful<T, E>
+export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxStatefulConfig): RxStateful<T, E> {
 
   const mergedConfig: RxStatefulConfig = {
     keepValueOnRefresh: true,
@@ -64,16 +65,16 @@ export function rxQuery$<T, E = unknown>(source$: Observable<T>, config?: RxStat
     share({
       connector: () => new ReplaySubject(1),
     }),
-    catchError((error) => of({ error: error })),
+    catchError((error) => of({ error: error, context: 'error' })),
   );
 
-  const request$: Observable<Partial<InternalRxState<any, any>>> = sharedSource$.pipe(
-    map((v) => ({ value: v, isLoading: false, isRefreshing: false })),
-    startWith({ isLoading: true, isRefreshing: false })
+  const request$: Observable<Partial<InternalRxState<T, E>>> = sharedSource$.pipe(
+    map((v) => ({ value: v, isLoading: false, isRefreshing: false, context: 'next' } as Partial<InternalRxState<T, E>>)),
+    startWith({ isLoading: true, isRefreshing: false, context: 'suspense' }as Partial<InternalRxState<T, E>>)
   );
 
 
-  const refreshedRequest$: Observable<Partial<InternalRxState<any, any>>> = refresh$.pipe(
+  const refreshedRequest$: Observable<Partial<InternalRxState<T, E>>> = refresh$.pipe(
     /**
      * in case the refreshTrigger$ is a BehaviorSubject, we want to skip the first value
      * bc otherwise the emissions are not correct. It will then emit 4 vales instead of 2.
@@ -82,8 +83,10 @@ export function rxQuery$<T, E = unknown>(source$: Observable<T>, config?: RxStat
     refreshTriggerIsBehaivorSubject(mergedConfig) ? skip(1) : pipe(),
     switchMap(() =>
       sharedSource$.pipe(
-        map((v) => ({ value: v, isLoading: false, isRefreshing: false })),
-        mergedConfig?.keepValueOnRefresh ? startWith({ isLoading: true, isRefreshing: true }) :  startWith({ isLoading: true, isRefreshing: true,  value: null }),
+        map((v) => ({ value: v, isLoading: false, isRefreshing: false, context:'next' } as Partial<InternalRxState<T, E>>)),
+        mergedConfig?.keepValueOnRefresh
+          ? startWith({ isLoading: true, isRefreshing: true, context: 'suspense' }as Partial<InternalRxState<T, E>>)
+          : startWith({ isLoading: true, isRefreshing: true,  value: null, context: 'suspense' }as Partial<InternalRxState<T, E>>),
       )
     )
   );
@@ -93,7 +96,7 @@ export function rxQuery$<T, E = unknown>(source$: Observable<T>, config?: RxStat
       (acc, curr) => {
         return { ...acc, ...curr };
       },
-      { isLoading: false, isRefreshing: false, value: undefined, error: undefined }
+      { isLoading: false, isRefreshing: false, value: undefined, error: undefined, context: 'idle' }
     ),
     distinctUntilChanged(),
     share({
@@ -106,12 +109,31 @@ export function rxQuery$<T, E = unknown>(source$: Observable<T>, config?: RxStat
   );
 
   return {
-    value$: state$.pipe(map((state) => state.value)),
-    hasValue$: state$.pipe(map((state) => !!state.value)),
-    isSuspense$: state$.pipe(map((state) => state.isLoading || state.isRefreshing)),
-    hasError$: state$.pipe(map((state) => !!state.error)),
+    value$: state$.pipe(
+      map((state, index) => {
+        /**
+         * todo there is for sure a nicer way to do this.
+         *
+         * IF we don't do this we will have two emissions when we refresh and keepValueOnRefresh = true.
+         */
+        if (
+          index !== 0 &&
+          !mergedConfig.keepValueOnRefresh &&
+          (state.isLoading || state.isRefreshing)
+        ) {
+          return null;
+        }
+        if (!state.isLoading || !state.isRefreshing) {
+          return state.value;
+        }
+      }),
+      filter((value) => value !== undefined)
+    ),
+    hasValue$: state$.pipe(map((state) => !!state.value)).pipe(distinctUntilChanged()),
+    isSuspense$: state$.pipe(map((state) => state.isLoading || state.isRefreshing)).pipe(distinctUntilChanged()),
+    hasError$: state$.pipe(map((state) => !!state.error)).pipe(distinctUntilChanged()),
     error$: state$.pipe(map((state) => state.error)),
-
+    context$: state$.pipe(map((state) => state.context)),
   }
 }
 function _handleSyncValue<T>(): MonoTypeOperatorFunction<any> {
