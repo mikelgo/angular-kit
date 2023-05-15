@@ -50,7 +50,7 @@ export function useFromEvent$<T extends Event>(
       .pipe(takeUntil(useOnDestroy()))
       .subscribe((value) => {
         events$.next(value);
-        cfg?.zoneless ? void 0 : cdr.detectChanges();
+        cfg?.zoneless ? void 0 : cdr?.detectChanges();
       });
   });
 
