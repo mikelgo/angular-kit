@@ -11,6 +11,8 @@
         "stream",
         "cdk",
         "rx",
+        "rx-stateful",
+        "reactive-state",
         "ci"
       ]
     ],
