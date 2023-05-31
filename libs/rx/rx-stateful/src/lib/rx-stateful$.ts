@@ -22,6 +22,19 @@ import {
 
 export type RxStatefulContext = 'idle' | 'suspense' | 'error' | 'next';
 
+export interface Stateful<T, E> {
+  hasError: boolean;
+  error: E | undefined;
+
+  isSuspense: boolean;
+
+  context: RxStatefulContext;
+
+  value: T | null | undefined;
+  hasValue: boolean;
+
+}
+
 export interface RxStateful<T, E>{
   hasError$: Observable<boolean>;
   error$: Observable<E | never>;
@@ -32,6 +45,8 @@ export interface RxStateful<T, E>{
   hasValue$: Observable<boolean>;
 
   context$: Observable<RxStatefulContext>;
+
+  state$: Observable<Stateful<T, E>>
 }
 
 
@@ -134,6 +149,17 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxS
     hasError$: state$.pipe(map((state) => !!state.error)).pipe(distinctUntilChanged()),
     error$: state$.pipe(map((state) => state.error)),
     context$: state$.pipe(map((state) => state.context)),
+    state$: state$.pipe(
+      map(state => ({
+        value: state.value,
+        hasValue: !!state.value,
+        hasError: !!state.error,
+        error: state.error,
+        isSuspense: state.isLoading || state.isRefreshing,
+        context: state.context
+      })),
+      distinctUntilChanged()
+    )
   }
 }
 function _handleSyncValue<T>(): MonoTypeOperatorFunction<any> {
