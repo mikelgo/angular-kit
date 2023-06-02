@@ -1,1 +1,1 @@
-export * from './lib/rx-stateful.module';
+export * from './lib/rx-stateful$';
