@@ -110,6 +110,7 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxS
      * bc otherwise the emissions are not correct. It will then emit 4 vales instead of 2.
      * the 2 additional values come from isRefreshing which is not correct.
      */
+    // @ts-ignore
     refreshTriggerIsBehaivorSubject(mergedConfig) ? skip(1) : pipe(),
     switchMap(() =>
       sharedSource$.pipe(
