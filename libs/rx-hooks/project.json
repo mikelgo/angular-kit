@@ -42,6 +42,12 @@
       "options": {
         "lintFilePatterns": ["libs/rx-hooks/**/*.ts", "libs/rx-hooks/**/*.html"]
       }
+    },
+    "version": {
+      "executor": "@jscutlery/semver:version",
+      "options": {
+        "preset": "angular"
+      }
     }
   }
 }
