@@ -18,6 +18,8 @@ import {
   Subject,
   switchMap
 } from "rxjs";
+import {Signal} from "@angular/core";
+import {toSignal} from "@angular/core/rxjs-interop";
 
 /**
  * @publicApi
@@ -57,6 +59,18 @@ export interface RxStateful<T, E>{
   state$: Observable<Stateful<T, E>>
 }
 
+export interface RxStatefulSignals<T, E> {
+  hasError: Signal<boolean>;
+  error: Signal<E | never>;
+
+  isSuspense: Signal<boolean>;
+  value: Signal<T | null | undefined>;
+  hasValue: Signal<boolean>;
+  context: Signal<RxStatefulContext>;
+
+  state: Signal<Stateful<T, E>>;
+}
+
 /**
  * @internal
  */
@@ -79,10 +93,20 @@ export interface RxStatefulConfig {
 /**
  * @publicApi
  */
+export interface RxStatefulSignalConfig {
+  refreshTrigger$?: Subject<any>;
+  keepValueOnRefresh?: boolean;
+  useSignals: true;
+}
+/**
+ * @publicApi
+ */
 export function rxStateful$<T, E = unknown>(source$: Observable<T>): RxStateful<T, E>;
 export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig): RxStateful<T, E>
-export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxStatefulConfig): RxStateful<T, E> {
+export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulSignalConfig): RxStatefulSignals<T, E>
+export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxStatefulConfig | RxStatefulSignalConfig): RxStateful<T, E> | RxStatefulSignals<T, E> {
 
+  const useSignals = (config as any)?.useSignals ?? false;
   const mergedConfig: RxStatefulConfig = {
     keepValueOnRefresh: true,
     ...config
@@ -110,6 +134,7 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxS
      * bc otherwise the emissions are not correct. It will then emit 4 vales instead of 2.
      * the 2 additional values come from isRefreshing which is not correct.
      */
+    // @ts-ignore todo
     refreshTriggerIsBehaivorSubject(mergedConfig) ? skip(1) : pipe(),
     switchMap(() =>
       sharedSource$.pipe(
@@ -139,7 +164,7 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxS
     _handleSyncValue()
   );
 
-  return {
+  const rxStateful$ = {
     value$: state$.pipe(
       map((state, index) => {
         /**
@@ -176,6 +201,20 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxS
       })),
       distinctUntilChanged()
     )
+  }
+
+  if (useSignals) {
+    return {
+      value: toSignal(rxStateful$.value$),
+      hasValue: toSignal(rxStateful$.hasValue$) as Signal<boolean>,
+      isSuspense: toSignal(rxStateful$.isSuspense$),
+      hasError: toSignal(rxStateful$.hasError$) as Signal<boolean>,
+      error: toSignal(rxStateful$.error$),
+      context: toSignal(rxStateful$.context$),
+      state: toSignal(rxStateful$.state$) as Signal<Stateful<T, E>>
+    };
+  } else {
+    return rxStateful$;
   }
 }
 function _handleSyncValue<T>(): MonoTypeOperatorFunction<any> {

@@ -1,6 +1,7 @@
 import {mergeAll, Observable, Subject, throwError} from 'rxjs';
 import {subscribeSpyTo} from '@hirez_io/observer-spy';
 import {rxStateful$} from './rx-stateful$';
+import {TestBed} from "@angular/core/testing";
 
 describe('rxStateful$', () => {
   describe('without refreshTrigger$', () => {
@@ -112,8 +113,8 @@ describe('rxStateful$', () => {
         );
         source$.next(10);
 
-        refreshTrigger$.next();
-        refreshTrigger$.next();
+        refreshTrigger$.next(void 0);
+        refreshTrigger$.next(void 0);
 
         expect(result.getValues()).toEqual([10, 10, 10]);
       });
@@ -126,8 +127,8 @@ describe('rxStateful$', () => {
         );
         source$.next(10);
 
-        refreshTrigger$.next();
-        refreshTrigger$.next();
+        refreshTrigger$.next(void 0);
+        refreshTrigger$.next(void 0);
 
         expect(result.getValues()).toEqual([10, null, 10, null, 10]);
       });
@@ -141,7 +142,7 @@ describe('rxStateful$', () => {
         );
 
         source$.next(10);
-        refreshTrigger$.next();
+        refreshTrigger$.next(void 0);
 
         expect(result.getValues()).toEqual([false, true]);
       });
@@ -153,7 +154,7 @@ describe('rxStateful$', () => {
         );
 
         source$.next(10);
-        refreshTrigger$.next();
+        refreshTrigger$.next(void 0);
 
         expect(result.getValues()).toEqual([false, true, false, true]);
       });
@@ -167,7 +168,7 @@ describe('rxStateful$', () => {
         );
 
         source$.next(10);
-        refreshTrigger$.next();
+        refreshTrigger$.next(void 0);
 
         expect(result.getValues()).toEqual([true, false, true, false]);
       });
@@ -179,7 +180,7 @@ describe('rxStateful$', () => {
         );
 
         source$.next(10);
-        refreshTrigger$.next();
+        refreshTrigger$.next(void 0);
 
         expect(result.getValues()).toEqual([true, false, true, false]);
       });
@@ -191,7 +192,7 @@ describe('rxStateful$', () => {
         const result = subscribeSpyTo(rxStateful$<number>(source$, { refreshTrigger$ }).context$);
 
         source$.next(10);
-        refreshTrigger$.next();
+        refreshTrigger$.next(void 0);
 
         expect(result.getValues()).toEqual(['suspense', 'next', 'suspense', 'next']);
       });
@@ -203,7 +204,7 @@ describe('rxStateful$', () => {
         const result = subscribeSpyTo(rxStateful$<number>(source$, { refreshTrigger$ }).state$);
 
         source$.next(10);
-        refreshTrigger$.next();
+        refreshTrigger$.next(void 0);
 
         expect(result.getValues()).toEqual([
           { hasValue: false, isSuspense: true, hasError: false, context:'suspense' },
@@ -217,4 +218,44 @@ describe('rxStateful$', () => {
     //describe('hasError$', () => {});
     //describe('error$', () => {});
   });
+
+  describe('Signals version', () => {
+    describe('state', () => {
+      it('should return the correct state', () => {
+        TestBed.runInInjectionContext(() => {
+          const source$ = new Subject<number>();
+          const refreshTrigger$ = new Subject<void>();
+          const result = rxStateful$<number>(source$, {
+            refreshTrigger$,
+            keepValueOnRefresh: true,
+            useSignals: true
+          }).state;
+
+          expect(result()).toEqual({hasValue: false, isSuspense: true, hasError: false, context: 'suspense'});
+          source$.next(10);
+          expect(result()).toEqual({hasValue: true, isSuspense: false, value: 10, hasError: false, context: 'next'});
+
+          refreshTrigger$.next(void 0);
+          // todo how to capture the state before the refreshTrigger$ emits?
+          // --> {
+          //             hasValue: true,
+          //             isSuspense: true,
+          //             value: 10,
+          //             context: 'suspense',
+          //             hasError: false
+          //           }
+
+          expect(result()).toEqual({
+            hasValue: true,
+            isSuspense: false,
+            value: 10,
+            context: 'next',
+            hasError: false
+          });
+        })
+
+
+      })
+    })
+  })
 });
