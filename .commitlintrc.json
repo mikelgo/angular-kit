@@ -13,6 +13,7 @@
         "rx",
         "rx-stateful",
         "reactive-state",
+        "rx-hooks",
         "ci"
       ]
     ],

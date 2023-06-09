@@ -1,0 +1,31 @@
+{
+  "name": "@angular-kit/rx-hooks",
+  "version": "0.0.1",
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@angular/common": "^15.0.0",
+    "@angular/core": "^15.0.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false,
+  "license": "MIT",
+  "description": "Reactive Lifecycle Hooks for Angular",
+  "keywords": [
+    "angular",
+    "reactive",
+    "hooks",
+    "lifecycle hooks",
+    "rxjs",
+    "reactive programming"
+  ],
+  "author": "Michael Berger",
+  "homepage": "https://github.com/mikelgo/angular-kit/libs/rx-hooks#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mikelgo/angular-kit"
+  }
+}
