@@ -12,6 +12,8 @@ A set of 🔥 Angular packages tools.
 - [stream](./libs/stream/README.md) - the better async pipe
 - [rx](./libs/rx/README.md) - reactive tools
 - [cdk](./libs/cdk/README.md) - common tools
+- [rx-hooks](./libs/rx-hooks/README.md) - reactive lifecycle hooks 
+- [rx-stateful](./libs/rx-stateful/README.md) - a powerful stateful wrapper for synchronous and asynchronous observables
 
 ## Info
 The main branch does always contain the latest version of the packages. If you want to use a specific version, please have a look at the [releases](https://github.com/mikelgo/angular-kit/releases).
