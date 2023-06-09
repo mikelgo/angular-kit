@@ -97,6 +97,7 @@ export class RxIfListDirective implements OnDestroy{
   }
 
   private _updateView(ctx: RxIfListContext) {
+    // @ts-ignore
     if (ctx.$implicit && (((ctx.$implicit as ArrayLike<any>)?.length ?? []) > 0)){
       if (!this._thenViewRef) {
         this._viewContainer.clear();
