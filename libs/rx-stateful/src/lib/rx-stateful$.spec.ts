@@ -12,9 +12,9 @@ describe('rxStateful$', () => {
          expect(result.getValues().length).toEqual(0);
        });
        it('value$ should return the current value ', () => {
-         const source$ = new Subject<number>();
+         const source$ = new Subject<number | null>();
 
-         const result = subscribeSpyTo(rxStateful$<number>(source$).value$);
+         const result = subscribeSpyTo(rxStateful$<number | null>(source$).value$);
          source$.next(10);
          source$.next(20);
          source$.next(null);

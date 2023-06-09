@@ -1,11 +1,31 @@
 {
   "name": "@angular-kit/rx-stateful",
-  "version": "0.0.1",
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
-    "@angular/common": "^15.0.0",
-    "@angular/core": "^15.0.0"
+    "@angular/common": ">=14.0.0",
+    "@angular/core": ">=14.0.0",
+    "rxjs": ">=7.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"
+  },
+  "license": "MIT",
+  "description": "Powerful RxJs extensions to level up your streams with stateful operators.",
+  "keywords": [
+    "angular",
+    "rxjs",
+    "stateful",
+    "state wrapper",
+    "state operators",
+    "state context",
+    "observable context"
+  ],
+  "author": "Michael Berger",
+  "homepage": "https://github.com/code-workers-io/angular-kit/libs/rx-stateful",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mikelgo/angular-kit/tree/main/libs/rx-stateful"
   }
 }

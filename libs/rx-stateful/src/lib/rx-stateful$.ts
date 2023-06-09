@@ -59,7 +59,7 @@ export interface InternalRxState<T, E> {
 }
 
 export interface RxStatefulConfig {
-  refreshTrigger$?: Subject<unknown>;
+  refreshTrigger$?: Subject<any>;
   keepValueOnRefresh?: boolean;
 }
 
@@ -108,6 +108,7 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxS
 
   const state$ = merge(request$, refreshedRequest$).pipe(
     scan(
+      // @ts-ignore
       (acc, curr) => {
         return { ...acc, ...curr };
       },
