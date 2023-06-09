@@ -19,9 +19,14 @@ import {
   switchMap
 } from "rxjs";
 
-
+/**
+ * @publicApi
+ */
 export type RxStatefulContext = 'idle' | 'suspense' | 'error' | 'next';
 
+/**
+ * @publicApi
+ */
 export interface Stateful<T, E> {
   hasError: boolean;
   error: E | undefined;
@@ -35,6 +40,9 @@ export interface Stateful<T, E> {
 
 }
 
+/**
+ * @publicApi
+ */
 export interface RxStateful<T, E>{
   hasError$: Observable<boolean>;
   error$: Observable<E | never>;
@@ -49,8 +57,10 @@ export interface RxStateful<T, E>{
   state$: Observable<Stateful<T, E>>
 }
 
-
-export interface InternalRxState<T, E> {
+/**
+ * @internal
+ */
+interface InternalRxState<T, E> {
   value: T | null | undefined;
   isLoading: boolean;
   isRefreshing: boolean;
@@ -58,12 +68,17 @@ export interface InternalRxState<T, E> {
   context: RxStatefulContext;
 }
 
+/**
+ * @publicApi
+ */
 export interface RxStatefulConfig {
   refreshTrigger$?: Subject<any>;
   keepValueOnRefresh?: boolean;
 }
 
-
+/**
+ * @publicApi
+ */
 export function rxStateful$<T, E = unknown>(source$: Observable<T>): RxStateful<T, E>;
 export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig): RxStateful<T, E>
 export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxStatefulConfig): RxStateful<T, E> {
