@@ -32,10 +32,10 @@
     "@angular/platform-browser-dynamic": "16.0.5",
     "@angular/router": "16.0.5",
     "@code-workers.io/ngx-dirty-checker": "^1.0.1",
+    "@nx/angular": "16.3.2",
     "rxjs": "7.8.1",
     "tslib": "^2.3.0",
-    "zone.js": "0.13.0",
-    "@nx/angular": "16.3.2"
+    "zone.js": "0.13.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "16.0.5",
@@ -52,7 +52,7 @@
     "@commitlint/config-conventional": "^17.3.0",
     "@cypress/webpack-dev-server": "^2.0.0",
     "@hirez_io/observer-spy": "^2.2.0",
-    "@jscutlery/semver": "^2.29.3",
+    "@jscutlery/semver": "^3.0.0",
     "@ngneat/spectator": "^13.0.0",
     "@nx/cypress": "16.3.2",
     "@nx/eslint-plugin": "16.3.2",
