@@ -7,6 +7,8 @@ stateful stream.
 ```bash
 
 npm install @angular-kit/rx-stateful
+yarn add @angular-kit/rx-stateful
+pnpm add @angular-kit/rx-stateful
   
   ```
 
