@@ -62,3 +62,11 @@ const stateful$ = rxStateful$(from(fetch('...')), {keepValueOnRefresh: true, ref
 - `error$` - the error if present
 
 
+## Versioning
+This project follows [Semantic Versioning](https://semver.org/).
+
+- Version `1.x.x` supports Angular <=15.x.x
+- Version `2.x.x` supports Angular >=16.x.x as it makes use of tne new Angular Signals
+
+## License
+MIT
