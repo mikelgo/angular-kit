@@ -53,6 +53,7 @@ const stateful$ = rxStateful$(from(fetch('...')), {keepValueOnRefresh: true, ref
 ```
 
 ## API
+### Observable based API
 `rxStateful$` returns several Observables:
 - `state$` - the stateful stream with all information combined
 - `value$` - the value
@@ -61,6 +62,16 @@ const stateful$ = rxStateful$(from(fetch('...')), {keepValueOnRefresh: true, ref
 - `hasError$` - boolean if an error is present
 - `error$` - the error if present
 
+### Signal based API
+`rxStateful$` returns several `Signals` when `useSignals: true` is set in the configuration object: `rxStateful$(source$, {useSignals: true})`
+- `state` - the stateful stream with all information combined
+- `value` - the value
+- `hasValue` - boolean if a value is present
+- `context` - the context of the underlying stream ('suspense', 'next', 'error', 'complete')
+- `hasError` - boolean if an error is present
+- `error` - the error if present
+
+It behaves the same as the Observable based API but instead of returning Observables it returns Signals.
 
 ## Versioning
 This project follows [Semantic Versioning](https://semver.org/).
