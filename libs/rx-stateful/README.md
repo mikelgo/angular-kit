@@ -75,6 +75,13 @@ const stateful$ = rxStateful$(from(fetch('...')), {keepValueOnRefresh: true, ref
 
 It behaves the same as the Observable based API but instead of returning Observables it returns Signals.
 
+### Configuration
+`rxStateful$` takes a configuration object as second parameter. The following options are available:
+- `keepValueOnRefresh` - boolean if the value should be kept when the `refreshTrigger$` emits. Default: `false`
+- `refreshTrigger$` - a Subject that triggers the source again. Default: not set
+- `useSignals` - boolean if the API should return Signals instead of Observables. Default: `false`
+
+
 ## Versioning
 This project follows [Semantic Versioning](https://semver.org/).
 
