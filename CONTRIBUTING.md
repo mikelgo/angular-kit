@@ -100,4 +100,16 @@ Must be one of the following:
 - **test**: Adding missing tests or correcting existing tests
 - **chore**: Changes to our CI configuration files and scripts
 
+##### Scope
+
+Must be one of the following:
+- demos
+- docs
+- stream
+- cdk
+- rx
+- rx-stateful
+- rx-hooks
+- ci
+
 The commit messages are linted using [commitlint](https://github.com/conventional-changelog/commitlint).
