@@ -83,3 +83,8 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## License
 MIT
+
+## Contributing
+Any Contributions are welcome. Please open up an issue or create PR if you would like to contribute.
+
+See [CONTRIBUTING.md](../../CONTRIBUTING.md) for more information.
