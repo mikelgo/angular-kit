@@ -11,6 +11,8 @@ yarn add @angular-kit/rx-stateful
 pnpm add @angular-kit/rx-stateful
   
   ```
+## Demo
+A live demo is available on [Stackblitz](https://stackblitz.com/edit/stackblitz-starters-l9nwsp?file=src%2Fmain.ts)
 
 ## Usage
 
