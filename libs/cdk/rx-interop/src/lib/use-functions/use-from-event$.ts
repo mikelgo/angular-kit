@@ -1,9 +1,10 @@
-import {ChangeDetectorRef, ElementRef, inject, NgZone} from '@angular/core';
+import {ChangeDetectorRef, ElementRef, inject, Injector, NgZone, runInInjectionContext,} from '@angular/core';
 import {distinctUntilChanged, fromEvent, Observable, ReplaySubject, takeUntil} from 'rxjs';
 import {useOnDestroy} from './use-host-listener$';
 
 export interface UseFromEventConfig {
   zoneless?: boolean;
+  injector?: Injector;
 }
 
 /**
@@ -39,9 +40,25 @@ export function useFromEvent$<T extends Event>(
   eventName: string,
   cfg?: UseFromEventConfig
 ): Observable<T> {
-  const ngZone = inject(NgZone);
+  let events$!: Observable<T>;
+  if (cfg?.injector) {
+    runInInjectionContext(cfg?.injector, () => {
+      events$ = _useFromEvent$(elementOrRef, eventName, cfg);
+    });
+  } else {
+    events$ = _useFromEvent$(elementOrRef, eventName, cfg);
+  }
+  return events$;
+}
+
+function _useFromEvent$<T extends Event>(
+  elementOrRef: HTMLElement | ElementRef,
+  eventName: string,
+  cfg?: UseFromEventConfig
+): Observable<T> {
   const events$ = new ReplaySubject<T>(1);
   const cdr = cfg?.zoneless ? undefined : inject(ChangeDetectorRef);
+  const ngZone = inject(NgZone);
 
   const el = elementOrRef instanceof ElementRef ? elementOrRef?.nativeElement : elementOrRef;
 
