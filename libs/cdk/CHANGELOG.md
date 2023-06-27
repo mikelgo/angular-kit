@@ -2,6 +2,10 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [2.2.0](https://github.com/code-workers-io/angular-kit/compare/cdk-2.1.0...cdk-2.2.0) (2023-06-27)
+
+
+
 # [2.1.0](https://github.com/code-workers-io/angular-kit/compare/cdk-2.0.0...cdk-2.1.0) (2023-06-27)
 
 
