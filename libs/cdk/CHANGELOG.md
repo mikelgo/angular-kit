@@ -2,6 +2,28 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [2.1.0](https://github.com/code-workers-io/angular-kit/compare/cdk-2.0.0...cdk-2.1.0) (2023-06-27)
+
+
+### Bug Fixes
+
+* **cdk:** export onChanges correctly ([2cbb13f](https://github.com/code-workers-io/angular-kit/commit/2cbb13f1aa3642051eb461bd49f967ae705539a5))
+* **rx:** typing issue in useFromEvent and useHostListener$ ([55c9a6b](https://github.com/code-workers-io/angular-kit/commit/55c9a6b6013916f10980eb5327918d0287ddec1e))
+
+
+### Features
+
+* **cdk:** add useFromEvent$ ([ed51684](https://github.com/code-workers-io/angular-kit/commit/ed51684a8345915378327283fcc9e3d334106143))
+* **cdk:** add useHostBinding ([3187ff3](https://github.com/code-workers-io/angular-kit/commit/3187ff30caf5b77e6ed7a1c44068e8450ab799f9))
+* **cdk:** add useHostListener$ ([94f03f2](https://github.com/code-workers-io/angular-kit/commit/94f03f2865ccf565e81b2e9b4a7cb2fc9275fd12))
+* **cdk:** add useOnChanges$ and useOnchangesState$ ([91da2a3](https://github.com/code-workers-io/angular-kit/commit/91da2a3a04726e715298febb6c734666271c0723))
+* **cdk:** allow passing injector to useFromEvent$ ([08482ce](https://github.com/code-workers-io/angular-kit/commit/08482cea2aa449a757c27710008ca6223e23adfa)), closes [#56](https://github.com/code-workers-io/angular-kit/issues/56)
+* **cdk:** allow passing injector to useHostListener$ ([e8aff57](https://github.com/code-workers-io/angular-kit/commit/e8aff57ca44fe622295faf8610c5daa63d3b6334)), closes [#55](https://github.com/code-workers-io/angular-kit/issues/55)
+* **cdk:** make it configurable to run change detection of not in useFromEvent$ ([b098529](https://github.com/code-workers-io/angular-kit/commit/b098529a5f85723a36b72cdf703fd1afdfa33b6a))
+* **cdk:** make it configurable to run change detection of not in useHostListener$ ([13e7890](https://github.com/code-workers-io/angular-kit/commit/13e78909f2a57e9142f8c37caf713e511e32aad5))
+
+
+
 # [2.0.0](https://github.com/code-workers-io/angular-kit/compare/cdk-1.2.0...cdk-2.0.0) (2023-04-17)
 
 
