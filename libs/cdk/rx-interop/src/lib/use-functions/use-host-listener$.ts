@@ -1,8 +1,9 @@
-import {ChangeDetectorRef, ElementRef, inject, NgZone, ViewRef} from '@angular/core';
+import {ChangeDetectorRef, ElementRef, inject, Injector, NgZone, runInInjectionContext, ViewRef} from '@angular/core';
 import {distinctUntilChanged, fromEvent, Observable, ReplaySubject, takeUntil} from 'rxjs';
 
 export interface UseHostListenerConfig {
   zoneless?: boolean;
+  injector?: Injector;
 }
 /**
  *
@@ -23,6 +24,18 @@ export interface UseHostListenerConfig {
 export function useHostListener$<T extends Event>(eventName: string): Observable<T>;
 export function useHostListener$<T extends Event>(eventName: string, cfg: UseHostListenerConfig): Observable<T>;
 export function useHostListener$<T extends Event>(eventName: string, cfg?: UseHostListenerConfig): Observable<T> {
+  let events$!: Observable<T>;
+  if (cfg?.injector) {
+    runInInjectionContext(cfg?.injector, () => {
+      events$ = _useHostListener$(eventName, cfg);
+    });
+  } else {
+    events$ = _useHostListener$(eventName, cfg);
+  }
+  return events$;
+}
+
+function _useHostListener$<T extends Event>(eventName: string, cfg?: UseHostListenerConfig): Observable<T> {
   const { nativeElement } = inject(ElementRef);
   const ngZone = inject(NgZone);
   const cdr = cfg?.zoneless ? undefined : inject(ChangeDetectorRef);
