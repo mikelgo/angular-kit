@@ -26,39 +26,41 @@ import {
 import {_handleSyncValue} from './util/handle-sync-value';
 import {createRxStateful} from './util/create-rx-stateful';
 import {createRxStatefulSignals} from './util/create-rx-stateful-signals';
-import {isRxStatefulSignalConfigGuard} from "./types/guards";
+import {isRxStatefulSignalConfigGuard} from './types/guards';
+import {defaultAccumulationFn} from './types/accumulation-fn';
 
 /**
  * @publicApi
  */
 export function rxStateful$<T, E = unknown>(source$: Observable<T>): RxStateful<T, E>;
-export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig): RxStateful<T, E>;
+export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig<T, E>): RxStateful<T, E>;
 export function rxStateful$<T, E = unknown>(
   source$: Observable<T>,
-  config: RxStatefulSignalConfig
+  config: RxStatefulSignalConfig<T, E>
 ): RxStatefulSignals<T, E>;
 export function rxStateful$<T, E = unknown>(
   source$: Observable<T>,
-  config?: RxStatefulConfig | RxStatefulSignalConfig
+  config?: RxStatefulConfig<T, E> | RxStatefulSignalConfig<T, E>
 ): RxStateful<T, E> | RxStatefulSignals<T, E> {
   const useSignals = isRxStatefulSignalConfigGuard(config) ?? false;
-  const mergedConfig: RxStatefulConfig = {
+  const mergedConfig: RxStatefulConfig<T, E> = {
     keepValueOnRefresh: true,
     ...config,
   };
+  const accumulationFn = mergedConfig.accumulationFn ?? defaultAccumulationFn;
   const error$$ = new Subject<RxStatefulWithError<T, E>>();
   const refresh$ = mergedConfig?.refreshTrigger$ ?? new Subject<unknown>();
 
   const { request$, refreshedRequest$ } = initSources(source$, error$$, refresh$, mergedConfig);
 
   const state$ = merge(request$, refreshedRequest$, error$$).pipe(
-    scan(
-      // @ts-ignore
-      (acc, curr) => {
-        return { ...acc, ...curr };
-      },
-      { isLoading: false, isRefreshing: false, value: undefined, error: undefined, context: 'idle' }
-    ),
+    scan(accumulationFn, {
+      isLoading: false,
+      isRefreshing: false,
+      value: undefined,
+      error: undefined,
+      context: 'idle',
+    }),
     distinctUntilChanged(),
     share({
       connector: () => new ReplaySubject(1),
@@ -105,9 +107,9 @@ function requestSource<T, E>(source$: Observable<T>): Observable<Partial<Interna
 function refreshedRequestSource<T, E>(
   sharedSource$: Observable<T>,
   refresh$: Subject<any>,
-  mergedConfig: RxStatefulConfig
+  mergedConfig: RxStatefulConfig<T, E>
 ): Observable<Partial<InternalRxState<T, E>>> {
-  const refreshTriggerIsBehaivorSubject = (config: RxStatefulConfig) =>
+  const refreshTriggerIsBehaivorSubject = (config: RxStatefulConfig<T, E>) =>
     config.refreshTrigger$ instanceof BehaviorSubject;
   return refresh$.pipe(
     /**
@@ -145,7 +147,7 @@ function initSources<T, E>(
   source$: Observable<T>,
   error$$: Subject<RxStatefulWithError<T, E>>,
   refresh$: Subject<any>,
-  mergedConfig: RxStatefulConfig
+  mergedConfig: RxStatefulConfig<T, E>
 ) {
   const sharedSource$ = initSource<T, E>(source$, error$$);
 

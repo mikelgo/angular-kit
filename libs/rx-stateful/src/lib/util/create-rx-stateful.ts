@@ -1,10 +1,10 @@
-import {distinctUntilChanged, filter, map, Observable} from "rxjs";
-import {RxStateful, RxStatefulConfig} from "../types/types";
+import {distinctUntilChanged, filter, map, Observable} from 'rxjs';
+import {RxStateful, RxStatefulConfig} from '../types/types';
 
 /**
  * @internal
  */
-export function createRxStateful<T,E>(state$: Observable<any>, config: RxStatefulConfig): RxStateful<T, E>{
+export function createRxStateful<T, E>(state$: Observable<any>, config: RxStatefulConfig<T, E>): RxStateful<T, E> {
   return {
     value$: state$.pipe(
       map((state, index) => {
@@ -38,5 +38,5 @@ export function createRxStateful<T,E>(state$: Observable<any>, config: RxStatefu
       })),
       distinctUntilChanged()
     ),
-  }
+  };
 }

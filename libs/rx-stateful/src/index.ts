@@ -8,3 +8,4 @@ export {
   RxStatefulSignalConfig,
   RxStatefulSignals,
 } from './lib/types/types';
+export {RxStatefulAccumulationFn} from './lib/types/accumulation-fn'

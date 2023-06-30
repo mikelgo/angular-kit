@@ -1,5 +1,6 @@
-import {Observable, Subject} from "rxjs";
-import {Signal} from "@angular/core";
+import {Observable, Subject} from 'rxjs';
+import {Signal} from '@angular/core';
+import {RxStatefulAccumulationFn} from './accumulation-fn';
 
 /**
  * @publicApi
@@ -19,13 +20,12 @@ export interface Stateful<T, E> {
 
   value: T | null | undefined;
   hasValue: boolean;
-
 }
 
 /**
  * @publicApi
  */
-export interface RxStateful<T, E>{
+export interface RxStateful<T, E> {
   hasError$: Observable<boolean>;
   error$: Observable<E | never>;
 
@@ -36,7 +36,7 @@ export interface RxStateful<T, E>{
 
   context$: Observable<RxStatefulContext>;
 
-  state$: Observable<Stateful<T, E>>
+  state$: Observable<Stateful<T, E>>;
 }
 
 export interface RxStatefulSignals<T, E> {
@@ -64,20 +64,21 @@ export interface InternalRxState<T, E> {
 
 export type RxStatefulWithError<T, E> = Pick<Stateful<T, E>, 'hasError' | 'error' | 'context'>;
 
-
 /**
  * @publicApi
  */
-export interface RxStatefulConfig {
+export interface RxStatefulConfig<T, E> {
   refreshTrigger$?: Subject<any>;
   keepValueOnRefresh?: boolean;
+  accumulationFn?: RxStatefulAccumulationFn<T, E>;
 }
 
 /**
  * @publicApi
  */
-export interface RxStatefulSignalConfig {
+export interface RxStatefulSignalConfig<T, E> {
   refreshTrigger$?: Subject<any>;
   keepValueOnRefresh?: boolean;
   useSignals: true;
+  accumulationFn?: RxStatefulAccumulationFn<T, E>;
 }
