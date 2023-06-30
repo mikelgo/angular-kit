@@ -2,7 +2,6 @@ import {
   BehaviorSubject,
   catchError,
   distinctUntilChanged,
-  filter,
   map,
   merge,
   NEVER,
@@ -16,8 +15,6 @@ import {
   Subject,
   switchMap,
 } from 'rxjs';
-import {Signal} from '@angular/core';
-import {toSignal} from '@angular/core/rxjs-interop';
 import {
   InternalRxState,
   RxStateful,
@@ -25,9 +22,10 @@ import {
   RxStatefulSignalConfig,
   RxStatefulSignals,
   RxStatefulWithError,
-  Stateful,
 } from './types/types';
 import {_handleSyncValue} from './util/handle-sync-value';
+import {createRxStateful} from "./util/create-rx-stateful";
+import {createRxStatefulSignals} from "./util/create-rx-stateful-signals";
 
 /**
  * @publicApi
@@ -123,51 +121,10 @@ export function rxStateful$<T, E = unknown>(
     _handleSyncValue()
   );
 
-  const rxStateful$ = {
-    value$: state$.pipe(
-      map((state, index) => {
-        /**
-         * todo there is for sure a nicer way to do this.
-         *
-         * IF we don't do this we will have two emissions when we refresh and keepValueOnRefresh = true.
-         */
-        if (index !== 0 && !mergedConfig.keepValueOnRefresh && (state.isLoading || state.isRefreshing)) {
-          return null;
-        }
-        if (!state.isLoading || !state.isRefreshing) {
-          return state.value;
-        }
-      }),
-      filter((value) => value !== undefined)
-    ),
-    hasValue$: state$.pipe(map((state) => !!state.value)).pipe(distinctUntilChanged()),
-    isSuspense$: state$.pipe(map((state) => state.isLoading || state.isRefreshing)).pipe(distinctUntilChanged()),
-    hasError$: state$.pipe(map((state) => !!state.error)).pipe(distinctUntilChanged()),
-    error$: state$.pipe(map((state) => state.error)),
-    context$: state$.pipe(map((state) => state.context)),
-    state$: state$.pipe(
-      map((state) => ({
-        value: state.value,
-        hasValue: !!state.value,
-        hasError: !!state.error,
-        error: state.error,
-        isSuspense: state.isLoading || state.isRefreshing,
-        context: state.context,
-      })),
-      distinctUntilChanged()
-    ),
-  };
+  const rxStateful$ = createRxStateful<T,E>(state$, mergedConfig);
 
   if (useSignals) {
-    return {
-      value: toSignal(rxStateful$.value$),
-      hasValue: toSignal(rxStateful$.hasValue$) as Signal<boolean>,
-      isSuspense: toSignal(rxStateful$.isSuspense$),
-      hasError: toSignal(rxStateful$.hasError$) as Signal<boolean>,
-      error: toSignal(rxStateful$.error$),
-      context: toSignal(rxStateful$.context$),
-      state: toSignal(rxStateful$.state$) as Signal<Stateful<T, E>>,
-    };
+    return createRxStatefulSignals<T, E>(rxStateful$);
   } else {
     return rxStateful$;
   }
