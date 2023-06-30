@@ -6,3 +6,4 @@ export {
   RxStatefulWithError,
   RxStatefulConfig,
 } from './lib/types/types';
+export { RxStatefulAccumulationFn } from './lib/types/accumulation-fn';

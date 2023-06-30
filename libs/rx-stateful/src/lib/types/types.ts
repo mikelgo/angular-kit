@@ -1,4 +1,5 @@
 import {Observable, Subject} from 'rxjs';
+import {RxStatefulAccumulationFn} from "./accumulation-fn";
 
 /**
  * @publicApi
@@ -53,7 +54,8 @@ export interface InternalRxState<T, E> {
 /**
  * @publicApi
  */
-export interface RxStatefulConfig {
+export interface RxStatefulConfig<T, E> {
   refreshTrigger$?: Subject<any>;
   keepValueOnRefresh?: boolean;
+  accumulationFn?: RxStatefulAccumulationFn<T, E>;
 }

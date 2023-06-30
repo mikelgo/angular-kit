@@ -18,23 +18,26 @@ import {
 } from 'rxjs';
 import {InternalRxState, RxStateful, RxStatefulConfig, RxStatefulWithError,} from './types/types';
 import {_handleSyncValue} from './util/handle-sync-value';
+import {defaultAccumulationFn} from "./types/accumulation-fn";
 
 /**
  * @publicApi
  */
 export function rxStateful$<T, E = unknown>(source$: Observable<T>): RxStateful<T, E>;
-export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig): RxStateful<T, E>;
+export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig<T,E>): RxStateful<T, E>;
 export function rxStateful$<T, E = unknown>(
   source$: Observable<T>,
-  config?: RxStatefulConfig
+  config?: RxStatefulConfig<T,E>
 ): RxStateful<T, E> {
   const error$$ = new Subject<RxStatefulWithError<T, E>>();
-  const mergedConfig: RxStatefulConfig = {
+  const mergedConfig: RxStatefulConfig<T,E> = {
     keepValueOnRefresh: true,
     ...config,
   };
+  const accumulationFn = mergedConfig.accumulationFn ?? defaultAccumulationFn;
 
-  const refreshTriggerIsBehaivorSubject = (config: RxStatefulConfig) =>
+
+  const refreshTriggerIsBehaivorSubject = (config: RxStatefulConfig<T,E>) =>
     config.refreshTrigger$ instanceof BehaviorSubject;
 
   const refresh$ = mergedConfig?.refreshTrigger$ ?? new Subject<unknown>();
@@ -87,10 +90,7 @@ export function rxStateful$<T, E = unknown>(
 
   const state$ = merge(request$, refreshedRequest$, error$$).pipe(
     scan(
-      // @ts-ignore
-      (acc, curr) => {
-        return { ...acc, ...curr };
-      },
+      accumulationFn,
       { isLoading: false, isRefreshing: false, value: undefined, error: undefined, context: 'idle' }
     ),
     distinctUntilChanged(),
