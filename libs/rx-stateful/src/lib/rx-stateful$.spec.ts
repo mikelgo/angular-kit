@@ -112,8 +112,8 @@ describe('rxStateful$', () => {
         );
         source$.next(10);
 
-        refreshTrigger$.next();
-        refreshTrigger$.next();
+        refreshTrigger$.next(void 0);
+        refreshTrigger$.next(void 0);
 
         expect(result.getValues()).toEqual([10, 10, 10]);
       });
@@ -126,8 +126,8 @@ describe('rxStateful$', () => {
         );
         source$.next(10);
 
-        refreshTrigger$.next();
-        refreshTrigger$.next();
+        refreshTrigger$.next(void 0);
+        refreshTrigger$.next(void 0);
 
         expect(result.getValues()).toEqual([10, null, 10, null, 10]);
       });
@@ -141,7 +141,7 @@ describe('rxStateful$', () => {
         );
 
         source$.next(10);
-        refreshTrigger$.next();
+        refreshTrigger$.next(void 0);
 
         expect(result.getValues()).toEqual([false, true]);
       });
@@ -153,7 +153,7 @@ describe('rxStateful$', () => {
         );
 
         source$.next(10);
-        refreshTrigger$.next();
+        refreshTrigger$.next(void 0);
 
         expect(result.getValues()).toEqual([false, true, false, true]);
       });
@@ -167,7 +167,7 @@ describe('rxStateful$', () => {
         );
 
         source$.next(10);
-        refreshTrigger$.next();
+        refreshTrigger$.next(void 0);
 
         expect(result.getValues()).toEqual([true, false, true, false]);
       });
@@ -179,7 +179,7 @@ describe('rxStateful$', () => {
         );
 
         source$.next(10);
-        refreshTrigger$.next();
+        refreshTrigger$.next(void 0);
 
         expect(result.getValues()).toEqual([true, false, true, false]);
       });
@@ -191,30 +191,44 @@ describe('rxStateful$', () => {
         const result = subscribeSpyTo(rxStateful$<number>(source$, { refreshTrigger$ }).context$);
 
         source$.next(10);
-        refreshTrigger$.next();
+        refreshTrigger$.next(void 0);
 
         expect(result.getValues()).toEqual(['suspense', 'next', 'suspense', 'next']);
       });
     });
     describe('state$', () => {
       it('should return the correct state', () => {
-        const source$ = new Subject<number>();
+        const source$ = new Subject<any>();
         const refreshTrigger$ = new Subject<void>();
         const result = subscribeSpyTo(rxStateful$<number>(source$, { refreshTrigger$ }).state$);
 
         source$.next(10);
-        refreshTrigger$.next();
+        refreshTrigger$.next(void 0);
+        // todo #60
+        //source$.next(throwError(() => new Error('error')));
 
         expect(result.getValues()).toEqual([
-          { hasValue: false, isSuspense: true, hasError: false, context:'suspense' },
+          { hasValue: false, isSuspense: true, hasError: false, context: 'suspense' },
           { hasValue: true, isSuspense: false, value: 10, hasError: false, context: 'next' },
           { hasValue: true, isSuspense: true, value: 10, context: 'suspense', hasError: false },
           { hasValue: true, isSuspense: false, value: 10, context: 'next', hasError: false },
+          // { hasValue: true, isSuspense: true, value: null, context: 'suspense', hasError: false },
+          //{ hasValue: false, isSuspense: false, value: null, context: 'error', hasError: true, error: 'error' },
         ]);
       });
-    })
-    // todo
-    //describe('hasError$', () => {});
-    //describe('error$', () => {});
+    });
+    describe('hasError$', () => {
+      it('should return false true false true', () => {
+        const source$ = new Subject<Observable<any>>();
+        const refreshTrigger$ = new Subject<void>();
+        const result = subscribeSpyTo(rxStateful$<number>(source$.pipe(mergeAll()), { refreshTrigger$ }).hasError$);
+
+        source$.next(throwError(() => new Error('error')));
+        refreshTrigger$.next(void 0);
+        source$.next(throwError(() => new Error('error')));
+
+        expect(result.getValues()).toEqual([false, true, false, true]);
+      });
+    });
   });
 });
