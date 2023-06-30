@@ -1,14 +1,12 @@
 import {
   BehaviorSubject,
   catchError,
-  debounce,
   distinctUntilChanged,
   filter,
   map,
   merge,
-  MonoTypeOperatorFunction,
+  NEVER,
   Observable,
-  of,
   pipe,
   ReplaySubject,
   scan,
@@ -16,117 +14,65 @@ import {
   skip,
   startWith,
   Subject,
-  switchMap
-} from "rxjs";
-import {Signal} from "@angular/core";
-import {toSignal} from "@angular/core/rxjs-interop";
+  switchMap,
+} from 'rxjs';
+import {Signal} from '@angular/core';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {
+  InternalRxState,
+  RxStateful,
+  RxStatefulConfig,
+  RxStatefulSignalConfig,
+  RxStatefulSignals,
+  RxStatefulWithError,
+  Stateful,
+} from './types/types';
+import {_handleSyncValue} from './util/handle-sync-value';
 
-/**
- * @publicApi
- */
-export type RxStatefulContext = 'idle' | 'suspense' | 'error' | 'next';
-
-/**
- * @publicApi
- */
-export interface Stateful<T, E> {
-  hasError: boolean;
-  error: E | undefined;
-
-  isSuspense: boolean;
-
-  context: RxStatefulContext;
-
-  value: T | null | undefined;
-  hasValue: boolean;
-
-}
-
-/**
- * @publicApi
- */
-export interface RxStateful<T, E>{
-  hasError$: Observable<boolean>;
-  error$: Observable<E | never>;
-
-  isSuspense$: Observable<boolean>;
-
-  value$: Observable<T | null | undefined>;
-  hasValue$: Observable<boolean>;
-
-  context$: Observable<RxStatefulContext>;
-
-  state$: Observable<Stateful<T, E>>
-}
-
-export interface RxStatefulSignals<T, E> {
-  hasError: Signal<boolean>;
-  error: Signal<E | never>;
-
-  isSuspense: Signal<boolean>;
-  value: Signal<T | null | undefined>;
-  hasValue: Signal<boolean>;
-  context: Signal<RxStatefulContext>;
-
-  state: Signal<Stateful<T, E>>;
-}
-
-/**
- * @internal
- */
-interface InternalRxState<T, E> {
-  value: T | null | undefined;
-  isLoading: boolean;
-  isRefreshing: boolean;
-  error: E | undefined;
-  context: RxStatefulContext;
-}
-
-/**
- * @publicApi
- */
-export interface RxStatefulConfig {
-  refreshTrigger$?: Subject<any>;
-  keepValueOnRefresh?: boolean;
-}
-
-/**
- * @publicApi
- */
-export interface RxStatefulSignalConfig {
-  refreshTrigger$?: Subject<any>;
-  keepValueOnRefresh?: boolean;
-  useSignals: true;
-}
 /**
  * @publicApi
  */
 export function rxStateful$<T, E = unknown>(source$: Observable<T>): RxStateful<T, E>;
-export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig): RxStateful<T, E>
-export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulSignalConfig): RxStatefulSignals<T, E>
-export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxStatefulConfig | RxStatefulSignalConfig): RxStateful<T, E> | RxStatefulSignals<T, E> {
+export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig): RxStateful<T, E>;
+export function rxStateful$<T, E = unknown>(
+  source$: Observable<T>,
+  config: RxStatefulSignalConfig
+): RxStatefulSignals<T, E>;
+export function rxStateful$<T, E = unknown>(
+  source$: Observable<T>,
+  config?: RxStatefulConfig | RxStatefulSignalConfig
+): RxStateful<T, E> | RxStatefulSignals<T, E> {
+  const error$$ = new Subject<RxStatefulWithError<T, E>>();
 
   const useSignals = (config as any)?.useSignals ?? false;
   const mergedConfig: RxStatefulConfig = {
     keepValueOnRefresh: true,
-    ...config
-  }
+    ...config,
+  };
 
-  const refreshTriggerIsBehaivorSubject = (config: RxStatefulConfig) => config.refreshTrigger$ instanceof BehaviorSubject;
+  const refreshTriggerIsBehaivorSubject = (config: RxStatefulConfig) =>
+    config.refreshTrigger$ instanceof BehaviorSubject;
 
   const refresh$ = mergedConfig?.refreshTrigger$ ?? new Subject<unknown>();
   const sharedSource$ = source$.pipe(
     share({
       connector: () => new ReplaySubject(1),
     }),
-    catchError((error) => of({ error: error, context: 'error' })),
+    catchError((error: any) => {
+      error$$.next({ error: error?.message, context: 'error', hasError: true });
+      return NEVER;
+    })
   );
 
   const request$: Observable<Partial<InternalRxState<T, E>>> = sharedSource$.pipe(
-    map((v) => ({ value: v, isLoading: false, isRefreshing: false, context: 'next' } as Partial<InternalRxState<T, E>>)),
-    startWith({ isLoading: true, isRefreshing: false, context: 'suspense' }as Partial<InternalRxState<T, E>>)
+    map(
+      (v) =>
+        ({ value: v, isLoading: false, isRefreshing: false, context: 'next', error: undefined } as Partial<
+          InternalRxState<T, E>
+        >)
+    ),
+    startWith({ isLoading: true, isRefreshing: false, context: 'suspense' } as Partial<InternalRxState<T, E>>)
   );
-
 
   const refreshedRequest$: Observable<Partial<InternalRxState<T, E>>> = refresh$.pipe(
     /**
@@ -138,15 +84,28 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxS
     refreshTriggerIsBehaivorSubject(mergedConfig) ? skip(1) : pipe(),
     switchMap(() =>
       sharedSource$.pipe(
-        map((v) => ({ value: v, isLoading: false, isRefreshing: false, context:'next' } as Partial<InternalRxState<T, E>>)),
+        map(
+          (v) =>
+            ({ value: v, isLoading: false, isRefreshing: false, context: 'next', error: undefined } as Partial<
+              InternalRxState<T, E>
+            >)
+        ),
         mergedConfig?.keepValueOnRefresh
-          ? startWith({ isLoading: true, isRefreshing: true, context: 'suspense' }as Partial<InternalRxState<T, E>>)
-          : startWith({ isLoading: true, isRefreshing: true,  value: null, context: 'suspense' }as Partial<InternalRxState<T, E>>),
+          ? startWith({ isLoading: true, isRefreshing: true, context: 'suspense', error: undefined } as Partial<
+              InternalRxState<T, E>
+            >)
+          : startWith({
+              isLoading: true,
+              isRefreshing: true,
+              value: null,
+              context: 'suspense',
+              error: undefined,
+            } as Partial<InternalRxState<T, E>>)
       )
     )
   );
 
-  const state$ = merge(request$, refreshedRequest$).pipe(
+  const state$ = merge(request$, refreshedRequest$, error$$).pipe(
     scan(
       // @ts-ignore
       (acc, curr) => {
@@ -172,11 +131,7 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxS
          *
          * IF we don't do this we will have two emissions when we refresh and keepValueOnRefresh = true.
          */
-        if (
-          index !== 0 &&
-          !mergedConfig.keepValueOnRefresh &&
-          (state.isLoading || state.isRefreshing)
-        ) {
+        if (index !== 0 && !mergedConfig.keepValueOnRefresh && (state.isLoading || state.isRefreshing)) {
           return null;
         }
         if (!state.isLoading || !state.isRefreshing) {
@@ -191,17 +146,17 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxS
     error$: state$.pipe(map((state) => state.error)),
     context$: state$.pipe(map((state) => state.context)),
     state$: state$.pipe(
-      map(state => ({
+      map((state) => ({
         value: state.value,
         hasValue: !!state.value,
         hasError: !!state.error,
         error: state.error,
         isSuspense: state.isLoading || state.isRefreshing,
-        context: state.context
+        context: state.context,
       })),
       distinctUntilChanged()
-    )
-  }
+    ),
+  };
 
   if (useSignals) {
     return {
@@ -211,29 +166,9 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxS
       hasError: toSignal(rxStateful$.hasError$) as Signal<boolean>,
       error: toSignal(rxStateful$.error$),
       context: toSignal(rxStateful$.context$),
-      state: toSignal(rxStateful$.state$) as Signal<Stateful<T, E>>
+      state: toSignal(rxStateful$.state$) as Signal<Stateful<T, E>>,
     };
   } else {
     return rxStateful$;
   }
-}
-function _handleSyncValue<T>(): MonoTypeOperatorFunction<any> {
-  return (source$: Observable<T>): Observable<T> => {
-    return new Observable<T>((observer) => {
-      const isReadySubject = new ReplaySubject<unknown>(1);
-
-      const subscription = source$
-        .pipe(
-          /* Wait for all synchronous processing to be done. */
-          debounce(() => isReadySubject)
-        )
-        .subscribe(observer);
-
-      /* Sync emitted values have been processed now.
-       * Mark source as ready and emit last computed state. */
-      isReadySubject.next(undefined);
-
-      return () => subscription.unsubscribe();
-    });
-  };
 }
