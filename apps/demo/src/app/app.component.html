@@ -1,3 +1,5 @@
+<angular-kit-effect/>
+
 <button (click)="id$.next(random())"> next id</button>
 <button (click)="name$.next('Hi ' + random())"> next name</button>
 <demo-onchanges [name]="(name$ | async)!"  [value]="(id$ | async)!"></demo-onchanges>

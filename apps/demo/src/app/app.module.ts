@@ -21,6 +21,7 @@ import {
   RxObserveVisibilityDirective
 } from '../../../../libs/rx/platform/src/lib/directives/rx-observe-visibility.directive';
 import {DemoOnchangesComponent} from './demo-onchanges/demo-onchanges.component';
+import {EffectComponent} from "./effect/effect.component";
 
 @NgModule({
   declarations: [
@@ -32,18 +33,19 @@ import {DemoOnchangesComponent} from './demo-onchanges/demo-onchanges.component'
     L1StreamComponent,
     L2StreamComponent,
   ],
-  imports: [
-    BrowserModule,
-    StreamDirective,
-    HttpClientModule,
-    NgxDirtyCheckerModule,
-    RxObserveResizeDirective,
-    RxObserveIntersectionDirective,
-    RxObserveVisibilityDirective,
-    RxObserveVisibilityDirective,
-    RxRenderInViewportDirective,
-    DemoOnchangesComponent,
-  ],
+    imports: [
+        BrowserModule,
+        StreamDirective,
+        HttpClientModule,
+        NgxDirtyCheckerModule,
+        RxObserveResizeDirective,
+        RxObserveIntersectionDirective,
+        RxObserveVisibilityDirective,
+        RxObserveVisibilityDirective,
+        RxRenderInViewportDirective,
+        DemoOnchangesComponent,
+        EffectComponent,
+    ],
   providers: [],
   bootstrap: [AppComponent],
 })
