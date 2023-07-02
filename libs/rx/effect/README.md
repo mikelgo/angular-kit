@@ -3,12 +3,33 @@
 Tooling to handle your effects (subscriptions)!
 
 ## 🔋 Included
-
+- [`runEffect$`](#runEffect$): Subscribe without subscribing to get subscription-less components.
 - [`Effect`](#EffectService): Subscribe without subscribing to get subscription-less components.
 - [`createEffect`](#createEffect): Create an effect to turn imperative code into declarative code.
 
-## `Effect`
+## `runEffect$`
 
+### Usage
+
+```typescript
+@Component({
+  ...
+})
+export class Component {
+    constructor() {
+        runEffect$(observable$, console.log)
+        runEffect$(observable$.subscribe(console.log))
+        runEffect$(observable$, (v) => console.log(v))
+    }
+}
+
+
+```
+If you want to run an effect outside a injection context (field declaration or constructor) you will need to pass
+the `Injector` as parameter.
+
+## `Effect` - deprecated
+NOte: will be removed in the next major version after 2.x.x. Use `runEffect$` instead.
 ### Usage
 
 ```typescript

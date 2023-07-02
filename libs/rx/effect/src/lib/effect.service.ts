@@ -4,6 +4,7 @@ import {catchError, EMPTY, Observable, Subscription, tap} from 'rxjs';
 /**
  * Keeps track of your subscriptions and unsubscribes them automatically when destroyed.
  *
+ * @deprecated use {@link effect$} instead. Will be removed in next major version (current: 2).
  * @example
  */
 @Injectable()
