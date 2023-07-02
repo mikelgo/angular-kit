@@ -32,6 +32,7 @@
       "@angular-kit/rx/platform": ["libs/rx/platform/src/index.ts"],
       "@angular-kit/rx/query": ["libs/rx/query/src/index.ts"],
       "@angular-kit/rx/streams": ["libs/rx/streams/src/index.ts"],
+      "@shared-internal": ["libs/shared/src/index.ts"],
       "@angular-kit/stream": ["libs/stream/src/index.ts"]
     }
   },
