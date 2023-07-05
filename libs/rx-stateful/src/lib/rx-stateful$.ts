@@ -90,7 +90,7 @@ export function rxStateful$<T, E = unknown>(
       connector: () => new ReplaySubject(1),
       resetOnError: false,
       resetOnComplete: false,
-      resetOnRefCountZero: false,
+      resetOnRefCountZero: true,
     }),
     _handleSyncValue()
   );
