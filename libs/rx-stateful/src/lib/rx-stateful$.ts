@@ -19,6 +19,7 @@ import {
 import {InternalRxState, RxStateful, RxStatefulConfig, RxStatefulWithError,} from './types/types';
 import {_handleSyncValue} from './util/handle-sync-value';
 import {defaultAccumulationFn} from "./types/accumulation-fn";
+import {calcStartValueForRefresh} from "./util/calc-start-value-for-refresh";
 
 /**
  * @publicApi
@@ -73,17 +74,8 @@ export function rxStateful$<T, E = unknown>(
               InternalRxState<T, E>
             >)
         ),
-        mergedConfig?.keepValueOnRefresh
-          ? startWith({ isLoading: true, isRefreshing: true, context: 'suspense', error: undefined } as Partial<
-              InternalRxState<T, E>
-            >)
-          : startWith({
-              isLoading: true,
-              isRefreshing: true,
-              value: null,
-              context: 'suspense',
-              error: undefined,
-            } as Partial<InternalRxState<T, E>>)
+           startWith(calcStartValueForRefresh(mergedConfig))
+
       )
     )
   );
