@@ -13,4 +13,16 @@ describe('calcStartValueForRefresh', () => {
       expect(result).toHaveProperty('value', null);
     });
   });
+  describe('keepErrorOnRefresh ', () => {
+    it('should return without error property when keepErrorOnRefresh = true', () => {
+      const result = calcStartValueForRefresh({ keepErrorOnRefresh: true });
+
+      expect(result).not.toHaveProperty('error');
+    });
+    it('should return with property error = undefined when keepErrorOnRefresh = false', () => {
+      const result = calcStartValueForRefresh({ keepErrorOnRefresh: false });
+
+      expect(result).toHaveProperty('error', undefined);
+    });
+  });
 });
