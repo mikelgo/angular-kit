@@ -56,6 +56,15 @@ export interface InternalRxState<T, E> {
  */
 export interface RxStatefulConfig<T, E> {
   refreshTrigger$?: Subject<any>;
+  /**
+   * Define if the value should be kept on refresh or reset to null
+   * @default true
+   */
   keepValueOnRefresh?: boolean;
   accumulationFn?: RxStatefulAccumulationFn<T, E>;
+  /**
+   * Define if the error should be kept on refresh or reset to null
+   * @default false
+   */
+  keepErrorOnRefresh?: boolean;
 }
