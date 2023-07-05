@@ -3,6 +3,9 @@ import {RxStatefulAccumulationFn} from "./accumulation-fn";
 
 /**
  * @publicApi
+ *
+ * @description
+ * Context of the current emission.
  */
 export type RxStatefulContext = 'idle' | 'suspense' | 'error' | 'next';
 
@@ -53,6 +56,12 @@ export interface InternalRxState<T, E> {
 
 /**
  * @publicApi
+ *
+ * @description
+ * Configuration for rxStateful$
+ *
+ * @example
+ * rxStateful$(source$, {keepValueOnRefresh: true})
  */
 export interface RxStatefulConfig<T, E> {
   refreshTrigger$?: Subject<any>;
