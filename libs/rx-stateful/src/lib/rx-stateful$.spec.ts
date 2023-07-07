@@ -210,7 +210,7 @@ describe('rxStateful$', () => {
         expect(result.getValues()).toEqual([
           { hasValue: false, isSuspense: true, hasError: false, context: 'suspense' },
           { hasValue: true, isSuspense: false, value: 10, hasError: false, context: 'next' },
-          { hasValue: true, isSuspense: true, value: 10, context: 'suspense', hasError: false },
+          { hasValue: false, isSuspense: true, value: null, context: 'suspense', hasError: false },
           { hasValue: true, isSuspense: false, value: 10, context: 'next', hasError: false },
           // { hasValue: true, isSuspense: true, value: null, context: 'suspense', hasError: false },
           //{ hasValue: false, isSuspense: false, value: null, context: 'error', hasError: true, error: 'error' },
@@ -228,6 +228,43 @@ describe('rxStateful$', () => {
         source$.next(throwError(() => new Error('error')));
 
         expect(result.getValues()).toEqual([false, true, false, true]);
+      });
+    });
+    describe('Configuration options', () => {
+      describe('keepErrorOnRefresh', () => {
+        it('should not keep the error on refresh when option is set to false', function () {
+          const source$ = new Subject<Observable<any>>();
+          const refreshTrigger$ = new Subject<void>();
+          const result = subscribeSpyTo(rxStateful$<number>(source$.pipe(mergeAll()),{ refreshTrigger$, keepErrorOnRefresh: false }).state$);
+
+          source$.next(throwError(() => new Error('error')));
+          refreshTrigger$.next(void 0);
+          source$.next(throwError(() => new Error('error')));
+
+          expect(result.getValues()).toEqual([
+            { hasValue: false, isSuspense: true, hasError: false, context: 'suspense', error: undefined },
+            { hasValue: false, isSuspense: false, hasError: true, context: 'error', error: 'error' },
+            { hasValue: false, isSuspense: true, hasError: false, context: 'suspense', error: undefined, value: null },
+            { hasValue: false, isSuspense: false, value: null, hasError: true, context: 'error', error: 'error' },
+          ]);
+        });
+
+        it('should keep the error on refresh when option is set to true', function () {
+          const source$ = new Subject<Observable<any>>();
+          const refreshTrigger$ = new Subject<void>();
+          const result = subscribeSpyTo(rxStateful$<number>(source$.pipe(mergeAll()),{ refreshTrigger$, keepErrorOnRefresh: true }).state$);
+
+          source$.next(throwError(() => new Error('error')));
+          refreshTrigger$.next(void 0);
+          source$.next(throwError(() => new Error('error')));
+
+          expect(result.getValues()).toEqual([
+            { hasValue: false, isSuspense: true, hasError: false, context: 'suspense', error: undefined },
+            { hasValue: false, isSuspense: false, value: undefined, hasError: true, context: 'error', error: 'error' },
+            { hasValue: false, isSuspense: true, value: null, hasError: true, context: 'suspense', error: 'error' },
+            { hasValue: false, isSuspense: false, value: undefined, hasError: true, context: 'error', error: 'error' },
+          ]);
+        });
       });
     });
   });
