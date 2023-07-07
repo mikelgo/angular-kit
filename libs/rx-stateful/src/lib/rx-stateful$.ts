@@ -32,7 +32,7 @@ export function rxStateful$<T, E = unknown>(
 ): RxStateful<T, E> {
   const error$$ = new Subject<RxStatefulWithError<T, E>>();
   const mergedConfig: RxStatefulConfig<T,E> = {
-    keepValueOnRefresh: true,
+    keepValueOnRefresh: false,
     keepErrorOnRefresh: false,
     ...config,
   };

@@ -67,7 +67,7 @@ export interface RxStatefulConfig<T, E> {
   refreshTrigger$?: Subject<any>;
   /**
    * Define if the value should be kept on refresh or reset to null
-   * @default true
+   * @default false
    */
   keepValueOnRefresh?: boolean;
   accumulationFn?: RxStatefulAccumulationFn<T, E>;
