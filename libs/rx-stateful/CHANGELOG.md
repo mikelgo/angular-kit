@@ -2,6 +2,33 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [2.0.0-alpha.3](https://github.com/code-workers-io/angular-kit/compare/rx-stateful-1.0.0-alpha.3...rx-stateful-2.0.0-alpha.3) (2023-07-07)
+
+
+### Features
+
+* **rx-stateful:** allow custom accumulation function ([c4e10ba](https://github.com/code-workers-io/angular-kit/commit/c4e10ba0d1d26a30b3c936127e09f9e69e09bf33)), closes [#53](https://github.com/code-workers-io/angular-kit/issues/53)
+
+
+
+# [2.0.0-alpha.2](https://github.com/code-workers-io/angular-kit/compare/rx-stateful-1.0.0-alpha.2...rx-stateful-2.0.0-alpha.2) (2023-06-30)
+
+
+### Bug Fixes
+
+* **rx-stateful:** handle errors correctly ([4bca29b](https://github.com/code-workers-io/angular-kit/commit/4bca29bb08a51a7f4a33b6c7b22bd2ac64f46180))
+
+
+
+# [2.0.0-alpha.1](https://github.com/code-workers-io/angular-kit/compare/rx-stateful-2.0.0-alpha.0...rx-stateful-2.0.0-alpha.1) (2023-06-09)
+
+
+### Features
+
+* **rx-stateful:** support signals ([ab1b778](https://github.com/code-workers-io/angular-kit/commit/ab1b778e7cbe2cab2aae992f54e81a3cef64d8d7))
+
+
+
 # [2.0.0-alpha.2](https://github.com/code-workers-io/angular-kit/compare/rx-stateful-2.0.0-alpha.1...rx-stateful-2.0.0-alpha.2) (2023-06-30)
 
 
