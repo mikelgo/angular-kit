@@ -33,6 +33,7 @@ export function rxStateful$<T, E = unknown>(
   const error$$ = new Subject<RxStatefulWithError<T, E>>();
   const mergedConfig: RxStatefulConfig<T,E> = {
     keepValueOnRefresh: true,
+    keepErrorOnRefresh: false,
     ...config,
   };
   const accumulationFn = mergedConfig.accumulationFn ?? defaultAccumulationFn;
