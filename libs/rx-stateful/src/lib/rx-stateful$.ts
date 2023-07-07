@@ -48,8 +48,9 @@ export function rxStateful$<T, E = unknown>(
     share({
       connector: () => new ReplaySubject(1),
     }),
-    catchError((error: any) => {
-      error$$.next({ error: error?.message, context: 'error', hasError: true });
+    catchError((error: E) => {
+      const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E ) => (error as any)?.message);
+      error$$.next({ error: errorMappingFn(error), context: 'error', hasError: true });
       return NEVER;
     })
   );

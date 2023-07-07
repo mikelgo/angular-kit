@@ -76,4 +76,9 @@ export interface RxStatefulConfig<T, E> {
    * @default false
    */
   keepErrorOnRefresh?: boolean;
+  /**
+   * Mapping function to map the error to a specific value.
+   * @param error
+   */
+  errorMappingFn?: (error: E) => any;
 }
