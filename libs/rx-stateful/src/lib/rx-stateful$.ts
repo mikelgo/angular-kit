@@ -24,10 +24,10 @@ import {
   RxStatefulWithError,
 } from './types/types';
 import {_handleSyncValue} from './util/handle-sync-value';
-import {createRxStateful} from './util/create-rx-stateful';
+import {defaultAccumulationFn} from "./types/accumulation-fn";
+import {createRxStateful} from "./util/create-rx-stateful";
 import {createRxStatefulSignals} from './util/create-rx-stateful-signals';
 import {isRxStatefulSignalConfigGuard} from './types/guards';
-import {defaultAccumulationFn} from './types/accumulation-fn';
 
 /**
  * @publicApi
@@ -42,36 +42,14 @@ export function rxStateful$<T, E = unknown>(
   source$: Observable<T>,
   config?: RxStatefulConfig<T, E> | RxStatefulSignalConfig<T, E>
 ): RxStateful<T, E> | RxStatefulSignals<T, E> {
-  const useSignals = isRxStatefulSignalConfigGuard(config) ?? false;
-  const mergedConfig: RxStatefulConfig<T, E> = {
-    keepValueOnRefresh: true,
+  const mergedConfig: RxStatefulConfig<T,E> = {
+    keepValueOnRefresh: false,
+    keepErrorOnRefresh: false,
     ...config,
   };
-  const accumulationFn = mergedConfig.accumulationFn ?? defaultAccumulationFn;
-  const error$$ = new Subject<RxStatefulWithError<T, E>>();
-  const refresh$ = mergedConfig?.refreshTrigger$ ?? new Subject<unknown>();
+  const useSignals = isRxStatefulSignalConfigGuard(config) ?? false;
 
-  const { request$, refreshedRequest$ } = initSources(source$, error$$, refresh$, mergedConfig);
-
-  const state$ = merge(request$, refreshedRequest$, error$$).pipe(
-    scan(accumulationFn, {
-      isLoading: false,
-      isRefreshing: false,
-      value: undefined,
-      error: undefined,
-      context: 'idle',
-    }),
-    distinctUntilChanged(),
-    share({
-      connector: () => new ReplaySubject(1),
-      resetOnError: false,
-      resetOnComplete: false,
-      resetOnRefCountZero: false,
-    }),
-    _handleSyncValue()
-  );
-
-  const rxStateful$ = createRxStateful<T, E>(state$, mergedConfig);
+  const rxStateful$ = createRxStateful<T, E>(createState$<T,E>(source$, mergedConfig), mergedConfig);
 
   if (useSignals) {
     return createRxStatefulSignals<T, E>(rxStateful$);
@@ -80,16 +58,54 @@ export function rxStateful$<T, E = unknown>(
   }
 }
 
-function initSource<T, E>(source$: Observable<T>, error$$: Subject<RxStatefulWithError<T, E>>): Observable<T> {
+function createState$<T,E>(source$: Observable<T>, mergedConfig: RxStatefulConfig<T,E>){
+  const accumulationFn = mergedConfig.accumulationFn ?? defaultAccumulationFn;
+  const error$$ = new Subject<RxStatefulWithError<T, E>>();
+  const refresh$ = mergedConfig?.refreshTrigger$ ?? new Subject<unknown>();
+  const { request$, refreshedRequest$ } = initSources(source$, error$$, refresh$, mergedConfig);
+
+  return merge(request$, refreshedRequest$, error$$).pipe(
+    scan(
+      accumulationFn,
+      { isLoading: false, isRefreshing: false, value: undefined, error: undefined, context: 'suspense' }
+    ),
+    distinctUntilChanged(),
+    share({
+      connector: () => new ReplaySubject(1),
+      resetOnError: false,
+      resetOnComplete: false,
+      resetOnRefCountZero: true,
+    }),
+    _handleSyncValue()
+  );
+}
+
+function initSource<T, E>(source$: Observable<T>, error$$: Subject<RxStatefulWithError<T, E>>, mergedConfig: RxStatefulConfig<T, E>): Observable<T> {
   return source$.pipe(
     share({
       connector: () => new ReplaySubject(1),
     }),
-    catchError((error: any) => {
-      error$$.next({ error: error?.message, context: 'error', hasError: true });
+    catchError((error: E) => {
+      const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E ) => (error as any)?.message);
+      error$$.next({ error: errorMappingFn(error), context: 'error', hasError: true });
       return NEVER;
     })
   );
+}
+
+function initSources<T, E>(
+  source$: Observable<T>,
+  error$$: Subject<RxStatefulWithError<T, E>>,
+  refresh$: Subject<any>,
+  mergedConfig: RxStatefulConfig<T, E>
+) {
+  const sharedSource$ = initSource<T, E>(source$, error$$, mergedConfig);
+
+  const request$ = requestSource<T, E>(sharedSource$);
+
+  const refreshedRequest$ = refreshedRequestSource<T, E>(sharedSource$, refresh$, mergedConfig);
+
+  return { request$, refreshedRequest$ };
 }
 
 function requestSource<T, E>(source$: Observable<T>): Observable<Partial<InternalRxState<T, E>>> {
@@ -98,7 +114,7 @@ function requestSource<T, E>(source$: Observable<T>): Observable<Partial<Interna
       (v) =>
         ({ value: v, isLoading: false, isRefreshing: false, context: 'next', error: undefined } as Partial<
           InternalRxState<T, E>
-        >)
+          >)
     ),
     startWith({ isLoading: true, isRefreshing: false, context: 'suspense' } as Partial<InternalRxState<T, E>>)
   );
@@ -125,35 +141,22 @@ function refreshedRequestSource<T, E>(
           (v) =>
             ({ value: v, isLoading: false, isRefreshing: false, context: 'next', error: undefined } as Partial<
               InternalRxState<T, E>
-            >)
+              >)
         ),
         mergedConfig?.keepValueOnRefresh
           ? startWith({ isLoading: true, isRefreshing: true, context: 'suspense', error: undefined } as Partial<
-              InternalRxState<T, E>
+            InternalRxState<T, E>
             >)
           : startWith({
-              isLoading: true,
-              isRefreshing: true,
-              value: null,
-              context: 'suspense',
-              error: undefined,
-            } as Partial<InternalRxState<T, E>>)
+            isLoading: true,
+            isRefreshing: true,
+            value: null,
+            context: 'suspense',
+            error: undefined,
+          } as Partial<InternalRxState<T, E>>)
       )
     )
   );
 }
 
-function initSources<T, E>(
-  source$: Observable<T>,
-  error$$: Subject<RxStatefulWithError<T, E>>,
-  refresh$: Subject<any>,
-  mergedConfig: RxStatefulConfig<T, E>
-) {
-  const sharedSource$ = initSource<T, E>(source$, error$$);
 
-  const request$ = requestSource<T, E>(sharedSource$);
-
-  const refreshedRequest$ = refreshedRequestSource<T, E>(sharedSource$, refresh$, mergedConfig);
-
-  return { request$, refreshedRequest$ };
-}

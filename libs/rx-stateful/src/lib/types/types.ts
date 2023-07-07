@@ -1,11 +1,14 @@
 import {Observable, Subject} from 'rxjs';
 import {Signal} from '@angular/core';
-import {RxStatefulAccumulationFn} from './accumulation-fn';
+import {RxStatefulAccumulationFn} from "./accumulation-fn";
 
 /**
  * @publicApi
+ *
+ * @description
+ * Context of the current emission.
  */
-export type RxStatefulContext = 'idle' | 'suspense' | 'error' | 'next';
+export type RxStatefulContext =  'suspense' | 'error' | 'next';
 
 /**
  * @publicApi
@@ -50,6 +53,7 @@ export interface RxStatefulSignals<T, E> {
 
   state: Signal<Stateful<T, E>>;
 }
+export type RxStatefulWithError<T, E> = Pick<Stateful<T, E>, 'hasError' | 'error' | 'context'>;
 
 /**
  * @internal
@@ -62,15 +66,33 @@ export interface InternalRxState<T, E> {
   context: RxStatefulContext;
 }
 
-export type RxStatefulWithError<T, E> = Pick<Stateful<T, E>, 'hasError' | 'error' | 'context'>;
-
 /**
  * @publicApi
+ *
+ * @description
+ * Configuration for rxStateful$
+ *
+ * @example
+ * rxStateful$(source$, {keepValueOnRefresh: true})
  */
 export interface RxStatefulConfig<T, E> {
   refreshTrigger$?: Subject<any>;
+  /**
+   * Define if the value should be kept on refresh or reset to null
+   * @default false
+   */
   keepValueOnRefresh?: boolean;
   accumulationFn?: RxStatefulAccumulationFn<T, E>;
+  /**
+   * Define if the error should be kept on refresh or reset to null
+   * @default false
+   */
+  keepErrorOnRefresh?: boolean;
+  /**
+   * Mapping function to map the error to a specific value.
+   * @param error
+   */
+  errorMappingFn?: (error: E) => any;
 }
 
 /**
@@ -78,7 +100,21 @@ export interface RxStatefulConfig<T, E> {
  */
 export interface RxStatefulSignalConfig<T, E> {
   refreshTrigger$?: Subject<any>;
+  /**
+   * Define if the value should be kept on refresh or reset to null
+   * @default false
+   */
   keepValueOnRefresh?: boolean;
   useSignals: true;
   accumulationFn?: RxStatefulAccumulationFn<T, E>;
+  /**
+   * Define if the error should be kept on refresh or reset to null
+   * @default false
+   */
+  keepErrorOnRefresh?: boolean;
+  /**
+   * Mapping function to map the error to a specific value.
+   * @param error
+   */
+  errorMappingFn?: (error: E) => any;
 }
