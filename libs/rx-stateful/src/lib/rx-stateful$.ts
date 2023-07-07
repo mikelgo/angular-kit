@@ -83,7 +83,7 @@ export function rxStateful$<T, E = unknown>(
   const state$ = merge(request$, refreshedRequest$, error$$).pipe(
     scan(
       accumulationFn,
-      { isLoading: false, isRefreshing: false, value: undefined, error: undefined, context: 'idle' }
+      { isLoading: false, isRefreshing: false, value: undefined, error: undefined, context: 'suspense' }
     ),
     distinctUntilChanged(),
     share({

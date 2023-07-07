@@ -7,7 +7,7 @@ import {RxStatefulAccumulationFn} from "./accumulation-fn";
  * @description
  * Context of the current emission.
  */
-export type RxStatefulContext = 'idle' | 'suspense' | 'error' | 'next';
+export type RxStatefulContext =  'suspense' | 'error' | 'next';
 
 /**
  * @publicApi
