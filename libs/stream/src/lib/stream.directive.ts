@@ -139,7 +139,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
    */
   @Input() streamLazyViewCreation = this.config?.lazyViewCreation ?? false;
 
-  private subscription: Unsubscribable = new Subscription();
+  private subscription = new Subscription();
   private embeddedView!: EmbeddedViewRef<StreamDirectiveContext<T>>;
 
   private context: StreamDirectiveContext<T> = {

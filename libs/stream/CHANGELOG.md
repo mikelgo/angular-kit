@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.0.1](https://github.com/mikelgo/angular-kit/compare/stream-2.0.0...stream-2.0.1) (2023-07-17)
+
+
+### Bug Fixes
+
+* **stream:** handle subscription correctly ([d4c966d](https://github.com/mikelgo/angular-kit/commit/d4c966daee0ac9850573a2abaccd686b4c37497c)), closes [#69](https://github.com/mikelgo/angular-kit/issues/69)
+
+
+
 # [2.0.0](https://github.com/code-workers-io/angular-kit/compare/stream-1.1.0...stream-2.0.0) (2023-04-17)
 
 
