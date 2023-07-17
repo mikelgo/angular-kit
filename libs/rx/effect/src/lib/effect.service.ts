@@ -8,7 +8,7 @@ import {catchError, EMPTY, Observable, Subscription, tap} from 'rxjs';
  * @example
  */
 @Injectable()
-export class Effect implements OnDestroy {
+export class EffectService implements OnDestroy {
   private readonly sub = new Subscription();
 
   constructor(private readonly e: ErrorHandler) {}
@@ -64,9 +64,9 @@ export class Effect implements OnDestroy {
 }
 
 export function provideEffect() {
-  return Effect;
+  return EffectService;
 }
 
 export function injectEffect() {
-  return inject(Effect);
+  return inject(EffectService);
 }
