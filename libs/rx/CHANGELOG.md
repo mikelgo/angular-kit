@@ -2,6 +2,27 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.1.1](https://github.com/mikelgo/angular-kit/compare/rx-2.1.0...rx-2.1.1) (2023-07-17)
+
+
+### Bug Fixes
+
+* **rx:** handle sync start values properly ([7698402](https://github.com/mikelgo/angular-kit/commit/76984020a6b2eb9bc62b7afef890194c8e04cb17))
+* **rx:** maintain peer dep to angular-kit/cdk correctly ([afa4e97](https://github.com/mikelgo/angular-kit/commit/afa4e97c6e616d05af4bbe1cfbda6d37b9c6adef))
+* **rx:** rename effect to EffectService as it is causing naming collision ([852cd8b](https://github.com/mikelgo/angular-kit/commit/852cd8bfc88a892f0f62737a193d26511de64295))
+* **rx:** rxQuery$ did emit wrong refreshing values when refresh trigger was a BehaivorSubject ([4631f50](https://github.com/mikelgo/angular-kit/commit/4631f5006ccd51d934ea68b44a15334fed23755e))
+
+
+### Features
+
+* **rx-stateful:** add rxStateful$ ([b40705e](https://github.com/mikelgo/angular-kit/commit/b40705ed25ebf3cbfdad5a426726834338852228))
+* **rx:** add rxStateful$ ([8e6a119](https://github.com/mikelgo/angular-kit/commit/8e6a1194b63b2a843fe122682a0114d3c426e45c))
+* **rx:** add rxStateful$ utility function ([8004842](https://github.com/mikelgo/angular-kit/commit/8004842e3b5848ab1442ccf2284efe8a5ec98a82))
+* **rx:** enhance rxStateful$ by state$ ([6f4147a](https://github.com/mikelgo/angular-kit/commit/6f4147aafb3db90b5279360a4b6148265bfb51f2))
+* **rx:** introduce functional runEffect$ and deprecate effect-service ([ad25b43](https://github.com/mikelgo/angular-kit/commit/ad25b43f7ba99e510f95fbb78302582dc35e0cd3))
+
+
+
 ## [2.1.1](https://github.com/code-workers-io/angular-kit/compare/rx-2.1.0...rx-2.1.1) (2023-04-19)
 
 
