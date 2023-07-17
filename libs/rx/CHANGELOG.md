@@ -2,6 +2,10 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.1.2](https://github.com/mikelgo/angular-kit/compare/rx-2.1.1...rx-2.1.2) (2023-07-17)
+
+
+
 ## [2.1.1](https://github.com/mikelgo/angular-kit/compare/rx-2.1.0...rx-2.1.1) (2023-07-17)
 
 
