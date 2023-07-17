@@ -224,7 +224,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
     }
 
     // todo refactor into smaller chunks
-    this.refreshEffect$$
+    this.subscription.add(this.refreshEffect$$
       .pipe(distinctUntilChanged(), mergeAll(), withLatestFrom(this.loadingTemplate$$.pipe(startWith(null))))
       .subscribe(([_, loadingTemplate]) => {
         this.context.loading = true;
@@ -249,7 +249,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
           value: this.context.$implicit,
           error: this.context.error,
         });
-      });
+      }));
 
     // todo refactor into smaller chunks
     this.subscription = this.sourceWithOperator$
