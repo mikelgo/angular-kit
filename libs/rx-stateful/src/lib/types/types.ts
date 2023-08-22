@@ -1,5 +1,5 @@
 import {Observable, Subject} from 'rxjs';
-import {Signal} from '@angular/core';
+import {Injector, Signal} from '@angular/core';
 import {RxStatefulAccumulationFn} from "./accumulation-fn";
 
 /**
@@ -76,12 +76,24 @@ export interface InternalRxState<T, E> {
  * rxStateful$(source$, {keepValueOnRefresh: true})
  */
 export interface RxStatefulConfig<T, E> {
+  /**
+   * Injector to create an injection-context for rxStateful$.
+   */
+  injector?: Injector;
+  /**
+   * Trigger to refresh the source$.
+   */
   refreshTrigger$?: Subject<any>;
   /**
    * Define if the value should be kept on refresh or reset to null
    * @default false
    */
   keepValueOnRefresh?: boolean;
+  /**
+   * Accumulation function to accumulate the state.
+   *
+   * @default: ({ ...acc, ...val })
+   */
   accumulationFn?: RxStatefulAccumulationFn<T, E>;
   /**
    * Define if the error should be kept on refresh or reset to null
@@ -90,7 +102,7 @@ export interface RxStatefulConfig<T, E> {
   keepErrorOnRefresh?: boolean;
   /**
    * Mapping function to map the error to a specific value.
-   * @param error
+   * @param error - the error which is thrown by the source$, e.g. a {@link HttpErrorResponse}.
    */
   errorMappingFn?: (error: E) => any;
 }
@@ -99,6 +111,13 @@ export interface RxStatefulConfig<T, E> {
  * @publicApi
  */
 export interface RxStatefulSignalConfig<T, E> {
+  /**
+   * Injector to create an injection-context for rxStateful$.
+   */
+  injector?: Injector;
+  /**
+   * Trigger to refresh the source$.
+   */
   refreshTrigger$?: Subject<any>;
   /**
    * Define if the value should be kept on refresh or reset to null
@@ -106,6 +125,11 @@ export interface RxStatefulSignalConfig<T, E> {
    */
   keepValueOnRefresh?: boolean;
   useSignals: true;
+  /**
+   * Accumulation function to accumulate the state.
+   *
+   * @default: ({ ...acc, ...val })
+   */
   accumulationFn?: RxStatefulAccumulationFn<T, E>;
   /**
    * Define if the error should be kept on refresh or reset to null

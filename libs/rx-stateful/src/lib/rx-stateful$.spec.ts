@@ -2,17 +2,29 @@ import {mergeAll, Observable, Subject, throwError} from 'rxjs';
 import {subscribeSpyTo} from '@hirez_io/observer-spy';
 import {rxStateful$} from './rx-stateful$';
 import {TestBed} from "@angular/core/testing";
+import {provideRxStatefulConfig} from "./config/provide-config";
+
+const test = (description :string, testFn: () => void, testBed?: TestBed) => {
+  it(description, () => {
+    (testBed ?? TestBed).runInInjectionContext(() => {
+      testFn();
+    })
+  });
+}
+
+
+
 
 describe('rxStateful$', () => {
   describe('without refreshTrigger$', () => {
     describe('value$', () => {
-      it('should be lazy', () => {
+      test('should be lazy', () => {
         const source$ = new Subject<number>();
         const result = subscribeSpyTo(rxStateful$<number>(source$).value$);
 
         expect(result.getValues().length).toEqual(0);
       });
-      it('value$ should return the current value ', () => {
+      test('value$ should return the current value ', () => {
         const source$ = new Subject<number | null>();
 
         const result = subscribeSpyTo(rxStateful$<number | null>(source$).value$);
@@ -25,13 +37,13 @@ describe('rxStateful$', () => {
     });
 
     describe('hasValue$', () => {
-      it('should return false initially', () => {
+      test('should return false initially', () => {
         const source$ = new Subject<number>();
         const result = subscribeSpyTo(rxStateful$<number>(source$).hasValue$);
 
         expect(result.getValues()).toEqual([false]);
       });
-      it('should return true if there is a value', () => {
+      test('should return true if there is a value', () => {
         const source$ = new Subject<number>();
         const result = subscribeSpyTo(rxStateful$<number>(source$).hasValue$);
 
@@ -41,7 +53,7 @@ describe('rxStateful$', () => {
       });
     });
     describe('isSuspense$', () => {
-      it('should return true and false', () => {
+      test('should return true and false', () => {
         const source$ = new Subject<number>();
         const result = subscribeSpyTo(rxStateful$<number>(source$).isSuspense$);
 
@@ -51,13 +63,13 @@ describe('rxStateful$', () => {
       });
     });
     describe('hasError$', () => {
-      it('should return false initially', () => {
+      test('should return false initially', () => {
         const source$ = new Subject<number>();
         const result = subscribeSpyTo(rxStateful$<number>(source$).hasError$);
 
         expect(result.getValues()).toEqual([false]);
       });
-      it('should return true if there is a error', () => {
+      test('should return true if there is a error', () => {
         const source$ = new Subject<Observable<any>>();
         const result = subscribeSpyTo(rxStateful$<number>(source$.pipe(mergeAll())).hasError$);
 
@@ -67,13 +79,13 @@ describe('rxStateful$', () => {
       });
     });
     describe('error$', () => {
-      it('should not emit when there is no error', () => {
+      test('should not emit when there is no error', () => {
         const source$ = new Subject<number>();
         const result = subscribeSpyTo(rxStateful$<number>(source$).error$);
 
         expect(result.getLastValue()).toEqual(undefined);
       });
-      it('should return the error if there is a error', () => {
+      test('should return the error if there is a error', () => {
         const source$ = new Subject<Observable<any>>();
         const result = subscribeSpyTo(rxStateful$<number>(source$.pipe(mergeAll())).error$);
 
@@ -83,7 +95,7 @@ describe('rxStateful$', () => {
       });
     });
     describe('context$', () => {
-      it('should return the correct context', () => {
+      test('should return the correct context', () => {
         const source$ = new Subject<number>();
         const result = subscribeSpyTo(rxStateful$<number>(source$).context$);
 
@@ -95,7 +107,7 @@ describe('rxStateful$', () => {
   });
   describe('with refreshTrigger$', () => {
     describe('value$', () => {
-      it('should be lazy', () => {
+      test('should be lazy', () => {
         const source$ = new Subject<number>();
         const refreshTrigger$ = new Subject<void>();
         const result = subscribeSpyTo(
@@ -104,7 +116,7 @@ describe('rxStateful$', () => {
 
         expect(result.getValues().length).toEqual(0);
       });
-      it('keepValueOnRefresh: true - should return the current value when refreshTrigger$ emits', () => {
+      test('keepValueOnRefresh: true - should return the current value when refreshTrigger$ emits', () => {
         const source$ = new Subject<number>();
         const refreshTrigger$ = new Subject<void>();
 
@@ -118,7 +130,7 @@ describe('rxStateful$', () => {
 
         expect(result.getValues()).toEqual([10, 10, 10]);
       });
-      it('keepValueOnRefresh: false - should return the current value when refreshTrigger$ emits', () => {
+      test('keepValueOnRefresh: false - should return the current value when refreshTrigger$ emits', () => {
         const source$ = new Subject<number>();
         const refreshTrigger$ = new Subject<void>();
 
@@ -134,7 +146,7 @@ describe('rxStateful$', () => {
       });
     });
     describe('hasValue$', () => {
-      it('should return false - true - true', () => {
+      test('should return false - true - true', () => {
         const source$ = new Subject<number>();
         const refreshTrigger$ = new Subject<void>();
         const result = subscribeSpyTo(
@@ -146,7 +158,7 @@ describe('rxStateful$', () => {
 
         expect(result.getValues()).toEqual([false, true]);
       });
-      it('should return false - true - false - true', () => {
+      test('should return false - true - false - true', () => {
         const source$ = new Subject<number>();
         const refreshTrigger$ = new Subject<void>();
         const result = subscribeSpyTo(
@@ -160,7 +172,7 @@ describe('rxStateful$', () => {
       });
     });
     describe('isSuspense$', () => {
-      it('should return false - true - true', () => {
+      test('should return false - true - true', () => {
         const source$ = new Subject<number>();
         const refreshTrigger$ = new Subject<void>();
         const result = subscribeSpyTo(
@@ -172,7 +184,7 @@ describe('rxStateful$', () => {
 
         expect(result.getValues()).toEqual([true, false, true, false]);
       });
-      it('should return false - true - false - true', () => {
+      test('should return false - true - false - true', () => {
         const source$ = new Subject<number>();
         const refreshTrigger$ = new Subject<void>();
         const result = subscribeSpyTo(
@@ -186,7 +198,7 @@ describe('rxStateful$', () => {
       });
     });
     describe('context$', () => {
-      it('should return the correct context', () => {
+      test('should return the correct context', () => {
         const source$ = new Subject<number>();
         const refreshTrigger$ = new Subject<void>();
         const result = subscribeSpyTo(rxStateful$<number>(source$, { refreshTrigger$ }).context$);
@@ -198,7 +210,7 @@ describe('rxStateful$', () => {
       });
     });
     describe('state$', () => {
-      it('should return the correct state', () => {
+      test('should return the correct state', () => {
         const source$ = new Subject<any>();
         const refreshTrigger$ = new Subject<void>();
         const result = subscribeSpyTo(rxStateful$<number>(source$, { refreshTrigger$ }).state$);
@@ -219,7 +231,7 @@ describe('rxStateful$', () => {
       });
     });
     describe('hasError$', () => {
-      it('should return false true false true', () => {
+      test('should return false true false true', () => {
         const source$ = new Subject<Observable<any>>();
         const refreshTrigger$ = new Subject<void>();
         const result = subscribeSpyTo(rxStateful$<number>(source$.pipe(mergeAll()), { refreshTrigger$ }).hasError$);
@@ -233,7 +245,7 @@ describe('rxStateful$', () => {
     });
     describe('Configuration options', () => {
       describe('keepErrorOnRefresh', () => {
-        it('should not keep the error on refresh when option is set to false', function () {
+        test('should not keep the error on refresh when option is set to false', function () {
           const source$ = new Subject<Observable<any>>();
           const refreshTrigger$ = new Subject<void>();
           const result = subscribeSpyTo(rxStateful$<number>(source$.pipe(mergeAll()),{ refreshTrigger$, keepErrorOnRefresh: false }).state$);
@@ -250,7 +262,7 @@ describe('rxStateful$', () => {
           ]);
         });
 
-        it('should keep the error on refresh when option is set to true', function () {
+        test('should keep the error on refresh when option is set to true', function () {
           const source$ = new Subject<Observable<any>>();
           const refreshTrigger$ = new Subject<void>();
           const result = subscribeSpyTo(rxStateful$<number>(source$.pipe(mergeAll()),{ refreshTrigger$, keepErrorOnRefresh: true }).state$);
@@ -309,5 +321,49 @@ describe('rxStateful$', () => {
       })
     })
   });
+  describe('Configuration', () => {
+    it('should use config from provider', () => {
+      TestBed.configureTestingModule({
+        providers: [provideRxStatefulConfig({ keepValueOnRefresh: true })],
+      }).runInInjectionContext(() => {
+        const source$ = new Subject<number>();
+        const refreshTrigger$ = new Subject<void>();
+
+        const result = subscribeSpyTo(
+            rxStateful$<number>(source$, { refreshTrigger$ }).value$
+        );
+        source$.next(10);
+
+        refreshTrigger$.next(void 0);
+        refreshTrigger$.next(void 0);
+
+        expect(result.getValues()).toEqual([10, 10, 10]);
+      })
+
+
+
+    });
+
+    it('should override config from provider', () => {
+      TestBed.configureTestingModule({
+        providers: [provideRxStatefulConfig({ keepValueOnRefresh: true })],
+      })
+
+      TestBed.runInInjectionContext(() => {
+        const source$ = new Subject<number>();
+        const refreshTrigger$ = new Subject<void>();
+
+        const result = subscribeSpyTo(
+            rxStateful$<number>(source$, { refreshTrigger$, keepValueOnRefresh: false }).value$
+        );
+        source$.next(10);
+
+        refreshTrigger$.next(void 0);
+        refreshTrigger$.next(void 0);
+
+        expect(result.getValues()).toEqual([10, null, 10, null, 10]);
+      })
+    });
+  })
 });
 

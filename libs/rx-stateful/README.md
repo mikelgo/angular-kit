@@ -3,6 +3,8 @@
 `rxStateful$` is a powerful RxJs operator that wraps any sync or async Observable and provides a
 stateful stream.
 
+Hint: You can use it on both sync and async Observables. However the real benefits you will get for async Observables.
+
 ## Installation
 ```bash
 
@@ -64,7 +66,7 @@ const stateful$ = rxStateful$(from(fetch('...')), {keepValueOnRefresh: true, ref
 - `hasValue$` - boolean if a value is present
 - `context$` - the context of the stream ('suspense', 'next', 'error', 'complete')
 - `hasError$` - boolean if an error is present
-- `error$` - the error if present
+- `error$` - the error, if present
 
 ### Signal based API
 `rxStateful$` returns several `Signals` when `useSignals: true` is set in the configuration object: `rxStateful$(source$, {useSignals: true})`
@@ -77,12 +79,54 @@ const stateful$ = rxStateful$(from(fetch('...')), {keepValueOnRefresh: true, ref
 
 It behaves the same as the Observable based API but instead of returning Observables it returns Signals.
 
-### Configuration
+## Configuration
+`rxStateful$` provides two configuration possibilities:
+
+### Global configuration
+
+Use `provideRxStatefulConfig` to provide a global configuration for all `rxStateful$` instances.
+
+For a standalone application:
+```typescript
+import { provideRxStatefulConfig } from '@angular-kit/rx-stateful';
+
+// app.component.ts
+@Component({...})
+export class AppComponent{}
+
+// main.ts
+bootstrapApplication(AppComponent, {
+    providers: [provideRxStatefulConfig({ keepValueOnRefresh: true })]
+});
+
+```
+For a ngModule based application:
+```typescript
+import { provideRxStatefulConfig } from '@angular-kit/rx-stateful';
+
+// main.ts
+platformBrowserDynamic()
+  .bootstrapModule(AppModule, {
+      providers: [provideRxStatefulConfig({ keepValueOnRefresh: true })]
+  })
+  .catch((err) => console.error(err));
+
+```
+
+### Configuration on instance level
+
+You can also provide a configuration on instance level. This will also override the global configuration (if present).
+
 `rxStateful$` takes a configuration object as second parameter. The following options are available:
 - `keepValueOnRefresh` - boolean if the value should be kept when the `refreshTrigger$` emits. Default: `false`
 - `refreshTrigger$` - a Subject that triggers the source again. Default: not set
 - `useSignals` - boolean if the API should return Signals instead of Observables. Default: `false`
 
+```typescript
+import { rxStateful$ } from '@angular-kit/rx-stateful';
+
+const rxStateful$ = rxStateful$(someSource$, { keepValueOnRefresh: true });
+```
 
 ## Versioning
 This project follows [Semantic Versioning](https://semver.org/).
