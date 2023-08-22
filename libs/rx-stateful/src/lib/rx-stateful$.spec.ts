@@ -280,46 +280,6 @@ describe('rxStateful$', () => {
         });
       });
     });
-
-    describe('Signals version', () => {
-      describe('state', () => {
-        it('should return the correct state', () => {
-          TestBed.runInInjectionContext(() => {
-            const source$ = new Subject<number>();
-            const refreshTrigger$ = new Subject<void>();
-            const result = rxStateful$<number>(source$, {
-              refreshTrigger$,
-              keepValueOnRefresh: true,
-              useSignals: true
-            }).state;
-
-            expect(result()).toEqual({hasValue: false, isSuspense: true, hasError: false, context: 'suspense'});
-            source$.next(10);
-            expect(result()).toEqual({hasValue: true, isSuspense: false, value: 10, hasError: false, context: 'next'});
-
-            refreshTrigger$.next(void 0);
-            // todo how to capture the state before the refreshTrigger$ emits?
-            // --> {
-            //             hasValue: true,
-            //             isSuspense: true,
-            //             value: 10,
-            //             context: 'suspense',
-            //             hasError: false
-            //           }
-
-            expect(result()).toEqual({
-              hasValue: true,
-              isSuspense: false,
-              value: 10,
-              context: 'next',
-              hasError: false
-            });
-          })
-
-
-        })
-      })
-    })
   });
   describe('Configuration', () => {
     it('should use config from provider', () => {

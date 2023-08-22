@@ -68,16 +68,6 @@ const stateful$ = rxStateful$(from(fetch('...')), {keepValueOnRefresh: true, ref
 - `hasError$` - boolean if an error is present
 - `error$` - the error, if present
 
-### Signal based API
-`rxStateful$` returns several `Signals` when `useSignals: true` is set in the configuration object: `rxStateful$(source$, {useSignals: true})`
-- `state` - the stateful stream with all information combined
-- `value` - the value
-- `hasValue` - boolean if a value is present
-- `context` - the context of the underlying stream ('suspense', 'next', 'error', 'complete')
-- `hasError` - boolean if an error is present
-- `error` - the error if present
-
-It behaves the same as the Observable based API but instead of returning Observables it returns Signals.
 
 ## Configuration
 `rxStateful$` provides two configuration possibilities:
@@ -120,7 +110,6 @@ You can also provide a configuration on instance level. This will also override 
 `rxStateful$` takes a configuration object as second parameter. The following options are available:
 - `keepValueOnRefresh` - boolean if the value should be kept when the `refreshTrigger$` emits. Default: `false`
 - `refreshTrigger$` - a Subject that triggers the source again. Default: not set
-- `useSignals` - boolean if the API should return Signals instead of Observables. Default: `false`
 
 ```typescript
 import { rxStateful$ } from '@angular-kit/rx-stateful';
@@ -131,8 +120,7 @@ const rxStateful$ = rxStateful$(someSource$, { keepValueOnRefresh: true });
 ## Versioning
 This project follows [Semantic Versioning](https://semver.org/).
 
-- Version `1.x.x` supports Angular <=15.x.x
-- Version `2.x.x` supports Angular >=16.x.x as it makes use of tne new Angular Signals
+- Version `1.x.x` supports Angular >=14.0.0
 
 ## License
 MIT

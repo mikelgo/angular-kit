@@ -15,19 +15,11 @@ import {
   Subject,
   switchMap,
 } from 'rxjs';
-import {
-  InternalRxState,
-  RxStateful,
-  RxStatefulConfig,
-  RxStatefulSignalConfig,
-  RxStatefulSignals,
-  RxStatefulWithError,
-} from './types/types';
+import {InternalRxState, RxStateful, RxStatefulConfig, RxStatefulWithError,} from './types/types';
 import {_handleSyncValue} from './util/handle-sync-value';
 import {defaultAccumulationFn} from './types/accumulation-fn';
 import {createRxStateful} from './util/create-rx-stateful';
-import {createRxStatefulSignals} from './util/create-rx-stateful-signals';
-import {isRxStatefulSignalConfigGuard} from './types/guards';
+
 import {injectConfig} from './config/provide-config';
 import {inject, Injector, runInInjectionContext} from '@angular/core';
 
@@ -58,14 +50,7 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>): RxStateful<
  * @param config - Configuration for rxStateful$.
  */
 export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig<T, E>): RxStateful<T, E>;
-export function rxStateful$<T, E = unknown>(
-  source$: Observable<T>,
-  config: RxStatefulSignalConfig<T, E>
-): RxStatefulSignals<T, E>;
-export function rxStateful$<T, E = unknown>(
-  source$: Observable<T>,
-  config?: RxStatefulConfig<T, E> | RxStatefulSignalConfig<T, E>
-): RxStateful<T, E> | RxStatefulSignals<T, E> {
+export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxStatefulConfig<T, E>): RxStateful<T, E> {
   const injector = config?.injector ?? inject(Injector);
 
   return runInInjectionContext(injector, () => {
@@ -76,15 +61,9 @@ export function rxStateful$<T, E = unknown>(
       ...environmentConfig,
       ...config,
     };
-    const useSignals = isRxStatefulSignalConfigGuard(config) ?? false;
 
-    const rxStateful$ = createRxStateful<T, E>(createState$<T, E>(source$, mergedConfig), mergedConfig);
+    return createRxStateful<T, E>(createState$<T, E>(source$, mergedConfig), mergedConfig);
 
-    if (useSignals) {
-      return createRxStatefulSignals<T, E>(rxStateful$);
-    } else {
-      return rxStateful$;
-    }
   });
 }
 
