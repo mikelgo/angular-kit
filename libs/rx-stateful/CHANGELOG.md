@@ -2,6 +2,10 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [2.0.0-alpha.4](https://github.com/mikelgo/angular-kit/compare/rx-stateful-2.0.0-alpha.3...rx-stateful-2.0.0-alpha.4) (2023-08-22)
+
+
+
 # [2.0.0-alpha.3](https://github.com/code-workers-io/angular-kit/compare/rx-stateful-1.0.0-alpha.3...rx-stateful-2.0.0-alpha.3) (2023-07-07)
 
 

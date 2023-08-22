@@ -1,6 +1,6 @@
 {
   "name": "@angular-kit/rx-stateful",
-  "version": "2.0.0-alpha.3",
+  "version": "2.0.0-alpha.4",
   "publishConfig": {
     "access": "public"
   },
