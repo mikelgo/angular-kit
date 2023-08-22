@@ -3,6 +3,8 @@
 `rxStateful$` is a powerful RxJs operator that wraps any sync or async Observable and provides a
 stateful stream.
 
+Hint: You can use it on both sync and async Observables. However the real benefits you will get for async Observables.
+
 ## Installation
 ```bash
 
@@ -59,6 +61,48 @@ const stateful$ = rxStateful$(from(fetch('...')), {keepValueOnRefresh: true, ref
 - `hasValue$` - boolean if a value is present
 - `context$` - the context of the stream ('suspense', 'next', 'error', 'complete')
 - `hasError$` - boolean if an error is present
-- `error$` - the error if present
+- `error$` - the error, if present
 
+## Configuration
+`rxStateful$` provides two configuration possibilities:
 
+### Global configuration
+
+Use `provideRxStatefulConfig` to provide a global configuration for all `rxStateful$` instances.
+
+ For a standalone application:
+```typescript
+import { provideRxStatefulConfig } from '@angular-kit/rx-stateful';
+
+// app.component.ts
+@Component({...})
+export class AppComponent{}
+
+// main.ts
+bootstrapApplication(AppComponent, {
+    providers: [provideRxStatefulConfig({ keepValueOnRefresh: true })]
+});
+
+```
+For a ngModule based application:
+```typescript
+import { provideRxStatefulConfig } from '@angular-kit/rx-stateful';
+
+// main.ts
+platformBrowserDynamic()
+  .bootstrapModule(AppModule, {
+      providers: [provideRxStatefulConfig({ keepValueOnRefresh: true })]
+  })
+  .catch((err) => console.error(err));
+
+```
+
+### Configuration on instance level
+
+You can also provide a configuration on instance level. This will also override the global configuration (if present).
+
+```typescript
+import { rxStateful$ } from '@angular-kit/rx-stateful';
+
+const rxStateful$ = rxStateful$(someSource$, { keepValueOnRefresh: true });
+```

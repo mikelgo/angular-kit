@@ -1,56 +1,89 @@
 import {
-  BehaviorSubject,
-  catchError,
-  distinctUntilChanged,
-  map,
-  merge,
-  NEVER,
-  Observable,
-  pipe,
-  ReplaySubject,
-  scan,
-  share,
-  skip,
-  startWith,
-  Subject,
-  switchMap,
+    BehaviorSubject,
+    catchError,
+    distinctUntilChanged,
+    map,
+    merge,
+    NEVER,
+    Observable,
+    pipe,
+    ReplaySubject,
+    scan,
+    share,
+    skip,
+    startWith,
+    Subject,
+    switchMap,
 } from 'rxjs';
-import {InternalRxState, RxStateful, RxStatefulConfig, RxStatefulWithError,} from './types/types';
+import {InternalRxState, RxStateful, RxStatefulConfig, RxStatefulWithError} from './types/types';
 import {_handleSyncValue} from './util/handle-sync-value';
-import {defaultAccumulationFn} from "./types/accumulation-fn";
-import {createRxStateful} from "./util/create-rx-stateful";
+import {defaultAccumulationFn} from './types/accumulation-fn';
+import {createRxStateful} from './util/create-rx-stateful';
+
+import {injectConfig} from './config/provide-config';
+import {inject, Injector, runInInjectionContext} from "@angular/core";
 
 /**
  * @publicApi
+ *
+ * @description
+ * Creates a new rxStateful$ instance.
+ *
+ * rxStateful$ will enhance the source$ with additional information about the current state of the source$, like
+ * e.g. if it is in a suspense or error state.
+ *
+ * @example
+ * const source$ = httpClient.get('https://my-api.com');
+ * const rxStateful$ = rxStateful$(source$);
+ *
+ * @param source$ - The source$ to enhance with additional state information.
  */
 export function rxStateful$<T, E = unknown>(source$: Observable<T>): RxStateful<T, E>;
-export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig<T,E>): RxStateful<T, E>;
-export function rxStateful$<T, E = unknown>(
-  source$: Observable<T>,
-  config?: RxStatefulConfig<T,E>
-): RxStateful<T, E> {
-  const mergedConfig: RxStatefulConfig<T,E> = {
-    keepValueOnRefresh: false,
-    keepErrorOnRefresh: false,
-    ...config,
-  };
+/**
+ * @publicApi
+ *
+ * @example
+ * const source$ = httpClient.get('https://my-api.com');
+ * const rxStateful$ = rxStateful$(source$, { keepValueOnRefresh: true });
+ *
+ * @param source$ - The source$ to enhance with additional state information.
+ * @param config - Configuration for rxStateful$.
+ */
+export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig<T, E>): RxStateful<T, E>;
+export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxStatefulConfig<T, E>): RxStateful<T, E> {
+  const injector = config?.injector ?? inject(Injector);
 
-  const rxStateful$ = createRxStateful<T, E>(createState$<T,E>(source$, mergedConfig), mergedConfig);
+    return runInInjectionContext(injector, () => {
+        const environmentConfig = injectConfig<T, E>();
 
-  return rxStateful$;
+        const mergedConfig: RxStatefulConfig<T, E> = {
+            keepValueOnRefresh: false,
+            keepErrorOnRefresh: false,
+            ...environmentConfig,
+            ...config,
+        };
+
+        const rxStateful$ = createRxStateful<T, E>(createState$<T, E>(source$, mergedConfig), mergedConfig);
+
+        return rxStateful$;
+    })
+
 }
 
-function createState$<T,E>(source$: Observable<T>, mergedConfig: RxStatefulConfig<T,E>){
+function createState$<T, E>(source$: Observable<T>, mergedConfig: RxStatefulConfig<T, E>) {
   const accumulationFn = mergedConfig.accumulationFn ?? defaultAccumulationFn;
   const error$$ = new Subject<RxStatefulWithError<T, E>>();
   const refresh$ = mergedConfig?.refreshTrigger$ ?? new Subject<unknown>();
   const { request$, refreshedRequest$ } = initSources(source$, error$$, refresh$, mergedConfig);
 
   return merge(request$, refreshedRequest$, error$$).pipe(
-    scan(
-      accumulationFn,
-      { isLoading: false, isRefreshing: false, value: undefined, error: undefined, context: 'suspense' }
-    ),
+    scan(accumulationFn, {
+      isLoading: false,
+      isRefreshing: false,
+      value: undefined,
+      error: undefined,
+      context: 'suspense',
+    }),
     distinctUntilChanged(),
     share({
       connector: () => new ReplaySubject(1),
@@ -62,13 +95,17 @@ function createState$<T,E>(source$: Observable<T>, mergedConfig: RxStatefulConfi
   );
 }
 
-function initSource<T, E>(source$: Observable<T>, error$$: Subject<RxStatefulWithError<T, E>>, mergedConfig: RxStatefulConfig<T, E>): Observable<T> {
+function initSource<T, E>(
+  source$: Observable<T>,
+  error$$: Subject<RxStatefulWithError<T, E>>,
+  mergedConfig: RxStatefulConfig<T, E>
+): Observable<T> {
   return source$.pipe(
     share({
       connector: () => new ReplaySubject(1),
     }),
     catchError((error: E) => {
-      const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E ) => (error as any)?.message);
+      const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E) => (error as any)?.message);
       error$$.next({ error: errorMappingFn(error), context: 'error', hasError: true });
       return NEVER;
     })
@@ -96,7 +133,7 @@ function requestSource<T, E>(source$: Observable<T>): Observable<Partial<Interna
       (v) =>
         ({ value: v, isLoading: false, isRefreshing: false, context: 'next', error: undefined } as Partial<
           InternalRxState<T, E>
-          >)
+        >)
     ),
     startWith({ isLoading: true, isRefreshing: false, context: 'suspense' } as Partial<InternalRxState<T, E>>)
   );
@@ -123,22 +160,20 @@ function refreshedRequestSource<T, E>(
           (v) =>
             ({ value: v, isLoading: false, isRefreshing: false, context: 'next', error: undefined } as Partial<
               InternalRxState<T, E>
-              >)
+            >)
         ),
         mergedConfig?.keepValueOnRefresh
           ? startWith({ isLoading: true, isRefreshing: true, context: 'suspense', error: undefined } as Partial<
-            InternalRxState<T, E>
+              InternalRxState<T, E>
             >)
           : startWith({
-            isLoading: true,
-            isRefreshing: true,
-            value: null,
-            context: 'suspense',
-            error: undefined,
-          } as Partial<InternalRxState<T, E>>)
+              isLoading: true,
+              isRefreshing: true,
+              value: null,
+              context: 'suspense',
+              error: undefined,
+            } as Partial<InternalRxState<T, E>>)
       )
     )
   );
 }
-
-
