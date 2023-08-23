@@ -5,10 +5,6 @@ This file was generated using [@jscutlery/semver](https://github.com/jscutlery/s
 # [1.1.0](https://github.com/mikelgo/angular-kit/compare/rx-stateful-1.0.0...rx-stateful-1.1.0) (2023-08-22)
 
 
-
-# [1.0.0](https://github.com/mikelgo/angular-kit/compare/rx-stateful-2.0.0-alpha.4...rx-stateful-1.0.0) (2023-08-22)
-
-
 ### Code Refactoring
 
 * **rx-stateful:** drop support for signals ([0cf756f](https://github.com/mikelgo/angular-kit/commit/0cf756ff7c36385c9642ce7b93369913b9812590))
