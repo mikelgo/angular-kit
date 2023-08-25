@@ -101,9 +101,7 @@ export class AppComponent {
     );
   }
 
-  onResize($event: any) {
-    //console.log($event);
-  }
+
   random() {
     return Math.random();
   }
