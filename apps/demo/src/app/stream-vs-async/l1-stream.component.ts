@@ -1,9 +1,11 @@
 import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
 import {Observable} from 'rxjs';
+import {L2StreamComponent} from './l2-stream.component';
+import {NgxDirtyCheckerModule} from '@code-workers.io/ngx-dirty-checker';
 
 @Component({
-  selector: 'angular-kit-l1-stream',
-  template: `
+    selector: 'angular-kit-l1-stream',
+    template: `
     <div>
       <ngx-dirty-checker></ngx-dirty-checker>
       <span>L1 Component</span>
@@ -13,8 +15,8 @@ import {Observable} from 'rxjs';
     </p>-->
     <angular-kit-l2-stream [value]="value"></angular-kit-l2-stream>
   `,
-  styles: [
-    `
+    styles: [
+        `
       :host {
         display: block;
         border: 1px dashed darkseagreen;
@@ -22,8 +24,10 @@ import {Observable} from 'rxjs';
         padding: 16px;
       }
     `,
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [NgxDirtyCheckerModule, L2StreamComponent],
 })
 export class L1StreamComponent {
   @Input() value!: Observable<any>;

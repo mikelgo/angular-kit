@@ -1,22 +1,34 @@
 import {ChangeDetectionStrategy, Component, Injectable} from '@angular/core';
 import {
-  BehaviorSubject,
-  delay,
-  EMPTY,
-  interval,
-  map,
-  mergeAll,
-  Observable,
-  of,
-  ReplaySubject,
-  scan,
-  Subject,
-  switchMap,
-  take,
-  takeUntil,
-  throwError,
+    BehaviorSubject,
+    delay,
+    EMPTY,
+    interval,
+    map,
+    mergeAll,
+    Observable,
+    of,
+    ReplaySubject,
+    scan,
+    Subject,
+    switchMap,
+    take,
+    takeUntil,
+    throwError,
 } from 'rxjs';
 import {HttpClient} from '@angular/common/http';
+import {AsyncPipe, JsonPipe} from '@angular/common';
+import {
+    RxObserveVisibilityDirective
+} from '../../../../libs/rx/platform/src/lib/directives/rx-observe-visibility.directive';
+import {
+    RxRenderInViewportDirective
+} from '../../../../libs/rx/platform/src/lib/directives/rx-render-in-view-port.directive';
+import {RxObserveResizeDirective} from '../../../../libs/rx/platform/src/lib/directives/rx-observe-resize.directive';
+import {StreamDirective} from '../../../../libs/stream/src/lib/stream.directive';
+import {DemoOnchangesComponent} from './demo-onchanges/demo-onchanges.component';
+import {RouterOutlet} from '@angular/router';
+import {NavComponent} from './core/nav.component';
 
 interface Foo {
   bar?: {
@@ -24,10 +36,22 @@ interface Foo {
   };
 }
 @Component({
-  selector: 'angular-kit-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'angular-kit-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        NavComponent,
+        RouterOutlet,
+        DemoOnchangesComponent,
+        StreamDirective,
+        RxObserveResizeDirective,
+        RxRenderInViewportDirective,
+        RxObserveVisibilityDirective,
+        AsyncPipe,
+        JsonPipe,
+    ],
 })
 export class AppComponent {
   name$ = new BehaviorSubject<string>('Hi');

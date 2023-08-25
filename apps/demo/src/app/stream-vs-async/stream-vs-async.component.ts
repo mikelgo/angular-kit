@@ -1,9 +1,13 @@
 import {ChangeDetectionStrategy, Component, ViewEncapsulation} from '@angular/core';
 import {scan, Subject} from 'rxjs';
+import {AsyncPipe} from '@angular/common';
+import {L1StreamComponent} from './l1-stream.component';
+import {L1Component} from './l1.component';
+import {NgxDirtyCheckerModule} from '@code-workers.io/ngx-dirty-checker';
 
 @Component({
-  selector: 'angular-kit-stream-vs-async',
-  template: `
+    selector: 'angular-kit-stream-vs-async',
+    template: `
     <div class="comp-container">
       <div>
         <ngx-dirty-checker></ngx-dirty-checker>
@@ -30,9 +34,16 @@ import {scan, Subject} from 'rxjs';
       </div>
     </div>
   `,
-  styleUrls: ['./stream-vs-async.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None,
+    styleUrls: ['./stream-vs-async.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [
+        NgxDirtyCheckerModule,
+        L1Component,
+        L1StreamComponent,
+        AsyncPipe,
+    ],
 })
 export class StreamVsAsyncComponent {
   value$$ = new Subject<number>();

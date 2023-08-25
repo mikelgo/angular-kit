@@ -1,16 +1,17 @@
 import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
+import {NgxDirtyCheckerModule} from '@code-workers.io/ngx-dirty-checker';
 
 @Component({
-  selector: 'angular-kit-l2',
-  template: `
+    selector: 'angular-kit-l2',
+    template: `
     <div>
       <ngx-dirty-checker></ngx-dirty-checker>
       <span>L2 Component</span>
     </div>
     <p>Value from L2: {{ value }}</p>
   `,
-  styles: [
-    `
+    styles: [
+        `
       :host {
         display: block;
         border: 1px dashed darkseagreen;
@@ -18,8 +19,10 @@ import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
         padding: 16px;
       }
     `,
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [NgxDirtyCheckerModule],
 })
 export class L2Component {
   @Input() value!: any;

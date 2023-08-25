@@ -1,16 +1,19 @@
 import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
 import {BehaviorSubject, Observable, ReplaySubject} from 'rxjs';
 import {
-  DebounceRenderStrategy,
-  RenderStrategy,
-  ThrottleRenderStrategy,
-  ViewportRenderStrategy
+    DebounceRenderStrategy,
+    RenderStrategy,
+    ThrottleRenderStrategy,
+    ViewportRenderStrategy
 } from "@angular-kit/stream";
+import {StreamDirective} from '../../../../../libs/stream/src/lib/stream.directive';
+import {NgxDirtyCheckerModule} from '@code-workers.io/ngx-dirty-checker';
+import {AsyncPipe, NgIf} from '@angular/common';
 
 
 @Component({
-  selector: 'angular-kit-l2-stream',
-  template: `
+    selector: 'angular-kit-l2-stream',
+    template: `
     <div>
       Render Strategy
       <div *ngIf="renderStrategy$$ | async as renderStrategy">
@@ -42,8 +45,8 @@ import {
       <span class="count">{{ count }}</span>
     </p>
   `,
-  styles: [
-    `
+    styles: [
+        `
       :host {
         display: block;
         border: 1px dashed darkseagreen;
@@ -70,8 +73,15 @@ import {
         padding: 8px;
       }
     `,
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        NgIf,
+        NgxDirtyCheckerModule,
+        StreamDirective,
+        AsyncPipe,
+    ],
 })
 export class L2StreamComponent {
   @Input() value!: Observable<any>;
