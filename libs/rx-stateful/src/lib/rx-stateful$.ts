@@ -21,7 +21,7 @@ import {defaultAccumulationFn} from './types/accumulation-fn';
 import {createRxStateful} from './util/create-rx-stateful';
 
 import {injectConfig} from './config/provide-config';
-import {inject, Injector, runInInjectionContext} from '@angular/core';
+import {EnvironmentInjector, inject} from '@angular/core';
 
 /**
  * @publicApi
@@ -51,9 +51,13 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>): RxStateful<
  */
 export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig<T, E>): RxStateful<T, E>;
 export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxStatefulConfig<T, E>): RxStateful<T, E> {
-  const injector = config?.injector ?? inject(Injector);
+  // todo Angular 16
+  // const injector = config?.injector ?? inject(Injector);
+  const environmentInjector = inject(EnvironmentInjector)
 
-  return runInInjectionContext(injector, () => {
+  // todo Angular-16 runInInjectionContext(injector)
+
+  return environmentInjector.runInContext( () => {
     const environmentConfig = injectConfig<T, E>();
     const mergedConfig: RxStatefulConfig<T, E> = {
       keepValueOnRefresh: false,
