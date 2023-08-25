@@ -6,7 +6,8 @@ import {
   Directive,
   DoCheck,
   OnDestroy,
-  OnInit
+  OnInit,
+  Output
 } from '@angular/core';
 import {distinctUntilChanged, Observable, ReplaySubject, Subject} from "rxjs";
 
@@ -31,94 +32,176 @@ import {distinctUntilChanged, Observable, ReplaySubject, Subject} from "rxjs";
   standalone: true,
 })
 export class RxHooks$ implements OnInit, DoCheck, AfterViewInit, AfterViewChecked, AfterContentInit, AfterContentChecked, OnDestroy{
-  #onConstruct$$ = new ReplaySubject<void>(1);
-  #onInit$ = new ReplaySubject<void>(1);
-  #doCheck$ = new ReplaySubject<void>(1);
-  #afterContentInit$ = new ReplaySubject<void>(1);
-  #afterContentChecked$ = new ReplaySubject<void>(1);
-  #afterViewInit$ = new ReplaySubject<void>(1);
-  #afterViewChecked$ = new ReplaySubject<void>(1);
-  #onDestroy$ = new ReplaySubject<void>(1);
+  private readonly onCreation$$ = new ReplaySubject<void>(1);
+  private readonly onInit$$ = new ReplaySubject<void>(1);
+  private readonly doCheck$$ = new ReplaySubject<void>(1);
+  private readonly afterContentInit$$ = new ReplaySubject<void>(1);
+  private readonly afterContentChecked$$ = new ReplaySubject<void>(1);
+  private readonly afterViewInit$$ = new ReplaySubject<void>(1);
+  private readonly afterViewChecked$$ = new ReplaySubject<void>(1);
+  private readonly onDestroy$$ = new ReplaySubject<void>(1);
 
   /**
    * @publicApi
    * @description
-   * Emits when the component or directive is constructed.
+   * Emits when the component or directive host is constructed.
    */
-  onConstruct$ = asObservable(this.#onConstruct$$);
+  readonly onCreation$ = asObservable(this.onCreation$$);
   /**
    * @publicApi
    * @description
-   * Emits when the component's or directive's ngOnInit is executed.
+   * Emits when the component's or directive's host ngOnInit is executed.
    */
-  onInit$ = asObservable(this.#onInit$);
+  readonly onInit$ = asObservable(this.onInit$$);
   /**
    * @publicApi
    * @description
-   * Emits when the component's or directive's ngDoCheck is executed.
+   * Emits when the component's or directive's host ngDoCheck is executed.
+   *
+   * Use this hook with caution as it will run after each change detection cycle
    */
-  doCheck$ = asObservable(this.#doCheck$);
+  readonly doCheck$ = asObservable(this.doCheck$$);
   /**
    * @publicApi
    * @description
-   * Emits when the component's or directive's ngAfterContentInit is executed.
+   * Emits when the component's or directive's host ngAfterContentInit is executed.
    */
-  afterContentInit$ = asObservable(this.#afterContentInit$);
+  readonly afterContentInit$ = asObservable(this.afterContentInit$$);
   /**
    * @publicApi
    * @description
-   * Emits when the component's or directive's ngAfterContentChecked is executed.
+   * Emits when the component's or directive's host ngAfterContentChecked is executed.
    */
-  afterContentChecked$ = asObservable(this.#afterContentChecked$);
+  readonly afterContentChecked$ = asObservable(this.afterContentChecked$$);
   /**
    * @publicApi
    * @description
-   * Emits when the component's or directive's ngAfterViewInit is executed.
+   * Emits when the component's or directive's host ngAfterViewInit is executed.
    */
-  afterViewInit$ = asObservable(this.#afterViewInit$);
+  readonly afterViewInit$ = asObservable(this.afterViewInit$$);
   /**
    * @publicApi
    * @description
-   * Emits when the component's or directive's ngAfterViewChecked is executed.
+   * Emits when the component's or directive's host ngAfterViewChecked is executed.
    */
-  afterViewChecked$ = asObservable(this.#afterViewChecked$);
+  readonly afterViewChecked$ = asObservable(this.afterViewChecked$$);
   /**
    * @publicApi
    * @description
-   * Emits when the component's or directive's ngOnDestroy is executed.
+   * Emits when the component's or directive's host ngOnDestroy is executed.
    */
-  onDestroy$ = asObservable(this.#onDestroy$);
+  readonly onDestroy$ = asObservable(this.onDestroy$$);
+
+  /**
+   * @publicApi
+   * @description
+   * Emits when the component or directive host is constructed.
+   *
+   * @example
+   * <div rxHooks (created)="onDivCreated($event)"> ... </div>
+   */
+  @Output() created = this.onCreation$;
+  /**
+   * @publicApi
+   * @description
+   * Emits when the component's or directive's host ngOnInit is executed.
+   *
+   * @example
+   * <div rxHooks (init)="onDivInit($event)"> ... </div>
+   */
+  @Output() init = this.onInit$;
+  /**
+   * @publicApi
+   * @description
+   * Emits when the component's or directive's host ngDoCheck is executed.
+   *
+   * Use this hook with caution as it will run after each change detection cycle
+   *
+   * @example
+   * <div rxHooks (doCheck)="onDivChecked($event)"> ... </div>
+   */
+  @Output() doCheck = this.doCheck$;
+  /**
+   * @publicApi
+   * @description
+   * Emits when the component's or directive's host ngAfterContentInit is executed.
+   *
+   * @example
+   * <div rxHooks (afterContentInit)="onDivContentInit($event)"> ... </div>
+   */
+  @Output() afterContentInit = this.afterContentInit$;
+  /**
+   * @publicApi
+   * @description
+   * Emits when the component's or directive's host ngAfterContentChecked is executed.
+   *
+   * @example
+   * <div rxHooks (afterContentChecked)="onDivContentChecked($event)"> ... </div>
+   */
+  @Output() afterContentChecked = this.afterContentChecked$;
+  /**
+   * @publicApi
+   * @description
+   * Emits when the component's or directive's host ngAfterViewInit is executed.
+   *
+   * @example
+   * <div rxHooks (afterViewInit)="onDivAfterViewInit($event)"> ... </div>
+   */
+  @Output() afterViewInit = this.afterViewInit$;
+  /**
+   * @publicApi
+   * @description
+   * Emits when the component's or directive's host ngAfterViewChecked is executed.
+   *
+   * @example
+   * <div rxHooks (afterViewChecked)="onDivAfterViewChecked($event)"> ... </div>
+   */
+  @Output() afterViewChecked = this.afterViewChecked$;
+  /**
+   * @publicApi
+   * @description
+   * Emits when the component's or directive's host ngOnDestroy is executed.
+   *
+   * @example
+   * <div rxHooks (destroy)="onDivDestroyed($event)"> ... </div>
+   */
+  @Output() destroy = this.onDestroy$;
 
   constructor() {
-    this.#onConstruct$$.next(void 0)
+    this.onCreation$$.next(void 0);
+    this.onCreation$$.complete();
   }
 
   ngOnInit(): void {
-    this.#onInit$.next();
+    this.onInit$$.next();
+    this.onInit$$.complete();
   }
 
   ngDoCheck(): void {
-    this.#doCheck$.next();
+    this.doCheck$$.next();
   }
 
   ngAfterViewInit(): void {
-    this.#afterViewInit$.next();
+    this.afterViewInit$$.next();
+    this.afterViewInit$$.complete();
   }
 
   ngAfterViewChecked(): void {
-    this.#afterViewChecked$.next();
+    this.afterViewChecked$$.next();
   }
 
   ngAfterContentInit(): void {
-    this.#afterContentInit$.next();
+    this.afterContentInit$$.next();
+    this.afterContentInit$$.complete();
   }
 
   ngAfterContentChecked(): void {
-    this.#afterContentChecked$.next();
+    this.afterContentChecked$$.next();
   }
 
   ngOnDestroy(): void {
-    this.#onDestroy$.next();
+    this.onDestroy$$.next();
+    this.onDestroy$$.complete();
   }
 }
 
