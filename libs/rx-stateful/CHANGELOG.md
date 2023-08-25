@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.1.1](https://github.com/mikelgo/angular-kit/compare/rx-stateful-1.1.0...rx-stateful-1.1.1) (2023-08-25)
+
+
+### Bug Fixes
+
+* **rx-stateful:** remove usages of assertInInjectionContext and runInInjectionContext ([f4d19e8](https://github.com/mikelgo/angular-kit/commit/f4d19e8eeb51959bc9549f093eaeab0e822b26de))
+
+
+
 # [1.1.0](https://github.com/mikelgo/angular-kit/compare/rx-stateful-1.0.0...rx-stateful-1.1.0) (2023-08-22)
 
 
