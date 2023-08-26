@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.2.0](https://github.com/mikelgo/angular-kit/compare/rx-stateful-1.1.1...rx-stateful-1.2.0) (2023-08-26)
+
+
+### Features
+
+* **rx-stateful:** generic E is now typed as unknown as default ([1fd1bab](https://github.com/mikelgo/angular-kit/commit/1fd1bab4efa269f3110df73adbaa19c82b14bb21))
+
+
+
 ## [1.1.1](https://github.com/mikelgo/angular-kit/compare/rx-stateful-1.1.0...rx-stateful-1.1.1) (2023-08-25)
 
 
