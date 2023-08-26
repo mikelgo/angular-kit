@@ -13,7 +13,7 @@ export type RxStatefulContext =  'suspense' | 'error' | 'next';
 /**
  * @publicApi
  */
-export interface Stateful<T, E> {
+export interface Stateful<T, E = unknown>  {
   hasError: boolean;
   error: E | undefined;
 
@@ -28,7 +28,7 @@ export interface Stateful<T, E> {
 /**
  * @publicApi
  */
-export interface RxStateful<T, E> {
+export interface RxStateful<T, E = unknown> {
   hasError$: Observable<boolean>;
   error$: Observable<E | never>;
 
@@ -43,12 +43,12 @@ export interface RxStateful<T, E> {
 }
 
 
-export type RxStatefulWithError<T, E> = Pick<Stateful<T, E>, 'hasError' | 'error' | 'context'>;
+export type RxStatefulWithError<T, E = unknown> = Pick<Stateful<T, E>, 'hasError' | 'error' | 'context'>;
 
 /**
  * @internal
  */
-export interface InternalRxState<T, E> {
+export interface InternalRxState<T, E = unknown> {
   value: T | null | undefined;
   isLoading: boolean;
   isRefreshing: boolean;
@@ -65,7 +65,7 @@ export interface InternalRxState<T, E> {
  * @example
  * rxStateful$(source$, {keepValueOnRefresh: true})
  */
-export interface RxStatefulConfig<T, E> {
+export interface RxStatefulConfig<T, E = unknown> {
   /**
    * Injector to create an injection-context for rxStateful$.
    */
@@ -94,7 +94,7 @@ export interface RxStatefulConfig<T, E> {
    * Mapping function to map the error to a specific value.
    * @param error - the error which is thrown by the source$, e.g. a {@link HttpErrorResponse}.
    */
-  errorMappingFn?: (error: E) => any;
+  errorMappingFn?: <R>(error: E) => R;
 }
 
 
