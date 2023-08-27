@@ -94,7 +94,7 @@ export interface RxStatefulConfig<T, E = unknown> {
    * Mapping function to map the error to a specific value.
    * @param error - the error which is thrown by the source$, e.g. a {@link HttpErrorResponse}.
    */
-  errorMappingFn?: <R>(error: E) => R;
+  errorMappingFn?: (error: E) => unknown;
 }
 
 
