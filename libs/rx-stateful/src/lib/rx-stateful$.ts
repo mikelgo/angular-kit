@@ -104,6 +104,9 @@ function initSource<T, E>(
   return source$.pipe(
     share({
       connector: () => new ReplaySubject(1),
+      resetOnError: false,
+      resetOnComplete: false,
+      resetOnRefCountZero: true,
     }),
     catchError((error: E) => {
       mergedConfig?.beforeHandleErrorFn?.(error);
