@@ -2,6 +2,22 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.3.0](https://github.com/mikelgo/angular-kit/compare/rx-stateful-1.2.1...rx-stateful-1.3.0) (2023-08-29)
+
+
+### Bug Fixes
+
+* **rx-stateful:** harmonize share config ([99c5b70](https://github.com/mikelgo/angular-kit/commit/99c5b7064eb5c2f522d7e7875554304d0514576b))
+* **rx-stateful:** improve typing of errorMappingFn in RxStatefulConfig ([2cd93e8](https://github.com/mikelgo/angular-kit/commit/2cd93e89a9c9504163eecccd7c945e6b3c3882f7))
+
+
+### Features
+
+* **rx-stateful:** enhance config by beforeHandleErrorFn ([dace1b1](https://github.com/mikelgo/angular-kit/commit/dace1b1627d76c082affc4722da8adbe72588ae2))
+* **rx-stateful:** enhance provider config with beforeHandleErroFn ([b925d35](https://github.com/mikelgo/angular-kit/commit/b925d35d667dee6d0a8d203e3660e132d15373db))
+
+
+
 ## [1.2.1](https://github.com/mikelgo/angular-kit/compare/rx-stateful-1.2.0...rx-stateful-1.2.1) (2023-08-26)
 
 
