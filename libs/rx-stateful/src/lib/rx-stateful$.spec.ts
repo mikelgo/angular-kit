@@ -3,6 +3,7 @@ import {subscribeSpyTo} from '@hirez_io/observer-spy';
 import {rxStateful$} from './rx-stateful$';
 import {TestBed} from "@angular/core/testing";
 import {provideRxStatefulConfig} from "./config/provide-config";
+import {inject} from "@angular/core";
 
 const test = (description :string, testFn: () => void, testBed?: TestBed) => {
   it(description, () => {
@@ -320,6 +321,40 @@ describe('rxStateful$', () => {
         refreshTrigger$.next(void 0);
 
         expect(result.getValues()).toEqual([10, null, 10, null, 10]);
+      })
+    });
+    it('should use beforeHandleErrorFn from provider ', () => {
+      class Service {
+        handleError(error: any) {}
+      }
+      TestBed.configureTestingModule({
+        providers: [
+          provideRxStatefulConfig({
+            keepValueOnRefresh: true,
+            beforeHandleErrorFn: (error: any) => {
+              const service = inject(Service);
+                service.handleError(error);
+            }
+          }),
+          {
+            provide: Service,
+            useValue: {
+                handleError: jest.fn()
+            }
+          }],
+      })
+      const service = TestBed.inject(Service);
+
+      TestBed.runInInjectionContext(() => {
+        const source$ = new Subject<any>();
+        const result = subscribeSpyTo(
+          rxStateful$<any>(source$.pipe(mergeAll()), {  keepValueOnRefresh: false }).value$
+        );
+
+        source$.next(throwError(() => new Error('error')));
+        expect(service.handleError).toHaveBeenCalledWith(Error('error'));
+        expect(service.handleError).toBeCalledTimes(1);
+
       })
     });
     test('should execute beforeHandleErrorFn', () => {

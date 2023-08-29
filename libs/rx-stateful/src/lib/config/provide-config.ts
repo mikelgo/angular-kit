@@ -1,7 +1,7 @@
 import {EnvironmentProviders, inject, InjectionToken, makeEnvironmentProviders} from "@angular/core";
 import {RxStatefulConfig} from "../types/types";
 
-type Config<T, E> = Pick<RxStatefulConfig<T, E>, 'keepValueOnRefresh' | 'keepErrorOnRefresh' | 'accumulationFn' | 'errorMappingFn'>
+type Config<T, E> = Pick<RxStatefulConfig<T, E>, 'keepValueOnRefresh' | 'keepErrorOnRefresh' | 'accumulationFn' | 'errorMappingFn' | 'beforeHandleErrorFn'>
 
 /**
  * @internal
@@ -24,7 +24,7 @@ export function provideRxStatefulConfig<T, E>(config: Config<T, E>): Environment
             useValue: config,
         },
     ]);
-};
+}
 
 /**
  * @internal
