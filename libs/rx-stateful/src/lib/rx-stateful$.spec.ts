@@ -300,8 +300,6 @@ describe('rxStateful$', () => {
         expect(result.getValues()).toEqual([10, 10, 10]);
       })
 
-
-
     });
 
     it('should override config from provider', () => {
@@ -323,6 +321,18 @@ describe('rxStateful$', () => {
 
         expect(result.getValues()).toEqual([10, null, 10, null, 10]);
       })
+    });
+    test('should execute beforeHandleErrorFn', () => {
+      const source$ = new Subject<any>();
+      const beforeHandleErrorFn = jest.fn()
+      const result = subscribeSpyTo(
+        rxStateful$<any>(source$.pipe(mergeAll()), {  keepValueOnRefresh: false, beforeHandleErrorFn }).value$
+      );
+
+      source$.next(throwError(() => new Error('error')));
+
+      expect(beforeHandleErrorFn).toHaveBeenCalledWith(Error('error'));
+      expect(beforeHandleErrorFn).toBeCalledTimes(1);
     });
   })
 });
