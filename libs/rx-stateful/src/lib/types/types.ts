@@ -95,6 +95,11 @@ export interface RxStatefulConfig<T, E = unknown> {
    * @param error - the error which is thrown by the source$, e.g. a {@link HttpErrorResponse}.
    */
   errorMappingFn?: (error: E) => unknown;
+  /**
+   * Function which is called before the error is handled.
+   * @param error - the error which is thrown by the source$, e.g. a {@link HttpErrorResponse}.
+   */
+  beforeHandleErrorFn?: (error: E) => void;
 }
 
 

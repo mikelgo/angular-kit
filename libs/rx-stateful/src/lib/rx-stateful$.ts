@@ -106,6 +106,7 @@ function initSource<T, E>(
       connector: () => new ReplaySubject(1),
     }),
     catchError((error: E) => {
+      mergedConfig?.beforeHandleErrorFn?.(error);
       const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E) => (error as any)?.message);
       error$$.next({ error: errorMappingFn(error), context: 'error', hasError: true });
       return NEVER;
