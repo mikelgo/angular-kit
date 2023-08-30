@@ -104,7 +104,7 @@ function initSource<T, E>(
   return source$.pipe(
     share({
       connector: () => new ReplaySubject(1),
-      resetOnError: false,
+      resetOnError: true,
       resetOnComplete: false,
       resetOnRefCountZero: true,
     }),
