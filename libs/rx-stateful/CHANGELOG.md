@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.3.1](https://github.com/mikelgo/angular-kit/compare/rx-stateful-1.3.0...rx-stateful-1.3.1) (2023-08-30)
+
+
+### Bug Fixes
+
+* **rx-stateful:** reset on error ([9c4df41](https://github.com/mikelgo/angular-kit/commit/9c4df4168d3de1ac1b957393e291ba35423c6131))
+
+
+
 # [1.3.0](https://github.com/mikelgo/angular-kit/compare/rx-stateful-1.2.1...rx-stateful-1.3.0) (2023-08-29)
 
 
