@@ -33,7 +33,12 @@
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/rx-stateful/**/*.ts", "libs/rx-stateful/**/*.html"]
+        "lintFilePatterns": [
+          "libs/rx-stateful/**/*.ts",
+          "libs/rx-stateful/**/*.html",
+          "libs/rx-stateful/testing/**/*.ts",
+          "libs/rx-stateful/testing/**/*.html"
+        ]
       }
     },
     "version": {
