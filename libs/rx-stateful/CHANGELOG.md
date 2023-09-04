@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.3.2](https://github.com/mikelgo/angular-kit/compare/rx-stateful-1.3.1...rx-stateful-1.3.2) (2023-09-04)
+
+
+### Features
+
+* **rx-stateful:** add testing utilities ([67dbe4c](https://github.com/mikelgo/angular-kit/commit/67dbe4c990c0dae64c051fb1e5be8beba86ca4ab)), closes [#78](https://github.com/mikelgo/angular-kit/issues/78)
+
+
+
 ## [1.3.1](https://github.com/mikelgo/angular-kit/compare/rx-stateful-1.3.0...rx-stateful-1.3.1) (2023-08-30)
 
 
