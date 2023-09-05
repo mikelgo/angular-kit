@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.3.3](https://github.com/mikelgo/angular-kit/compare/rx-stateful-1.3.2...rx-stateful-1.3.3) (2023-09-05)
+
+
+### Features
+
+* **rx-stateful:** add MockRxStateful type ([84fbeed](https://github.com/mikelgo/angular-kit/commit/84fbeed3e0ea27d437acb6e5d676587ff3d37a32))
+
+
+
 ## [1.3.2](https://github.com/mikelgo/angular-kit/compare/rx-stateful-1.3.1...rx-stateful-1.3.2) (2023-09-04)
 
 
