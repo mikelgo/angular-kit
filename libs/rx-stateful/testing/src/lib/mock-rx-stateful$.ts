@@ -1,15 +1,15 @@
 import {RxStateful, RxStatefulContext, Stateful} from '@angular-kit/rx-stateful'
 import {BehaviorSubject, ReplaySubject, Subject} from "rxjs";
 
-interface RxStatefulMock<T, E> {
-  hasError$Trigger: Subject<boolean> 
-  error$Trigger: Subject<E> 
+export interface RxStatefulMock<T, E> {
+  hasError$Trigger: Subject<boolean>
+  error$Trigger: Subject<E>
   isSuspense$Trigger: Subject<boolean>
   instance: RxStateful<T, E>;
-  context$Trigger: Subject<RxStatefulContext> 
-  value$Trigger: Subject<T> 
-  hasValue$Trigger: Subject<boolean> 
-  state$Trigger: Subject<Stateful<T, E>> 
+  context$Trigger: Subject<RxStatefulContext>
+  value$Trigger: Subject<T>
+  hasValue$Trigger: Subject<boolean>
+  state$Trigger: Subject<Stateful<T, E>>
 }
 export function mockRxStateful<T, E = unknown>(startValues?: {
   value?: T | undefined | null;
@@ -49,7 +49,7 @@ export function mockRxStateful<T, E = unknown>(startValues?: {
     value$Trigger,
     isSuspense$Trigger,
     error$Trigger,
-    state$Trigger 
+    state$Trigger
   } as RxStatefulMock<T, E>
 }
 

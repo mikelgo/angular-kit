@@ -1,1 +1,1 @@
-export {mockRxStateful} from './lib/mock-rx-stateful$'
+export {mockRxStateful, RxStatefulMock} from './lib/mock-rx-stateful$'
