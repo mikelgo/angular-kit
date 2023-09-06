@@ -16,7 +16,7 @@ import {delay, map, scan, Subject} from "rxjs";
     <div>
       <h4>State</h4>
          <div *ngIf="state$ | async as state">
-           <div>{{state.value | json}}</div>
+           <div *ngIf="state.value">{{state.value | json}}</div>
            <div *ngIf="state.isSuspense"> loading</div>
          </div>
     </div>
