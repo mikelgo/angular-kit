@@ -57,4 +57,9 @@ export class DemoRxStatefulComponent {
             map((v) => v?.title)
         );
   }
+
+  constructor() {
+    this.state$.subscribe()
+    this.state$.subscribe()
+  }
 }
