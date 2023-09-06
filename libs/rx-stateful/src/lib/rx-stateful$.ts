@@ -89,7 +89,7 @@ function createState$<T, E>(source$: Observable<T>, mergedConfig: RxStatefulConf
     share({
       connector: () => new ReplaySubject(1),
       resetOnError: false,
-      resetOnComplete: false,
+      resetOnComplete: true,
       resetOnRefCountZero: true,
     }),
     _handleSyncValue()
@@ -105,7 +105,7 @@ function initSource<T, E>(
     share({
       connector: () => new ReplaySubject(1),
       resetOnError: true,
-      resetOnComplete: false,
+      resetOnComplete: true,
       resetOnRefCountZero: true,
     }),
     catchError((error: E) => {
