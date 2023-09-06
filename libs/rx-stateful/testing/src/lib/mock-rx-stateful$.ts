@@ -1,5 +1,5 @@
 import {RxStateful, RxStatefulContext, Stateful} from '@angular-kit/rx-stateful'
-import {BehaviorSubject, ReplaySubject, Subject} from "rxjs";
+import {BehaviorSubject, map, merge, Observable, ReplaySubject, Subject} from "rxjs";
 
 export interface RxStatefulMock<T, E> {
   hasError$Trigger: Subject<boolean>
@@ -9,36 +9,29 @@ export interface RxStatefulMock<T, E> {
   context$Trigger: Subject<RxStatefulContext>
   value$Trigger: Subject<T>
   hasValue$Trigger: Subject<boolean>
-  state$Trigger: Subject<Stateful<T, E>>
+  state$Trigger: Subject<Partial<Stateful<T, E>>>
 }
-export function mockRxStateful<T, E = unknown>(startValues?: {
-  value?: T | undefined | null;
-  hasError?: boolean;
-  hasValue?: boolean;
-  context?: RxStatefulContext
-  isSuspense?: boolean;
-  error?: E;
-  state?: Stateful<T, E>
-}): RxStatefulMock<T, E> {
-  function createTrigger<T>(startValue?: T | null){
+export function mockRxStateful<T, E = unknown>(): RxStatefulMock<T, E> {
+  function createTrigger<T>(startValue?: T | null | undefined){
     const trigger = startValue ? new BehaviorSubject(startValue) : new ReplaySubject<T>(1)
     return trigger;
   }
-  const hasError$Trigger = createTrigger<boolean>(startValues?.hasError)
-  const hasValue$Trigger = createTrigger<boolean>(startValues?.hasValue)
-  const context$Trigger = createTrigger<RxStatefulContext>(startValues?.context)
-  const value$Trigger = createTrigger<T>(startValues?.value)
-  const isSuspense$Trigger = createTrigger<boolean>(startValues?.isSuspense)
-  const error$Trigger = createTrigger<E>(startValues?.error)
-  const state$Trigger = createTrigger<Stateful<T,  E>>(startValues?.state)
+
+  const hasError$Trigger = createTrigger<boolean>()
+  const hasValue$Trigger = createTrigger<boolean>()
+  const context$Trigger = createTrigger<RxStatefulContext>()
+  const value$Trigger = createTrigger<T>()
+  const isSuspense$Trigger = createTrigger<boolean>()
+  const error$Trigger = createTrigger<E>()
+  const state$Trigger = createTrigger<Partial<Stateful<T,  E>>>()
   const instance: RxStateful<T, E> = {
-    hasError$: hasError$Trigger.asObservable(),
-    hasValue$: hasValue$Trigger.asObservable(),
-    context$: context$Trigger.asObservable(),
-    value$: value$Trigger.asObservable(),
-    isSuspense$: isSuspense$Trigger.asObservable(),
-    error$: error$Trigger.asObservable(),
-    state$: state$Trigger.asObservable(),
+    hasError$: merge(hasError$Trigger.asObservable(),state$Trigger.pipe(map(v => v.hasError))) as Observable<boolean>,
+    hasValue$: merge(hasValue$Trigger.asObservable(), state$Trigger.pipe(map(v => v.hasValue))) as Observable<boolean>,
+    context$: merge(context$Trigger.asObservable(),  state$Trigger.pipe(map(v => v.context))) as Observable<RxStatefulContext>,
+    value$: merge(value$Trigger.asObservable(),  state$Trigger.pipe(map(v => v.value))) as Observable<T>,
+    isSuspense$: merge(isSuspense$Trigger.asObservable(), state$Trigger.pipe(map(v => v.isSuspense))) as Observable<boolean>,
+    error$: merge(error$Trigger.asObservable(), state$Trigger.pipe(map(v => v.error))) as Observable<E> as Observable<E>,
+    state$: state$Trigger.asObservable() as Observable<Stateful<T,  E>>,
   }
 
   return {
