@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.3.6](https://github.com/mikelgo/angular-kit/compare/rx-stateful-1.3.5...rx-stateful-1.3.6) (2023-09-06)
+
+
+### Bug Fixes
+
+* **rx-stateful:** refresh stopped to work ([7f099e4](https://github.com/mikelgo/angular-kit/commit/7f099e40ca93f0d676df4e022d0e57008da0757c))
+
+
+
 ## [1.3.5](https://github.com/mikelgo/angular-kit/compare/rx-stateful-1.3.4...rx-stateful-1.3.5) (2023-09-06)
 
 
