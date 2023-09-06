@@ -1,27 +1,24 @@
 import {
-  BehaviorSubject,
-  catchError,
-  distinctUntilChanged,
-  map,
-  merge,
-  NEVER,
-  Observable,
-  pipe,
-  ReplaySubject,
-  scan,
-  share,
-  skip,
-  startWith,
-  Subject,
-  switchMap,
+    BehaviorSubject,
+    catchError,
+    distinctUntilChanged,
+    map,
+    merge,
+    NEVER,
+    Observable,
+    pipe,
+    ReplaySubject,
+    scan,
+    share,
+    skip,
+    startWith,
+    Subject,
+    switchMap,
 } from 'rxjs';
 import {InternalRxState, RxStateful, RxStatefulConfig, RxStatefulWithError,} from './types/types';
 import {_handleSyncValue} from './util/handle-sync-value';
 import {defaultAccumulationFn} from './types/accumulation-fn';
 import {createRxStateful} from './util/create-rx-stateful';
-
-import {injectConfig} from './config/provide-config';
-import {EnvironmentInjector, inject} from '@angular/core';
 
 /**
  * @publicApi
@@ -53,22 +50,17 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxSt
 export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxStatefulConfig<T, E>): RxStateful<T, E> {
   // todo Angular 16
   // const injector = config?.injector ?? inject(Injector);
-  const environmentInjector = inject(EnvironmentInjector)
-
   // todo Angular-16 runInInjectionContext(injector)
 
-  return environmentInjector.runInContext( () => {
-    const environmentConfig = injectConfig<T, E>();
     const mergedConfig: RxStatefulConfig<T, E> = {
       keepValueOnRefresh: false,
       keepErrorOnRefresh: false,
-      ...environmentConfig,
       ...config,
     };
 
     return createRxStateful<T, E>(createState$<T, E>(source$, mergedConfig), mergedConfig);
 
-  });
+
 }
 
 function createState$<T, E>(source$: Observable<T>, mergedConfig: RxStatefulConfig<T, E>) {

@@ -1,5 +1,4 @@
 import {Observable, Subject} from 'rxjs';
-import {Injector} from '@angular/core';
 import {RxStatefulAccumulationFn} from "./accumulation-fn";
 
 /**
@@ -66,10 +65,6 @@ export interface InternalRxState<T, E = unknown> {
  * rxStateful$(source$, {keepValueOnRefresh: true})
  */
 export interface RxStatefulConfig<T, E = unknown> {
-  /**
-   * Injector to create an injection-context for rxStateful$.
-   */
-  injector?: Injector;
   /**
    * Trigger to refresh the source$.
    */

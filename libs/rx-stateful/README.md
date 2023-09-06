@@ -70,38 +70,7 @@ const stateful$ = rxStateful$(from(fetch('...')), {keepValueOnRefresh: true, ref
 
 
 ## Configuration
-`rxStateful$` provides two configuration possibilities:
-
-### Global configuration
-
-Use `provideRxStatefulConfig` to provide a global configuration for all `rxStateful$` instances.
-
-For a standalone application:
-```typescript
-import { provideRxStatefulConfig } from '@angular-kit/rx-stateful';
-
-// app.component.ts
-@Component({...})
-export class AppComponent{}
-
-// main.ts
-bootstrapApplication(AppComponent, {
-    providers: [provideRxStatefulConfig({ keepValueOnRefresh: true })]
-});
-
-```
-For a ngModule based application:
-```typescript
-import { provideRxStatefulConfig } from '@angular-kit/rx-stateful';
-
-// main.ts
-platformBrowserDynamic()
-  .bootstrapModule(AppModule, {
-      providers: [provideRxStatefulConfig({ keepValueOnRefresh: true })]
-  })
-  .catch((err) => console.error(err));
-
-```
+`rxStateful$` provides configuration possibility on instance level:
 
 ### Configuration on instance level
 
