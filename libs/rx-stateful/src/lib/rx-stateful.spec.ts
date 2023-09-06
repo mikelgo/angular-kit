@@ -1,19 +1,19 @@
-import {mergeAll, Observable, Subject, throwError} from 'rxjs';
+import {map, mergeAll, Observable, of, Subject, throwError} from 'rxjs';
 import {subscribeSpyTo} from '@hirez_io/observer-spy';
 import {rxStateful$} from './rx-stateful$';
-import {TestBed} from "@angular/core/testing";
+import {TestBed} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {inject, Injectable} from '@angular/core';
+import spyOn = jest.spyOn;
 
-
-const test = (description :string, testFn: () => void, testBed?: TestBed) => {
+const test = (description: string, testFn: () => void, testBed?: TestBed) => {
   it(description, () => {
     (testBed ?? TestBed).runInInjectionContext(() => {
       testFn();
-    })
+    });
   });
-}
-
-
-
+};
 
 describe('rxStateful$', () => {
   describe('without refreshTrigger$', () => {
@@ -248,7 +248,9 @@ describe('rxStateful$', () => {
         test('should not keep the error on refresh when option is set to false', function () {
           const source$ = new Subject<Observable<any>>();
           const refreshTrigger$ = new Subject<void>();
-          const result = subscribeSpyTo(rxStateful$<number>(source$.pipe(mergeAll()),{ refreshTrigger$, keepErrorOnRefresh: false }).state$);
+          const result = subscribeSpyTo(
+            rxStateful$<number>(source$.pipe(mergeAll()), { refreshTrigger$, keepErrorOnRefresh: false }).state$
+          );
 
           source$.next(throwError(() => new Error('error')));
           refreshTrigger$.next(void 0);
@@ -265,7 +267,9 @@ describe('rxStateful$', () => {
         test('should keep the error on refresh when option is set to true', function () {
           const source$ = new Subject<Observable<any>>();
           const refreshTrigger$ = new Subject<void>();
-          const result = subscribeSpyTo(rxStateful$<number>(source$.pipe(mergeAll()),{ refreshTrigger$, keepErrorOnRefresh: true }).state$);
+          const result = subscribeSpyTo(
+            rxStateful$<number>(source$.pipe(mergeAll()), { refreshTrigger$, keepErrorOnRefresh: true }).state$
+          );
 
           source$.next(throwError(() => new Error('error')));
           refreshTrigger$.next(void 0);
@@ -282,12 +286,11 @@ describe('rxStateful$', () => {
     });
   });
   describe('Configuration', () => {
-
     test('should execute beforeHandleErrorFn', () => {
       const source$ = new Subject<any>();
-      const beforeHandleErrorFn = jest.fn()
+      const beforeHandleErrorFn = jest.fn();
       const result = subscribeSpyTo(
-        rxStateful$<any>(source$.pipe(mergeAll()), {  keepValueOnRefresh: false, beforeHandleErrorFn }).value$
+        rxStateful$<any>(source$.pipe(mergeAll()), { keepValueOnRefresh: false, beforeHandleErrorFn }).value$
       );
 
       source$.next(throwError(() => new Error('error')));
@@ -295,6 +298,49 @@ describe('rxStateful$', () => {
       expect(beforeHandleErrorFn).toHaveBeenCalledWith(Error('error'));
       expect(beforeHandleErrorFn).toBeCalledTimes(1);
     });
-  })
+  });
+
+  describe('', () => {
+    it('should call fetch() as many times as refreshtrigger is executed', async () => {
+      const { dataService, httpClient } = await setupHttpTest();
+      spyOn(dataService, 'fetch')
+
+
+      const result = subscribeSpyTo(dataService.fetch().value$);
+      dataService.refresh$$.next(null);
+
+      expect(result.getValues()).toEqual(['test', 'test']);
+
+      expect(dataService.fetch).toBeCalledTimes(2);
+     // expect(httpClient.get).toBeCalledTimes(2);
+    });
+  });
 });
 
+async function setupHttpTest() {
+  @Injectable({ providedIn: 'root' })
+  class DataService {
+    http = inject(HttpClient);
+    refresh$$ = new Subject<any>();
+
+    fetch() {
+      return rxStateful$<string, HttpErrorResponse>(
+        this.http.get('https://jsonplaceholder.typicode.com/todos/1').pipe(map((v) => (v as any)?.title)),
+        { refreshTrigger$: this.refresh$$ }
+      );
+    }
+  }
+
+  await TestBed.configureTestingModule({
+    imports: [HttpClientTestingModule],
+    providers: [DataService, HttpClient],
+  }).compileComponents();
+  const dataService = TestBed.inject(DataService);
+      const  httpClient = TestBed.inject(HttpClient);
+  jest.spyOn(httpClient, 'get').mockReturnValue(of('test'));
+
+  return {
+    dataService,
+    httpClient
+  };
+}
