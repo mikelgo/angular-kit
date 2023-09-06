@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.3.7](https://github.com/mikelgo/angular-kit/compare/rx-stateful-1.3.6...rx-stateful-1.3.7) (2023-09-06)
+
+
+### Bug Fixes
+
+* **rx-stateful:** remove provideRxStatefulConfig ([a27af94](https://github.com/mikelgo/angular-kit/commit/a27af9424b5f241e463c2e206820f6435ea3b514))
+
+
+
 ## [1.3.6](https://github.com/mikelgo/angular-kit/compare/rx-stateful-1.3.5...rx-stateful-1.3.6) (2023-09-06)
 
 
