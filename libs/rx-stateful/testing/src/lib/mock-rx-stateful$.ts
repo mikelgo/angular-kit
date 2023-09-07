@@ -1,4 +1,4 @@
-import {RxStateful, RxStatefulContext, Stateful} from '../../../src/lib/types/types';
+import {RxStateful, RxStatefulContext, Stateful} from '@angular-kit/rx-stateful';
 import {BehaviorSubject, map, merge, Observable, ReplaySubject, Subject} from "rxjs";
 
 export interface RxStatefulMock<T, E> {
