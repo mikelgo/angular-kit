@@ -2,6 +2,16 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.4.0](https://github.com/mikelgo/angular-kit/compare/rx-stateful-1.3.7...rx-stateful-1.4.0) (2023-09-07)
+
+
+### Features
+
+* **rx-stateful:** RxStatefulClient and configuration ([72c9d6d](https://github.com/mikelgo/angular-kit/commit/72c9d6de7ab3c232435958558146a0cdf2a31c5a))
+* **rx-stateful:** RxStatefulClient and configuration ([71ca27a](https://github.com/mikelgo/angular-kit/commit/71ca27a8e2667d2be10c04e53cb971197c27896e))
+
+
+
 ## [1.3.7](https://github.com/mikelgo/angular-kit/compare/rx-stateful-1.3.6...rx-stateful-1.3.7) (2023-09-06)
 
 
