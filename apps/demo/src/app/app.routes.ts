@@ -23,7 +23,7 @@ export const routes: Route[] = [
         component: DemoStreamComponent
     },
     {
-        path: 'rx-stateful',
+        path: 'rx-stateful/:id',
         component: DemoRxStatefulComponent
     }
 ]
