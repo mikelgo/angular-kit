@@ -1,8 +1,10 @@
 import {Component, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {HttpClient} from "@angular/common/http";
-import {rxStateful$} from "@angular-kit/rx-stateful";
-import {delay, map, scan, Subject} from "rxjs";
+import {provideRxStatefulClient, rxStateful$, RxStatefulClient, withConfig} from "@angular-kit/rx-stateful";
+import {delay, map, scan, Subject, switchMap} from "rxjs";
+import {ActivatedRoute} from "@angular/router";
+
 
 @Component({
   selector: 'angular-kit-demo-rx-stateful',
@@ -26,12 +28,32 @@ import {delay, map, scan, Subject} from "rxjs";
         <li> {{v | json}}</li>
       </ul>
     </div>
+    <div>
+      <h4>Query Params</h4>
+      <div>{{query$ |async | json}}</div>
+      <div>{{value$ |async | json}}</div>
+    </div>
   `,
   styles: [],
+  providers: [
+      provideRxStatefulClient(
+          withConfig({keepValueOnRefresh: true, errorMappingFn: (e) => e})
+      ),
+     // provideRxStatefulConfig({keepValueOnRefresh: true, errorMappingFn: (e) => e})
+  ]
 })
 export class DemoRxStatefulComponent {
   private http = inject(HttpClient)
+  private route = inject(ActivatedRoute)
   refresh$$ = new Subject<any>()
+
+  client = inject(RxStatefulClient)
+
+  query$ = this.route.params
+
+  value$ = this.query$.pipe(
+      switchMap(() => this.client.request(this.fetch()).value$)
+  )
 
 
   instance = rxStateful$(this.fetch(), {
