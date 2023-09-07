@@ -17,8 +17,8 @@ pnpm add @angular-kit/rx-stateful
 A live demo is available on [Stackblitz](https://stackblitz.com/edit/stackblitz-starters-l9nwsp?file=src%2Fmain.ts)
 
 ## Usage
-
-### Sync source Observable
+### `rxStateful$` as standalone function
+#### Sync source Observable
 ```typescript
 import { rxStateful$ } from '@angular-kit/rx-stateful';
 
@@ -33,7 +33,7 @@ import { rxStateful$ } from '@angular-kit/rx-stateful';
 const stateful$ = rxStateful$(of(1, 2, 3)).state$;
 ```
 
-### Async source Observable
+#### Async source Observable
 ```typescript
 import { rxStateful$ } from '@angular-kit/rx-stateful';
 
@@ -58,8 +58,8 @@ const refreshTrigger$ = new Subject();
 const stateful$ = rxStateful$(from(fetch('...')), {keepValueOnRefresh: true, refreshTrigger$}).state$;
 ```
 
-## API
-### Observable based API
+### API
+#### Observable based API
 `rxStateful$` returns several Observables:
 - `state$` - the stateful stream with all information combined
 - `value$` - the value
@@ -69,10 +69,10 @@ const stateful$ = rxStateful$(from(fetch('...')), {keepValueOnRefresh: true, ref
 - `error$` - the error, if present
 
 
-## Configuration
+### Configuration
 `rxStateful$` provides configuration possibility on instance level:
 
-### Configuration on instance level
+#### Configuration on instance level
 
 You can also provide a configuration on instance level. This will also override the global configuration (if present).
 
@@ -85,6 +85,38 @@ import { rxStateful$ } from '@angular-kit/rx-stateful';
 
 const rxStateful$ = rxStateful$(someSource$, { keepValueOnRefresh: true });
 ```
+
+### Usage via `RxStatefulClient`
+In order to use `RxStatefulClient` you first need to provide it, e.g. in your `AppModule`:
+
+```typescript
+import {provideRxStatefulClient} from "@angular-kit/rx-stateful";
+
+@NgModule({
+    providers: [
+        provideRxStatefulClient()
+    ],
+})
+export class AppModule {}
+```
+``RxStatefulClient`` offers a `request`-method which basically has the same signature as `rxStateful$` - so there'is no 
+difference in usage.
+
+#### Global configuration 
+``provideRxStatefulClient()`` can be configured: 
+```typescript
+import {provideRxStatefulClient, withConfig} from "@angular-kit/rx-stateful";
+
+@NgModule({
+    providers: [
+        provideRxStatefulClient(withConfig({ keepValueOnRefresh: true}))
+    ],
+})
+export class AppModule {}
+```
+The global configuration will be used for every `request`-call. You can still override the global configuration by
+providing a configuration object as second parameter to `request`-method.
+
 
 ## Versioning
 This project follows [Semantic Versioning](https://semver.org/).
