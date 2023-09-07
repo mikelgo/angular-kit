@@ -7,7 +7,7 @@ import {
     RxRenderInViewportDirective
 } from '../../../../libs/rx/platform/src/lib/directives/rx-render-in-view-port.directive';
 import {RxObserveResizeDirective} from '../../../../libs/rx/platform/src/lib/directives/rx-observe-resize.directive';
-import {StreamDirective} from '../../../../libs/stream/src/lib/stream.directive';
+import {StreamDirective} from '@angular-kit/stream';
 import {DemoOnchangesComponent} from './demo-onchanges/demo-onchanges.component';
 import {RouterOutlet} from '@angular/router';
 import {NavComponent} from './core/nav.component';

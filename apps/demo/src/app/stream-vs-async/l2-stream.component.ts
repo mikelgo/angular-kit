@@ -3,10 +3,10 @@ import {BehaviorSubject, Observable, ReplaySubject} from 'rxjs';
 import {
     DebounceRenderStrategy,
     RenderStrategy,
+    StreamDirective,
     ThrottleRenderStrategy,
     ViewportRenderStrategy
 } from "@angular-kit/stream";
-import {StreamDirective} from '../../../../../libs/stream/src/lib/stream.directive';
 import {NgxDirtyCheckerModule} from '@code-workers.io/ngx-dirty-checker';
 import {AsyncPipe, NgIf} from '@angular/common';
 

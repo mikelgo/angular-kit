@@ -14,7 +14,7 @@ describe('RxRenderInViewportDirective', () => {
     const {  fixture } = await create();
 
     fixture.nativeElement.dispatchEvent(new Event('intersect'));
-    tick(1000);
+    tick(1100);
 
     const element = fixture.debugElement.query(By.css('h1'));
     expect(element).toBeTruthy();
