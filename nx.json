@@ -1,11 +1,15 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "npmScope": "angular-kit",
+  "affected": {
+    "defaultBase": "main"
+  },
   "tasksRunnerOptions": {
     "default": {
-      "runner": "nx/tasks-runners/default",
+      "runner": "nx-cloud",
       "options": {
-        "cacheableOperations": ["build", "lint", "test", "e2e", "component-test"]
+        "cacheableOperations": ["build", "lint", "test", "e2e", "component-test"],
+        "accessToken": "YTI1NTg5NTMtYThlZC00ZWY5LTg3MmEtN2ZjNWQ2MTI3N2RhfHJlYWQtd3JpdGU="
       }
     }
   },
