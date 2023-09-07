@@ -117,6 +117,8 @@ export class AppModule {}
 The global configuration will be used for every `request`-call. You can still override the global configuration by
 providing a configuration object as second parameter to `request`-method.
 
+## Testing
+Please have a look at the [testing documentation](./testing/README.md).
 
 ## Versioning
 This project follows [Semantic Versioning](https://semver.org/).
