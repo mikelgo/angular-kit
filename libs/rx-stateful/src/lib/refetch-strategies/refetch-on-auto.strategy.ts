@@ -1,5 +1,5 @@
 import {interval, Observable, Subject, takeUntil, timer} from "rxjs";
-import {refetchFnFactory, RefetchStrategy} from "./refetch-strategy";
+import {AutoRefetchStrategy, refetchFnFactory} from "./refetch-strategy";
 
 /**
  * Creates a refetch strategy that will refetch the data periodically
@@ -10,7 +10,7 @@ import {refetchFnFactory, RefetchStrategy} from "./refetch-strategy";
  * withAutoRefetch(1000, 5000);
  * Will refetch the data every second for 5 seconds
  */
-export function withAutoRefetch(intervalMs: number, takeForMs: number) : RefetchStrategy
+export function withAutoRefetch(intervalMs: number, takeForMs: number) : AutoRefetchStrategy
 /**
  * Creates a refetch strategy that will refetch the data periodically
  * @param intervalMs - The interval in milliseconds on which the data will be refetched
@@ -21,8 +21,8 @@ export function withAutoRefetch(intervalMs: number, takeForMs: number) : Refetch
  * withAutoRefetch(1000, trigger);
  * Will refetch the data every second until the trigger emits
  */
-export function withAutoRefetch(intervalMs: number, takeUntilTrigger: Observable<any> | Subject<any>): RefetchStrategy
-export function withAutoRefetch(intervalMs: number, takeForMsOrTrigger: number | Observable<any> | Subject<any>): RefetchStrategy{
+export function withAutoRefetch(intervalMs: number, takeUntilTrigger: Observable<any> | Subject<any>): AutoRefetchStrategy
+export function withAutoRefetch(intervalMs: number, takeForMsOrTrigger: number | Observable<any> | Subject<any>): AutoRefetchStrategy{
     const terminationSignal = isObservableOrSubject(takeForMsOrTrigger) ? takeForMsOrTrigger : timer(getTime(takeForMsOrTrigger));
     const trigger = refetchFnFactory(interval(getTime(intervalMs)).pipe(takeUntil(terminationSignal)));
     return {

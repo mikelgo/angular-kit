@@ -15,6 +15,11 @@ export type TriggerRefetchStrategy = {
     refetchFn: RefetchFn
 }
 
+export type AutoRefetchStrategy = {
+    kind: 'auto__rxStateful',
+    refetchFn: RefetchFn
+}
+
 export function refetchFnFactory(trigger: Observable<any> | Subject<any>){
     return () => defer(() => trigger)
 }
