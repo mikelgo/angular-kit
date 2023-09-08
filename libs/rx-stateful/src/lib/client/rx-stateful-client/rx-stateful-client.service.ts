@@ -16,13 +16,18 @@ export class RxStatefulClient {
   request<T, E>(source$: Observable<T>, options: RxStatefulRequestOptions<T, E>): RxStateful<T, E>;
   request<T, E>(source$: Observable<T>, options?: RxStatefulRequestOptions<T, E>): RxStateful<T, E> {
 
-    const mergedConfig = {
+    const refetchstrategies = [
+        (this.config?.autoRefetch ?? void 0),
+        ...options?.refetchStrategies ?? []
+    ]
+
+    const mergedConfig: RxStatefulConfig<T,  E> = {
       ...(this.config as Config<T, E>),
       ...options,
+      // @ts-ignore
+      refetchStrategies: [...refetchstrategies].filter(Boolean)
     };
-    if (this.config?.periodicRefetch){
-      mergedConfig?.refetchStrategies?.push(this.config?.periodicRefetch);
-    }
+
 
     return rxStateful$<T, E>(source$, mergedConfig);
   }

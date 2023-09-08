@@ -10,7 +10,7 @@ export type Config<T, E> = Pick<RxStatefulConfig<T, E>,
     | 'errorMappingFn'
     | 'beforeHandleErrorFn'
     | 'accumulationFn'> & {
-    periodicRefetch: AutoRefetchStrategy;
+    autoRefetch?: AutoRefetchStrategy;
 }
 export const RX_STATEFUL_CONFIG = <T,E>() => new InjectionToken<Config<T, E>>('RX_STATEFUL_CONFIG');
 
