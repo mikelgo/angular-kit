@@ -1,19 +1,17 @@
 import {mergeAll, Observable, Subject, throwError} from 'rxjs';
 import {subscribeSpyTo} from '@hirez_io/observer-spy';
 import {rxStateful$} from './rx-stateful$';
-import {TestBed} from "@angular/core/testing";
+import {fakeAsync, TestBed, tick} from '@angular/core/testing';
+import {withRefetchOnTrigger, withRefetchOnTriggers} from './refetch-strategies/refetch-on-trigger.strategy';
+import {withAutoRefetch} from './refetch-strategies/refetch-on-auto.strategy';
 
-
-const test = (description :string, testFn: () => void, testBed?: TestBed) => {
+const test = (description: string, testFn: () => void, testBed?: TestBed) => {
   it(description, () => {
     (testBed ?? TestBed).runInInjectionContext(() => {
       testFn();
-    })
+    });
   });
-}
-
-
-
+};
 
 describe('rxStateful$', () => {
   describe('without refreshTrigger$', () => {
@@ -144,6 +142,63 @@ describe('rxStateful$', () => {
 
         expect(result.getValues()).toEqual([10, null, 10, null, 10]);
       });
+      describe('with refetch strategies', () => {
+        test('keepValueOnRefresh: true - should return the current value when withTriggerRefetch emits', () => {
+          const source$ = new Subject<number>();
+          const refreshTrigger$ = new Subject<void>();
+
+          const result = subscribeSpyTo(
+            rxStateful$<number>(source$, {
+              keepValueOnRefresh: true,
+              refetchStrategies: [withRefetchOnTrigger(refreshTrigger$)],
+            }).value$
+          );
+          source$.next(10);
+
+          refreshTrigger$.next(void 0);
+          refreshTrigger$.next(void 0);
+
+          expect(result.getValues()).toEqual([10, 10, 10]);
+        });
+        test('keepValueOnRefresh: true - should return the current value when autoRefetchStrategy emits', fakeAsync(() => {
+          const source$ = new Subject<number>();
+
+          const result = subscribeSpyTo(
+            rxStateful$<number>(source$, { keepValueOnRefresh: true, refetchStrategies: [withAutoRefetch(100, 301)] })
+              .value$
+          );
+          source$.next(10);
+          tick(500);
+
+          expect(result.getValues()).toEqual([10, 10, 10, 10]);
+        }));
+        test('keepValueOnRefresh: true - should return the current value when mixed refetch strategies emits', fakeAsync(() => {
+          const source$ = new Subject<number>();
+          const refreshTrigger1$ = new Subject<void>();
+          const refreshTrigger2$ = new Subject<void>();
+
+          const result = subscribeSpyTo(
+            rxStateful$<number>(source$, {
+              keepValueOnRefresh: true,
+              refetchStrategies: [
+                withAutoRefetch(100, 301),
+                ...withRefetchOnTriggers(
+                  withRefetchOnTrigger(refreshTrigger1$),
+                  withRefetchOnTrigger(refreshTrigger2$)
+                ),
+              ],
+            }).value$
+          );
+          source$.next(10);
+          tick(500);
+
+          refreshTrigger1$.next(void 0);
+          refreshTrigger2$.next(void 0);
+
+          expect(result.getValues().length).toEqual(6);
+          expect(result.getValues()).toEqual([10, 10, 10, 10, 10, 10]);
+        }));
+      });
     });
     describe('hasValue$', () => {
       test('should return false - true - true', () => {
@@ -248,7 +303,9 @@ describe('rxStateful$', () => {
         test('should not keep the error on refresh when option is set to false', function () {
           const source$ = new Subject<Observable<any>>();
           const refreshTrigger$ = new Subject<void>();
-          const result = subscribeSpyTo(rxStateful$<number>(source$.pipe(mergeAll()),{ refreshTrigger$, keepErrorOnRefresh: false }).state$);
+          const result = subscribeSpyTo(
+            rxStateful$<number>(source$.pipe(mergeAll()), { refreshTrigger$, keepErrorOnRefresh: false }).state$
+          );
 
           source$.next(throwError(() => new Error('error')));
           refreshTrigger$.next(void 0);
@@ -265,7 +322,9 @@ describe('rxStateful$', () => {
         test('should keep the error on refresh when option is set to true', function () {
           const source$ = new Subject<Observable<any>>();
           const refreshTrigger$ = new Subject<void>();
-          const result = subscribeSpyTo(rxStateful$<number>(source$.pipe(mergeAll()),{ refreshTrigger$, keepErrorOnRefresh: true }).state$);
+          const result = subscribeSpyTo(
+            rxStateful$<number>(source$.pipe(mergeAll()), { refreshTrigger$, keepErrorOnRefresh: true }).state$
+          );
 
           source$.next(throwError(() => new Error('error')));
           refreshTrigger$.next(void 0);
@@ -282,12 +341,11 @@ describe('rxStateful$', () => {
     });
   });
   describe('Configuration', () => {
-
     test('should execute beforeHandleErrorFn', () => {
       const source$ = new Subject<any>();
-      const beforeHandleErrorFn = jest.fn()
+      const beforeHandleErrorFn = jest.fn();
       const result = subscribeSpyTo(
-        rxStateful$<any>(source$.pipe(mergeAll()), {  keepValueOnRefresh: false, beforeHandleErrorFn }).value$
+        rxStateful$<any>(source$.pipe(mergeAll()), { keepValueOnRefresh: false, beforeHandleErrorFn }).value$
       );
 
       source$.next(throwError(() => new Error('error')));
@@ -295,6 +353,5 @@ describe('rxStateful$', () => {
       expect(beforeHandleErrorFn).toHaveBeenCalledWith(Error('error'));
       expect(beforeHandleErrorFn).toBeCalledTimes(1);
     });
-  })
+  });
 });
-
