@@ -19,6 +19,7 @@ import {InternalRxState, RxStateful, RxStatefulConfig, RxStatefulWithError,} fro
 import {_handleSyncValue} from './util/handle-sync-value';
 import {defaultAccumulationFn} from './types/accumulation-fn';
 import {createRxStateful} from './util/create-rx-stateful';
+import {mergeRefetchStrategies} from "./refetch-strategies/merge-refetch-strategies";
 
 /**
  * @publicApi
@@ -63,10 +64,15 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxS
 
 }
 
+
+
 function createState$<T, E>(source$: Observable<T>, mergedConfig: RxStatefulConfig<T, E>) {
   const accumulationFn = mergedConfig.accumulationFn ?? defaultAccumulationFn;
   const error$$ = new Subject<RxStatefulWithError<T, E>>();
-  const refresh$ = mergedConfig?.refreshTrigger$ ?? new Subject<unknown>();
+  const refresh$ = merge(
+      mergedConfig?.refreshTrigger$ ?? new Subject<unknown>(),
+      ...mergeRefetchStrategies(mergedConfig?.refetchStrategies)
+  )
 
   const sharedSource$ = initSharedSource(source$, error$$, mergedConfig);
   const request$: Observable<Partial<InternalRxState<T, E>>> = requestSource(sharedSource$);
@@ -128,7 +134,7 @@ function requestSource<T, E>(source$: Observable<T>): Observable<Partial<Interna
 
 function refreshedRequestSource<T, E>(
   sharedSource$: Observable<T>,
-  refresh$: Subject<any>,
+  refresh$: Observable<any>,
   mergedConfig: RxStatefulConfig<T, E>
 ): Observable<Partial<InternalRxState<T, E>>> {
   const refreshTriggerIsBehaivorSubject = (config: RxStatefulConfig<T, E>) =>
