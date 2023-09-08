@@ -1,9 +1,17 @@
 import {inject, InjectionToken} from "@angular/core";
 import {RxStatefulConfig} from "../../types/types";
 import {makeFeature} from "./config-feature";
+import {AutoRefetchStrategy} from "../../refetch-strategies/refetch-strategy";
 
 
-export type Config<T, E> = Pick<RxStatefulConfig<T, E>, 'keepErrorOnRefresh' | 'keepValueOnRefresh' | 'errorMappingFn' | 'beforeHandleErrorFn' | 'accumulationFn'>
+export type Config<T, E> = Pick<RxStatefulConfig<T, E>,
+    'keepErrorOnRefresh'
+    | 'keepValueOnRefresh'
+    | 'errorMappingFn'
+    | 'beforeHandleErrorFn'
+    | 'accumulationFn'> & {
+    autoRefetch?: AutoRefetchStrategy;
+}
 export const RX_STATEFUL_CONFIG = <T,E>() => new InjectionToken<Config<T, E>>('RX_STATEFUL_CONFIG');
 
 

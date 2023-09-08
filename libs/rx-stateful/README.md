@@ -48,16 +48,6 @@ import { rxStateful$ } from '@angular-kit/rx-stateful';
 const stateful$ = rxStateful$(from(fetch('...'))).state$;
 ```
 
-For async Observables you can also make use of a `refreshTrigger$` to trigger the async operation again. You can 
-also configure if the value should be reset to `null` when the `refreshTrigger$` emits or if it should be kept.
-
-```typescript
-import { rxStateful$ } from '@angular-kit/rx-stateful';
-
-const refreshTrigger$ = new Subject();
-const stateful$ = rxStateful$(from(fetch('...')), {keepValueOnRefresh: true, refreshTrigger$}).state$;
-```
-
 ### API
 #### Observable based API
 `rxStateful$` returns several Observables:
@@ -116,6 +106,31 @@ export class AppModule {}
 ```
 The global configuration will be used for every `request`-call. You can still override the global configuration by
 providing a configuration object as second parameter to `request`-method.
+
+## Configuring refresh behaviour
+Both `rxStateful$` and `RxStatefulClient` can be configured to refresh the source (e.g. make a HTTP call again).  
+
+To define the refresh behaviour you can make use of so called `RefetchStrategy`'s. Right now there are following strategies
+built in: `withAutoRefetch` and `withRefetchOnTrigger`.
+
+### Usage on `rxStateful$`
+```typescript
+```typescript
+    const instance = rxStateful$(fetch(), { refetchStrategy: [withAutoRefetch(1000, Infinity)] })
+```
+### Usage on `RxStatefulClient`
+
+```typescript
+
+
+const client = inject(RxStatefulClient);
+const instance = client.request(fetch(), { refetchStrategy: [withAutoRefetch(1000, Infinity)] })
+```
+
+All strategies can be cominded in an arbitrary way.
+
+In the future there will come more strategies built in, as well as an easy way to define custom strategies. However defining
+custom strategies is already possible by implementing the `RefetchStrategy` interface.
 
 ## Testing
 Please have a look at the [testing documentation](./testing/README.md).

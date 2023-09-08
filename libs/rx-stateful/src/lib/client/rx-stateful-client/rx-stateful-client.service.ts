@@ -1,27 +1,34 @@
 import {Injectable} from '@angular/core';
-import {Config, injectRxStatefulConfig} from "../config/rx-stateful-config.provider";
-import {Observable} from "rxjs";
-import {RxStateful, RxStatefulConfig} from "../../types/types";
-import {rxStateful$} from "../../rx-stateful$";
+import {Config, injectRxStatefulConfig} from '../config/rx-stateful-config.provider';
+import {Observable} from 'rxjs';
+import {RxStateful, RxStatefulConfig} from '../../types/types';
+import {rxStateful$} from '../../rx-stateful$';
 
 export type RxStatefulRequestOptions<T, E> = RxStatefulConfig<T, E>;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class RxStatefulClient {
-
   private readonly config = injectRxStatefulConfig();
 
-  request<T,E>(source$: Observable<T>): RxStateful<T, E>
-  request<T,E>(source$: Observable<T>, options: RxStatefulRequestOptions<T, E>): RxStateful<T, E>
-  request<T,E>(source$: Observable<T>, options?: RxStatefulRequestOptions<T, E>): RxStateful<T, E>{
-    const mergedConfig = {
-      ...this.config as Config<T, E>,
-        ...options
-    }
+  request<T, E>(source$: Observable<T>): RxStateful<T, E>;
+  request<T, E>(source$: Observable<T>, options: RxStatefulRequestOptions<T, E>): RxStateful<T, E>;
+  request<T, E>(source$: Observable<T>, options?: RxStatefulRequestOptions<T, E>): RxStateful<T, E> {
 
-        return rxStateful$<T, E>(source$, mergedConfig);
+    const refetchstrategies = [
+        (this.config?.autoRefetch ?? void 0),
+        ...options?.refetchStrategies ?? []
+    ]
 
+    const mergedConfig: RxStatefulConfig<T,  E> = {
+      ...(this.config as Config<T, E>),
+      ...options,
+      // @ts-ignore
+      refetchStrategies: [...refetchstrategies].filter(Boolean)
+    };
+
+
+    return rxStateful$<T, E>(source$, mergedConfig);
   }
 }

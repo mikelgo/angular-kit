@@ -19,6 +19,7 @@ import {InternalRxState, RxStateful, RxStatefulConfig, RxStatefulWithError,} fro
 import {_handleSyncValue} from './util/handle-sync-value';
 import {defaultAccumulationFn} from './types/accumulation-fn';
 import {createRxStateful} from './util/create-rx-stateful';
+import {mergeRefetchStrategies} from "./refetch-strategies/merge-refetch-strategies";
 
 /**
  * @publicApi
@@ -63,11 +64,20 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxS
 
 }
 
+
+
 function createState$<T, E>(source$: Observable<T>, mergedConfig: RxStatefulConfig<T, E>) {
   const accumulationFn = mergedConfig.accumulationFn ?? defaultAccumulationFn;
   const error$$ = new Subject<RxStatefulWithError<T, E>>();
-  const refresh$ = mergedConfig?.refreshTrigger$ ?? new Subject<unknown>();
-  const { request$, refreshedRequest$ } = initSources(source$, error$$, refresh$, mergedConfig);
+  const refresh$ = merge(
+      mergedConfig?.refreshTrigger$ ?? new Subject<unknown>(),
+      ...mergeRefetchStrategies(mergedConfig?.refetchStrategies)
+  )
+
+  const sharedSource$ = initSharedSource(source$, error$$, mergedConfig);
+  const request$: Observable<Partial<InternalRxState<T, E>>> = requestSource(sharedSource$);
+  const refreshedRequest$: Observable<Partial<InternalRxState<T, E>>> = refreshedRequestSource(sharedSource$, refresh$, mergedConfig);
+
 
   return merge(request$, refreshedRequest$, error$$).pipe(
     scan(accumulationFn, {
@@ -88,7 +98,7 @@ function createState$<T, E>(source$: Observable<T>, mergedConfig: RxStatefulConf
   );
 }
 
-function initSource<T, E>(
+function initSharedSource<T, E>(
   source$: Observable<T>,
   error$$: Subject<RxStatefulWithError<T, E>>,
   mergedConfig: RxStatefulConfig<T, E>
@@ -109,20 +119,6 @@ function initSource<T, E>(
   );
 }
 
-function initSources<T, E>(
-  source$: Observable<T>,
-  error$$: Subject<RxStatefulWithError<T, E>>,
-  refresh$: Subject<any>,
-  mergedConfig: RxStatefulConfig<T, E>
-) {
-  const sharedSource$ = initSource<T, E>(source$, error$$, mergedConfig);
-
-  const request$ = requestSource<T, E>(sharedSource$);
-
-  const refreshedRequest$ = refreshedRequestSource<T, E>(sharedSource$, refresh$, mergedConfig);
-
-  return { request$, refreshedRequest$ };
-}
 
 function requestSource<T, E>(source$: Observable<T>): Observable<Partial<InternalRxState<T, E>>> {
   return source$.pipe(
@@ -138,7 +134,7 @@ function requestSource<T, E>(source$: Observable<T>): Observable<Partial<Interna
 
 function refreshedRequestSource<T, E>(
   sharedSource$: Observable<T>,
-  refresh$: Subject<any>,
+  refresh$: Observable<any>,
   mergedConfig: RxStatefulConfig<T, E>
 ): Observable<Partial<InternalRxState<T, E>>> {
   const refreshTriggerIsBehaivorSubject = (config: RxStatefulConfig<T, E>) =>

@@ -1,5 +1,6 @@
 import {Observable, Subject} from 'rxjs';
 import {RxStatefulAccumulationFn} from "./accumulation-fn";
+import {RefetchStrategy} from "../refetch-strategies/refetch-strategy";
 
 /**
  * @publicApi
@@ -67,8 +68,14 @@ export interface InternalRxState<T, E = unknown> {
 export interface RxStatefulConfig<T, E = unknown> {
   /**
    * Trigger to refresh the source$.
+   * @deprecated use refetchStrategies instead
+   * Will be removed in version 2 or 3.
    */
   refreshTrigger$?: Subject<any>;
+  /**
+   * Trigger to refresh the source$.
+   */
+  refetchStrategies?: RefetchStrategy[]
   /**
    * Define if the value should be kept on refresh or reset to null
    * @default false
