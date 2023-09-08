@@ -1,5 +1,5 @@
 import {Observable, OperatorFunction, Subject, takeUntil} from 'rxjs';
-import {refetchFnFactory, RefetchStrategy, TriggerRefetchStrategy} from './refetch-strategy';
+import {refetchFnFactory, TriggerRefetchStrategy} from './refetch-strategy';
 import {isObservableOrSubject} from './refetch-on-auto.strategy';
 
 export type RefetchTrigger = {
@@ -47,23 +47,8 @@ export function withRefetchOnTrigger<T>(triggerSource: Observable<T> | Subject<T
   }
 }
 
-export function withRefetchOnTriggers(
-    ...triggerStrategies: TriggerRefetchStrategy[]
-): RefetchStrategy[] {
-  if (!triggerStrategies){
-    return [];
-  }
-
-  return triggerStrategies
-}
 
 function isTriggerGuard(arg: any): arg is RefetchTrigger {
   return arg && !!arg?.trigger && !!arg?.teardown;
 }
 
-function isTriggerArrayGuard(arg: any): arg is RefetchTrigger[] {
-  return Array.isArray(arg) && arg.every(isTriggerGuard);
-}
-function isObservableOrSubjectArrayGuard(arg: any): arg is Observable<any>[] | Subject<any>[] {
-  return Array.isArray(arg) && arg.every(isObservableOrSubject);
-}

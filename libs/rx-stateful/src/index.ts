@@ -15,4 +15,4 @@ export {provideRxStatefulClient} from './lib/client/config/provide-rx-stateful-c
 
 export {RefetchStrategy} from './lib/refetch-strategies/refetch-strategy';
 export {withAutoRefetch} from './lib/refetch-strategies/refetch-on-auto.strategy';
-export {withRefetchOnTriggers, withRefetchOnTrigger} from './lib/refetch-strategies/refetch-on-trigger.strategy';
+export {withRefetchOnTrigger} from './lib/refetch-strategies/refetch-on-trigger.strategy';

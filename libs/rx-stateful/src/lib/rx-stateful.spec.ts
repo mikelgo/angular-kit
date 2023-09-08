@@ -2,7 +2,7 @@ import {mergeAll, Observable, Subject, throwError} from 'rxjs';
 import {subscribeSpyTo} from '@hirez_io/observer-spy';
 import {rxStateful$} from './rx-stateful$';
 import {fakeAsync, TestBed, tick} from '@angular/core/testing';
-import {withRefetchOnTrigger, withRefetchOnTriggers} from './refetch-strategies/refetch-on-trigger.strategy';
+import {withRefetchOnTrigger} from './refetch-strategies/refetch-on-trigger.strategy';
 import {withAutoRefetch} from './refetch-strategies/refetch-on-auto.strategy';
 
 const test = (description: string, testFn: () => void, testBed?: TestBed) => {
@@ -182,10 +182,9 @@ describe('rxStateful$', () => {
               keepValueOnRefresh: true,
               refetchStrategies: [
                 withAutoRefetch(100, 301),
-                ...withRefetchOnTriggers(
-                  withRefetchOnTrigger(refreshTrigger1$),
-                  withRefetchOnTrigger(refreshTrigger2$)
-                ),
+
+                withRefetchOnTrigger(refreshTrigger1$),
+                withRefetchOnTrigger(refreshTrigger2$),
               ],
             }).value$
           );
