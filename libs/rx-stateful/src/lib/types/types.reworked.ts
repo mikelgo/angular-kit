@@ -1,6 +1,13 @@
 import {Observable} from "rxjs";
 import {RxStatefulContext} from "./types";
 
+/**
+ * todo
+ *
+ * I need to consider the following: If I do remove the | null from value
+ * e.g. the keepValueOnRefresh: false is not possible anymore.
+ */
+
 // base types
 interface RxStateful<T, E = unknown> {
     hasValue$: Observable<boolean>;
