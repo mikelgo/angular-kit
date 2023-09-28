@@ -79,7 +79,15 @@ function createState$<T, E>(source$: Observable<T>, mergedConfig: RxStatefulConf
   const refreshedRequest$: Observable<Partial<InternalRxState<T, E>>> = refreshedRequestSource(sharedSource$, refresh$, mergedConfig);
 
 
-  return merge(request$, refreshedRequest$, error$$).pipe(
+
+    return merge(request$, refreshedRequest$, error$$).pipe(
+        /**
+         * todo
+         * this is a bit hacky as value can not be undefined (it is typed
+         * as T | null). However when I change to null some side effets happen.
+         * Need investigation!!!
+         */
+        // @ts-ignore
     scan(accumulationFn, {
       isLoading: false,
       isRefreshing: false,

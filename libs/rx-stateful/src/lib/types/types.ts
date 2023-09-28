@@ -21,7 +21,7 @@ export interface Stateful<T, E = unknown>  {
 
   context: RxStatefulContext;
 
-  value: T | null | undefined;
+  value: T | null;
   hasValue: boolean;
 }
 
@@ -34,7 +34,7 @@ export interface RxStateful<T, E = unknown> {
 
   isSuspense$: Observable<boolean>;
 
-  value$: Observable<T | null | undefined>;
+  value$: Observable<T | null>;
   hasValue$: Observable<boolean>;
 
   context$: Observable<RxStatefulContext>;
@@ -49,7 +49,7 @@ export type RxStatefulWithError<T, E = unknown> = Pick<InternalRxState<T, E>,  '
  * @internal
  */
 export interface InternalRxState<T, E = unknown> {
-  value: T | null | undefined;
+  value: T | null;
   isLoading: boolean;
   isRefreshing: boolean;
   error: E | undefined;
