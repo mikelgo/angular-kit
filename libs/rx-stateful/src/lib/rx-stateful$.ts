@@ -113,7 +113,8 @@ function initSharedSource<T, E>(
     catchError((error: E) => {
       mergedConfig?.beforeHandleErrorFn?.(error);
       const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E) => (error as any)?.message);
-      error$$.next({ error: errorMappingFn(error), context: 'error', hasError: true });
+      error$$.next({ error: errorMappingFn(error), context: 'error',   isLoading: false,
+          isRefreshing: false, value: null });
       return NEVER;
     })
   );
@@ -155,18 +156,32 @@ function refreshedRequestSource<T, E>(
               InternalRxState<T, E>
             >)
         ),
-        mergedConfig?.keepValueOnRefresh
-          ? startWith({ isLoading: true, isRefreshing: true, context: 'suspense', error: undefined } as Partial<
-              InternalRxState<T, E>
-            >)
-          : startWith({
-              isLoading: true,
-              isRefreshing: true,
-              value: null,
-              context: 'suspense',
-              error: undefined,
-            } as Partial<InternalRxState<T, E>>)
+        deriveInitialValue<T,E>(mergedConfig)
       )
     )
-  );
+  ) as Observable<Partial<InternalRxState<T, E>>>
+}
+
+function deriveInitialValue<T, E>(mergedConfig: RxStatefulConfig<T,E>){
+    let value: Partial<InternalRxState<T, E>> = {
+        isLoading: true,
+        isRefreshing: true,
+        context: 'suspense',
+    }
+    if (!mergedConfig.keepValueOnRefresh){
+        value = {
+            ...value,
+            value: null
+        }
+
+    }
+    if (!mergedConfig.keepErrorOnRefresh){
+        value = {
+            ...value,
+            error: undefined
+        }
+    }
+
+
+    return startWith(value)
 }

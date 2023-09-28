@@ -43,7 +43,7 @@ export interface RxStateful<T, E = unknown> {
 }
 
 
-export type RxStatefulWithError<T, E = unknown> = Pick<Stateful<T, E>, 'hasError' | 'error' | 'context'>;
+export type RxStatefulWithError<T, E = unknown> = Pick<InternalRxState<T, E>,  'error' | 'context' | 'isLoading' | 'isRefreshing' | 'value' >;
 
 /**
  * @internal
