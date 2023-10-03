@@ -1,7 +1,7 @@
 import {RxStateful, RxStatefulContext, Stateful} from '@angular-kit/rx-stateful';
 import {BehaviorSubject, map, merge, Observable, ReplaySubject, Subject} from "rxjs";
 
-export interface RxStatefulMock<T, E> {
+export interface RxStatefulMock<T, E = unknown> {
   hasError$Trigger: Subject<boolean>
   error$Trigger: Subject<E>
   isSuspense$Trigger: Subject<boolean>
