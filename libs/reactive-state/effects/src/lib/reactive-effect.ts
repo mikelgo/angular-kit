@@ -92,6 +92,14 @@ type ReactiveEffectsSetupFn = (
     rxEffect: Pick<RxEffects, 'register' | 'registerOnTeardown' | 'unregister'>
 ) => TeardownFn ;
 
+type ReactiveEffectsTeardown = {
+  /**
+   * Unsubscribe from all registered effects and execute the teardown function
+   * within the scope of the effects-instance
+   */
+  terminate: () => void
+};
+
 /**
  * A helper function to manage any RxJs subscription
  * @param setupFn
@@ -110,7 +118,7 @@ type ReactiveEffectsSetupFn = (
  *     }
  * })
  */
-export function reactiveEffects(setupFn: ReactiveEffectsSetupFn): () => void {
+export function reactiveEffects(setupFn: ReactiveEffectsSetupFn): ReactiveEffectsTeardown {
     // todo Angular-16 assertInInjectionContext(reactiveEffects);
     const errorHandler = inject(ErrorHandler, { optional: true });
     const effects = new RxEffects(errorHandler);
@@ -121,16 +129,19 @@ export function reactiveEffects(setupFn: ReactiveEffectsSetupFn): () => void {
         unregister: effects.unregister.bind(effects)
     });
 
-    onDestroy(() => {
-        if (typeof teardownFn === 'function'){
-            teardownFn();
-        }
+    const terminate = () => {
+      if (typeof teardownFn === 'function'){
+        teardownFn();
+      }
 
-        effects.ngOnDestroy();
-    });
+      effects.ngOnDestroy();
+    }
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    return () => {};
+    onDestroy(() => terminate());
+
+    return {
+      terminate: () => terminate()
+    }
 }
 
 function onDestroy(teardown: () => void) {

@@ -30,6 +30,24 @@ describe('reactiveEffects', () => {
 
         expect(component.clearInterval$$.next).toHaveBeenCalled();
     });
+    describe('terminate', () => {
+      it('should execute teardown function when terminate is called', async () => {
+          const { component } = await setup();
+          jest.spyOn(component.clearInterval$$, 'next');
+          component.effects.terminate();
+
+          expect(component.clearInterval$$.next).toHaveBeenCalled();
+      });
+      it('should unsubscribe from all sources when terminate is called', async () => {
+          const {service, component} = await setup();
+
+          component.effects.terminate()
+          component.trigger$$.next(10);
+
+          expect(service.triggerEffect).not.toHaveBeenCalled();
+
+      });
+    })
 
     describe('registerOnTeardown', () => {
         it('should execute effect onDestroy', async () => {
@@ -114,5 +132,6 @@ class TestComponent implements OnDestroy {
     ngOnDestroy() {
         this.destroy$$.next(void 0);
         this.clearInterval$$.next(void 0);
+
     }
 }
