@@ -1,0 +1,1 @@
+export type MapFn<T, R> = (state: T) => R

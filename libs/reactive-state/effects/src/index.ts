@@ -1,1 +1,2 @@
-export * from './lib/effects.module';
+export { createEffect } from './lib/create-effect';
+export { reactiveEffects } from './lib/reactive-effect';

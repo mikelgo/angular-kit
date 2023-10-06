@@ -1,1 +1,6 @@
-export * from './lib/reactive-state.module';
+export {
+    reactiveState,
+    SetupFn,
+    Config,
+    TeardownFn
+} from './lib/reactive-state.factory'

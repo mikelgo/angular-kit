@@ -1,0 +1,1 @@
+export type ProjectStateFn<T> = (oldState: T) => Partial<T>;
