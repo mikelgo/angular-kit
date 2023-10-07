@@ -2,6 +2,18 @@ import {mockRxStateful} from "./mock-rx-stateful$";
 import {subscribeSpyTo} from "@hirez_io/observer-spy";
 
 describe('mockRxStateful', () => {
+    it('should create mock with all properties defined', () => {
+        const mock = mockRxStateful()
+
+        expect(mock.instance).toBeTruthy()
+        expect(mock.hasError$Trigger).toBeTruthy()
+        expect(mock.hasValue$Trigger).toBeTruthy()
+        expect(mock.context$Trigger).toBeTruthy()
+        expect(mock.value$Trigger).toBeTruthy()
+        expect(mock.isSuspense$Trigger).toBeTruthy()
+        expect(mock.error$Trigger).toBeTruthy()
+        expect(mock.state$Trigger).toBeTruthy()
+    })
     it('hasError should emit when state.hasError is given', () => {
         const mock = mockRxStateful()
         const result = subscribeSpyTo(mock.instance.hasError$)
