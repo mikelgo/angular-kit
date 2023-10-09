@@ -16,9 +16,20 @@ export class RxStatefulClient {
   request<T, E>(source$: Observable<T>, options: RxStatefulRequestOptions<T, E>): RxStateful<T, E>;
   request<T, E>(source$: Observable<T>, options?: RxStatefulRequestOptions<T, E>): RxStateful<T, E> {
 
+    const strategies = [];
+
+    if (options?.refetchStrategies){
+      if (Array.isArray(options.refetchStrategies)){
+        strategies.push(...options.refetchStrategies)
+      }
+      if (!Array.isArray(options.refetchStrategies)){
+        strategies.push(options.refetchStrategies)
+      }
+    }
+
     const refetchstrategies = [
         (this.config?.autoRefetch ?? void 0),
-        ...options?.refetchStrategies ?? []
+        ...strategies
     ]
 
     const mergedConfig: RxStatefulConfig<T,  E> = {

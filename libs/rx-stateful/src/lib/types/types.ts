@@ -73,9 +73,9 @@ export interface RxStatefulConfig<T, E = unknown> {
    */
   refreshTrigger$?: Subject<any>;
   /**
-   * Trigger to refresh the source$.
+   * One or multiple Trigger to refresh the source$.
    */
-  refetchStrategies?: RefetchStrategy[]
+  refetchStrategies?: RefetchStrategy[] | RefetchStrategy
   /**
    * Define if the value should be kept on refresh or reset to null
    * @default false
