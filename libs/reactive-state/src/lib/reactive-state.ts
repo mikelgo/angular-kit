@@ -1,6 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { distinctUntilChanged, isObservable, map, Observable, Subscription } from 'rxjs';
-import { mapByKeys, rxDistinctUntilKeysChange } from '@devkit/cdk/rx-operators';
+import { mapByKeys } from './rx-operators/map-by-keys';
+import { rxDistinctUntilKeysChange } from './rx-operators/rx-distinct-until-keys-change';
 import { isKeyOf } from './types/is-key-of';
 import { ProjectStateFn } from './types/project-state-fn';
 import { MapFn } from './types/map-fn';
@@ -70,7 +71,7 @@ export class ReactiveState<T extends State> implements OnDestroy {
         /**
          * The initialize method takes only a Partial<T> as initialstate and does not require the whole state
          * to improve developer ergonomics. E.g. in a log of cases you want to define something in your state
-         * which is derived from connecting a source. 
+         * which is derived from connecting a source.
          */
         this.stateAccumulator.nextSlice(state);
         if (inputs$) {

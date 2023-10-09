@@ -1,5 +1,4 @@
 import { ChangeDetectorRef, inject, OnChanges, ViewRef } from '@angular/core';
-import { useOnChanges$ } from '@devkit/cdk';
 import { State } from './types/state';
 import { ReactiveState } from './reactive-state';
 
@@ -39,16 +38,6 @@ export type SetupFn<T extends State> = (
     state: Pick<ReactiveState<T>, 'connect' | 'initialize' | 'useAccumulatorFn' | 'select'>
 ) => TeardownFn | void;
 
-export type Config<T, C extends OnChanges = any> = {
-    connectInputs?: C;
-};
-
-/**
- * @internal
- */
-type InternalConfig<T, C extends OnChanges> = {
-    connectInputs?: C;
-};
 
 /**
  * Creates a instance of a lightweight state container
@@ -59,22 +48,17 @@ type InternalConfig<T, C extends OnChanges> = {
  *     connect({...)})
  * })
  */
-export function reactiveState<T extends State>(setupFn?: SetupFn<T>, cfg?: Config<T>): ReactiveState<T> {
+export function reactiveState<T extends State>(setupFn?: SetupFn<T>): ReactiveState<T> {
     const state = new ReactiveState<T>();
-    const mergedConfig: InternalConfig<T, any> = {
-        ...cfg
-    };
 
+    // TODO check if i want to use this
+    // I think I will remove the useOnChangea$ from the API
     // @ts-ignore
     const teardown = setupFn?.({
         connect: state.connect.bind(state),
         useAccumulatorFn: state.useAccumulatorFn.bind(state),
         select: state.select.bind(state),
-        // @ts-ignore prettier-ignore
-        initialize: mergedConfig.connectInputs
-            ? // @ts-ignore
-              state.initialize.bind(state, useOnChanges$(mergedConfig.connectInputs))
-            : state.initialize.bind(state)
+        initialize:  state.initialize.bind(state)
     });
 
     onDestroy(() => {
