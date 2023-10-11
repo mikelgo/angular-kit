@@ -86,12 +86,21 @@ function createState$<T, E>(source$: Observable<T>, mergedConfig: RxStatefulConf
    * Das klappt so nicht. Da ich request und refreshedRequest habe ist es ein wenig komplizierter
    * muss schauen wie ich das am besten mache
    */
-  const suspenseState$ = deriveSuspenseState<T,E>(merge(refreshedRequest$, request$)).pipe(
+  const suspenseState$ = deriveSuspenseState<T,E>(merge (request$)).pipe(
       distinctUntilChanged()
   )
-    suspenseState$.subscribe(x => console.log('suspenseState$', x))
 
-  return merge(request$, refreshedRequest$, error$$).pipe(
+  // todo hier muss ich was drehen damit das auch für refresh passt
+  // hat glaub auch keinen effekt bisher
+  const refreshedRequestSuspenseState$ = deriveSuspenseState<T,E>(merge (refreshedRequest$)).pipe(
+    distinctUntilChanged(),
+  )
+
+  const suspense$ = merge(suspenseState$, refreshedRequestSuspenseState$).pipe(
+    distinctUntilChanged((a,b) => a.context === b.context)
+  )
+
+  return merge(request$, refreshedRequest$, error$$,suspense$ ).pipe(
     /**
      * todo
      * this is a bit hacky as value can not be undefined (it is typed
@@ -100,11 +109,7 @@ function createState$<T, E>(source$: Observable<T>, mergedConfig: RxStatefulConf
      */
     // @ts-ignore
     scan(accumulationFn, {
-      isLoading: false,
-      isRefreshing: false,
-      value: undefined,
-      error: undefined,
-      context: 'suspense',
+
     }),
     distinctUntilChanged(),
     share({
@@ -148,11 +153,11 @@ function requestSource<T, E>(source$: Observable<T>): Observable<Partial<Interna
   return source$.pipe(
     map(
       (v) =>
-        ({ value: v, isLoading: false, isRefreshing: false, context: 'next', error: undefined } as Partial<
+        ({ value: v, error: undefined } as Partial<
           InternalRxState<T, E>
         >)
     ),
-    startWith({ isLoading: true, isRefreshing: false, context: 'suspense' } as Partial<InternalRxState<T, E>>)
+    //startWith({ isLoading: true, isRefreshing: false, context: 'suspense' } as Partial<InternalRxState<T, E>>)
   );
 }
 
@@ -175,7 +180,7 @@ function refreshedRequestSource<T, E>(
       sharedSource$.pipe(
         map(
           (v) =>
-            ({ value: v, isLoading: false, isRefreshing: false, context: 'next', error: undefined } as Partial<
+            ({ value: v, error: undefined } as Partial<
               InternalRxState<T, E>
             >)
         ),
@@ -187,9 +192,9 @@ function refreshedRequestSource<T, E>(
 
 function deriveInitialValue<T, E>(mergedConfig: RxStatefulConfig<T, E>) {
   let value: Partial<InternalRxState<T, E>> = {
-    isLoading: true,
-    isRefreshing: true,
-    context: 'suspense',
+    //isLoading: true,
+    //isRefreshing: true,
+    //context: 'suspense',
   };
   if (!mergedConfig.keepValueOnRefresh) {
     value = {
@@ -219,7 +224,7 @@ export function deriveSuspenseState<T, E>(
     // ON after suspenseThreshold
     timer(suspenseThreshold).pipe(
       map(() => ({ isLoading: true, isRefreshing: true, context: 'suspense' })),
-      takeUntil(result$)
+      takeUntil(result$),
     ),
 
     // OFF once we receive a result, yet at least in 2s
