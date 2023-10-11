@@ -1,7 +1,7 @@
 import {Component, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {HttpClient} from '@angular/common/http';
-import {provideRxStatefulClient, RxStatefulClient, withAutoRefetch, withConfig,} from '@angular-kit/rx-stateful';
+import {provideRxStatefulClient, RxStatefulClient, withConfig,} from '@angular-kit/rx-stateful';
 import {delay, map, scan, Subject, switchMap} from 'rxjs';
 import {ActivatedRoute} from '@angular/router';
 
@@ -36,7 +36,7 @@ import {ActivatedRoute} from '@angular/router';
   styles: [],
   providers: [
     provideRxStatefulClient(
-      withConfig({ keepValueOnRefresh: true, errorMappingFn: (e) => e, autoRefetch: withAutoRefetch(1000, 10000) })
+      withConfig({ keepValueOnRefresh: true, errorMappingFn: (e) => e })
     ),
     // provideRxStatefulConfig({keepValueOnRefresh: true, errorMappingFn: (e) => e})
   ],
@@ -68,7 +68,7 @@ export class DemoRxStatefulComponent {
     }, [])
   );
 
-  fetch(delayInMs = 1500) {
+  fetch(delayInMs = 2000) {
     return this.http.get<any>('https://jsonplaceholder.typicode.com/todos/1').pipe(
       delay(delayInMs),
       map((v) => v?.title)
