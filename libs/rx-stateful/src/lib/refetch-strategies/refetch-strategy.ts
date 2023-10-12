@@ -3,7 +3,7 @@ import {Observable, Subject} from "rxjs";
 
 export type RefetchStrategyKind = 'trigger__rxStateful' | 'auto__rxStateful';
 
-export type RefetchFn = () => Observable<any>;
+export type RefetchFn = () => Observable<any> | Subject<any>;
 
 export type RefetchStrategy = {
     kind: RefetchStrategyKind & string,

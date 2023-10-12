@@ -28,6 +28,7 @@ describe('mergeRefetchStrategies', () => {
 
 
 
+
         const result = subscribeSpyTo(of(refetchStrategies).pipe(
             concatAll(),
             mergeAll()
@@ -37,6 +38,9 @@ describe('mergeRefetchStrategies', () => {
         trigger2$.next(20);
         trigger3$.next(30);
 
+       // expect(first.getValues()).toEqual([10]);
+        //expect(second.getValues()).toEqual([20]);
+        //expect(third.getValues()).toEqual([ 30]);
 
         expect(result.getValues()).toEqual([10, 20, 30]);
 
