@@ -1,7 +1,7 @@
 import {mergeRefetchStrategies} from "./merge-refetch-strategies";
 import {RefetchStrategy} from "./refetch-strategy";
 import {withRefetchOnTrigger} from "./refetch-on-trigger.strategy";
-import {BehaviorSubject, ReplaySubject, Subject} from "rxjs";
+import {BehaviorSubject, concatAll, mergeAll, of, ReplaySubject, Subject} from "rxjs";
 import {subscribeSpyTo} from "@hirez_io/observer-spy";
 
 describe('mergeRefetchStrategies', () => {
@@ -27,17 +27,18 @@ describe('mergeRefetchStrategies', () => {
         expect(refetchStrategies.length).toEqual(3);
 
 
-        const first = subscribeSpyTo(refetchStrategies[0]);
-        const second = subscribeSpyTo(refetchStrategies[1]);
-        const third = subscribeSpyTo(refetchStrategies[2]);
+
+        const result = subscribeSpyTo(of(refetchStrategies).pipe(
+            concatAll(),
+            mergeAll()
+        ));
 
         trigger1$.next(10);
         trigger2$.next(20);
         trigger3$.next(30);
 
-        expect(first.getValues()).toEqual([10]);
-        expect(second.getValues()).toEqual([20]);
-        expect(third.getValues()).toEqual([null, 30]);
+
+        expect(result.getValues()).toEqual([10, 20, 30]);
 
     })
 })

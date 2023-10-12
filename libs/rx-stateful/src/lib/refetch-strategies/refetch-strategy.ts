@@ -1,4 +1,4 @@
-import {defer, Observable, Subject} from "rxjs";
+import {Observable, Subject} from "rxjs";
 
 
 export type RefetchStrategyKind = 'trigger__rxStateful' | 'auto__rxStateful';
@@ -21,6 +21,6 @@ export type AutoRefetchStrategy = {
 }
 
 export function refetchFnFactory(trigger: Observable<any> | Subject<any>){
-    return () => defer(() => trigger)
+    return () => trigger
 }
 export function refetchStrategyFactory(){}

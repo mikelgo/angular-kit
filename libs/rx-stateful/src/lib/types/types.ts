@@ -118,7 +118,7 @@ export interface RxStatefulConfig<T, E = unknown> {
   /**
    *
    */
-  //suspenseConfig: RxStatefulSuspenseConfig;
+  suspenseConfig?: RxStatefulSuspenseConfig;
 }
 
 
