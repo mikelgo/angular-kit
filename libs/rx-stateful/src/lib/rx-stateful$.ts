@@ -238,3 +238,28 @@ export function deriveSuspenseState<T, E>(
 
   return showLoadingIndicator$;
 }
+
+/**
+ *
+ * ## expose loading
+ * ```ts
+ *
+ * { "hasValue": false, "hasError": false, "isSuspense": true, "context": "suspense" } }
+ * { "value": "delectus aut autem", "hasValue": true, "hasError": false, "isSuspense": false, "context": "next" }
+ *
+ * ---
+ *  { "value": null, "hasValue": false, "hasError": false, "isSuspense": true, "context": "suspense" }
+ *  { "value": "delectus aut autem", "hasValue": true, "hasError": false, "isSuspense": false, "context": "next" }
+ * ```
+ *
+ * ## dont expose loading because its fast
+ * ```ts
+ *
+ *
+ * { "value": "delectus aut autem", "hasValue": true, "hasError": false, "isSuspense": false, "context": "next" }
+ *
+ * ---
+ *
+ *  { "value": "delectus aut autem", "hasValue": true, "hasError": false, "isSuspense": false, "context": "next" }
+ * ```
+ */
