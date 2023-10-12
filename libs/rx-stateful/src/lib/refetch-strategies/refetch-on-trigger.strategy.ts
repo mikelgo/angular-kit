@@ -47,8 +47,3 @@ export function withRefetchOnTrigger<T>(triggerSource: Observable<T> | Subject<T
   }
 }
 
-
-function isTriggerGuard(arg: any): arg is RefetchTrigger {
-  return arg && !!arg?.trigger && !!arg?.teardown;
-}
-
