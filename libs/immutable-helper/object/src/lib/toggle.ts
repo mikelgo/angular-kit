@@ -15,34 +15,8 @@ import { isDefined, isKeyOf, isObjectGuard, OnlyKeysOfSpecificType } from './_in
  * // updatedState will be:
  * // {items: [1,2,3], loading: false};
  *
- * @example
- * // Usage with RxState
- *
- * export class ListComponent {
- *    readonly loadingChange$ = new Subject();
- *
- *    constructor(
- *      private state: RxState<ComponentState>
- *    ) {
- *      // Reactive implementation
- *      state.connect(
- *        this.api.loadingChange$,
- *        (state, _) => {
- *            return toggle(state, 'isLoading');
- *        }
- *      );
- *    }
- *
- *    // Imperative implementation
- *    toggleLoading(): void {
- *      this.set(toggle(state, 'isLoading'));
- *    }
- * }
  *
  * @returns T
- *
- * @docsPage toggle
- * @docsCategory transformation-helpers
  */
 
 export function toggle<T extends object>(object: T, key: OnlyKeysOfSpecificType<T, boolean>): T {

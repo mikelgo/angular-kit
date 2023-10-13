@@ -16,33 +16,7 @@ import { isDefined, isKeyOf, isObjectGuard } from './_internals/guards';
  * // anonymusCat will be:
  * // {id: 1, type: 'cat'};
  *
- * @example
- * // Usage with RxState
- *
- * export class ProfileComponent {
- *
- *    readonly removeName$ = new Subject();
- *
- *    constructor(private state: RxState<ComponentState>) {
- *      // Reactive implementation
- *      state.connect(
- *        this.removeName$,
- *        (state) => {
- *            return deleteProp(state, 'name');
- *        }
- *      );
- *    }
- *
- *    // Imperative implementation
- *    removeName(): void {
- *        this.state.set(remove(this.get(), 'name'));
- *    }
- * }
- *
  * @returns Omit<T, K>
- *
- * @docsPage deleteProp
- * @docsCategory transformation-helpers
  */
 export function deleteProp<T extends object, K extends keyof T>(object: T, key: K): Omit<T, K> {
   if (!isDefined(object) || !isObjectGuard(object)) {

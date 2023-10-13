@@ -25,37 +25,8 @@ import { isDefined } from './_internals/guards';
  * // updatedCreatures will be:
  * // [{id: 1, type: 'cat'}, {id: 2, type: 'dog'}, {id: 3, type: 'parrot'}, {id: 4, type: 'hamster'}];
  *
- * @example
- * // Usage with RxState
- *
- * export class ListComponent {
- *
- *    readonly insertCreature$ = new Subject<void>();
- *
- *    constructor(private state: RxState<ComponentState>) {
- *      // Reactive implementation
- *      state.connect(
- *        'creatures',
- *        this.insertCreature$,
- *        ({ creatures }) => {
- *            const creatureToAdd = {id: generateId(), name: 'newCreature', type: 'dinosaur' };
- *            return insert(creatures, creatureToAdd);
- *        }
- *      );
- *    }
- *
- *    // Imperative implementation
- *    insertCeature(): void {
- *        const creatureToAdd = {id: generateId(), name: 'newCreature', type: 'dinosaur' };
- *        this.state.set({ creatures: insert(this.state.get().creatures, creatureToAdd)});
- *    }
- * }
- *
- *
  * @returns T[]
  *
- * @docsPage insert
- * @docsCategory transformation-helpers
  */
 export function insert<T>(source: T[], updates: T | T[]): T[] {
   const updatesDefined = isDefined(updates);

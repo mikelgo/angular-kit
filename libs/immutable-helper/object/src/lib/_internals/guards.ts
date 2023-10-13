@@ -34,9 +34,6 @@ export function isDefined(val: unknown): val is NonNullable<any> {
  *
  * // Invalid key
  * updateCreature(cat, 'id', 3);
- *
- * @docsPage OnlyKeysOfSpecificType
- * @docsCategory interfaces
  */
 export type OnlyKeysOfSpecificType<T, S> = {
   [Key in keyof T]: S extends T[Key] ? Key : never;

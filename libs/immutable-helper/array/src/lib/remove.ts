@@ -51,34 +51,9 @@ import { valuesComparer } from './_internals/valuesComparer.util';
  *
  * // realCreatures will be: [{id: 1, type: 'cat'}];
  *
- * @example
- * // Usage with RxState
- *
- * export class ListComponent {
- *
- *    readonly removeCreature$ = new Subject<Creature>();
- *
- *    constructor(private state: RxState<ComponentState>) {
- *      // Reactive implementation
- *      state.connect(
- *        'creatures',
- *        this.removeCreature$,
- *        ({ creatures }, creatureToRemove) => {
- *            return remove(creatures, creatureToRemove, (a, b) => a.id === b.id);
- *        }
- *      );
- *    }
- *
- *    // Imperative implementation
- *    removeCreature(creatureToRemove: Creature): void {
- *        this.state.set({ creatures: remove(this.state.get().creatures, creatureToRemove, (a, b) => a.id === b.id)});
- *    }
- * }
  *
  * @returns T[]
  *
- * @docsPage remove
- * @docsCategory transformation-helpers
  */
 export function remove<T>(source: T[], scrap: Partial<T>[] | Partial<T>, compare?: ComparableData<T>): T[] {
   const scrapAsArray = isDefined(scrap) ? (Array.isArray(scrap) ? scrap : [scrap]) : [];

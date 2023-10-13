@@ -19,33 +19,7 @@ import { isObjectGuard } from './_internals/guards';
  * // catWithname will be:
  * // {id: 1, type: 'cat', name: 'Fluffy'};
  *
- * @example
- * // Usage with RxState
- *
- * export class ProfileComponent {
- *
- *    readonly changeName$ = new Subject<string>();
- *
- *    constructor(private state: RxState<ComponentState>) {
- *      // Reactive implementation
- *      state.connect(
- *        this.changeName$,
- *        (state, name) => {
- *            return patch(state, { name });
- *        }
- *      );
- *    }
- *
- *    // Imperative implementation
- *    changeName(name: string): void {
- *        this.state.set(patch(this.get(), { name }));
- *    }
- * }
- *
  * @returns T
- *
- * @docsPage patch
- * @docsCategory transformation-helpers
  */
 export function patch<T extends object>(object: T, upd: Partial<T>): T {
   const update = isObjectGuard(upd) ? upd : {};

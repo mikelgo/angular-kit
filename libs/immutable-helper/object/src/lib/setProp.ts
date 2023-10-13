@@ -14,33 +14,8 @@ import { isDefined, isKeyOf, isObjectGuard } from './_internals/guards';
  * // renamedCat will be:
  * // {id: 1, type: 'cat', name: 'Bella'};
  *
- * @example
- * // Usage with RxState
- *
- * export class ProfileComponent {
- *
- *    readonly changeName$ = new Subject<string>();
- *
- *    constructor(private state: RxState<ComponentState>) {
- *      // Reactive implementation
- *      state.connect(
- *        this.changeName$,
- *        (state, name) => {
- *            return setProp(state, 'name', name);
- *        }
- *      );
- *    }
- *
- *    // Imperative implementation
- *    changeName(name: string): void {
- *        this.state.set(setProp(this.get(), 'name', name));
- *    }
- * }
- *
  * @returns T
  *
- * @docsPage setProp
- * @docsCategory transformation-helpers
  */
 export function setProp<T extends object, K extends keyof T>(object: T, key: K, value: T[K]): T {
   const objectIsObject = isObjectGuard(object);

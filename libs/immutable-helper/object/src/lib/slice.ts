@@ -13,27 +13,8 @@ import { isDefined, isKeyOf, isObjectGuard } from './_internals/guards';
  *
  * // catWithoutType will be:
  * // {id: 1, name: 'Fluffy'};
- *
- * @example
- * // Usage with RxState
- *
- * export class AnimalsListComponent {
- *
- *    constructor(private state: RxState<ComponentState>, private api: ApiService) {
- *      state.connect(
- *        'animals'
- *        this.api.getAnimals(),
- *        (state, animals) => {
- *            return animals.map(animal => slice(animal, ['id', 'name']));
- *        }
- *      );
- *    }
- * }
- *
  * @returns T
  *
- * @docsPage slice
- * @docsCategory transformation-helpers
  */
 export function slice<T extends object, K extends keyof T>(object: T, keys: K | K[]): Pick<T, K> {
   const objectIsObject = isDefined(object) && isObjectGuard(object);

@@ -20,37 +20,7 @@ import { isDefined, isObjectGuard } from './_internals/guards';
  * @example
  * // Usage with RxState
  *
- * export class ListComponent {
- *    readonly removeName$ = new Subject();
- *
- *    constructor(
- *      private state: RxState<ComponentState>,
- *      private api: ApiService
- *    ) {
- *      // Reactive implementation
- *      state.connect(
- *        'creatures',
- *        this.api.creaturesDictionary$,
- *        (_, creatures) => {
- *            return dictionaryToArray(creatures);
- *        }
- *      );
- *    }
- *
- *    // Imperative implementation
- *    removeName(): void {
- *      this.api.creaturesDictionary$.pipe(
- *        // subscription handling logic
- *      ).subscribe(
- *        dictionary => this.set({creatures: dictionaryToArray(dictionary)})
- *      );
- *    }
- * }
- *
  * @returns T[];
- *
- * @docsPage dictionaryToArray
- * @docsCategory transformation-helpers
  */
 export function dictionaryToArray<T>(dictionary: { [key: string]: T }): T[] {
   if (!isDefined(dictionary)) {

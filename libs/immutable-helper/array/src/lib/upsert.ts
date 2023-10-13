@@ -59,37 +59,8 @@ import { ComparableData } from '@angular-kit/immutable-helper';
  * // updatedCreatures will be:
  * // [{id: 1, type: 'cat'}, {id: 2, type: 'dog'}, {id: 3, type: 'lion'}];
  *
- * @example
- * // Usage with RxState
- *
- * export class ListComponent {
- *
- *    // trigger which gets called on add/update (for reactive implementation)
- *    readonly addOrUpdateCreature = new Subject<Creature>();
- *
- *    constructor(private state: RxState<ComponentState>) {
- *      const initialCreatures = [{id: 1, type: 'cat', name: 'Bella'}, {id: 2, type: 'dog', name: 'Sparky'}];
- *      state.set({ creatures: initialCreatures });
- *      // Reactive implementation
- *      state.connect(
- *        'creatures',
- *        this.addOrUpdateCreature,
- *        ({ creatures }, creatureToUpsert) => {
- *            return upsert(creatures, creatureToUpsert, 'id');
- *        }
- *      );
- *    }
- *
- *    // Imperative implementation
- *    updateCreature(creatureToUpdate: Creature): void {
- *        this.state.set({ creatures: upsert(this.state.get('creatures'), creatureToUpdate, 'id')});
- *    }
- * }
  *
  * @returns T[]
- *
- * @docsPage upsert
- * @docsCategory transformation-helpers
  */
 export function upsert<T>(source: T[], update: Partial<T>[] | Partial<T>, compare?: ComparableData<T>): T[] {
   // check inputs for validity

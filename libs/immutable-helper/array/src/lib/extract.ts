@@ -15,24 +15,9 @@ import { isDefined, isKeyOf } from './_internals/guards';
  * // catsWithoutTypes will be:
  * // [{id: 1, name: 'Fluffy'}, {id: 2, name: 'Emma'}];
  *
- * @example
- * // Usage with RxState
- *
- * export class AnimalsListComponent {
- *
- *    constructor(private state: RxState<ComponentState>, private api: ApiService) {
- *      state.connect(
- *        'animals'
- *        this.api.getAnimals(),
- *        (state, animals) => extract(animals, ['id', 'name'])
- *      );
- *    }
- * }
  *
  * @returns T
  *
- * @docsPage slice
- * @docsCategory transformation-helpers
  */
 export function extract<T extends object, K extends keyof T>(array: T[], keys: K | K[]): Pick<T, K>[] {
   const arrayIsArray = isDefined(array) && Array.isArray(array);
