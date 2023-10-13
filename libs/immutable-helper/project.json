@@ -1,0 +1,55 @@
+{
+  "name": "immutable-helper",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/immutable-helper/src",
+  "prefix": "angular-kit",
+  "tags": [],
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/angular:package",
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
+      "options": {
+        "project": "libs/immutable-helper/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/immutable-helper/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "libs/immutable-helper/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/immutable-helper/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": [
+          "libs/immutable-helper/**/*.ts",
+          "libs/immutable-helper/**/*.html",
+          "libs/immutable-helper/package.json",
+          "libs/immutable-helper/object/**/*.ts",
+          "libs/immutable-helper/object/**/*.html",
+          "libs/immutable-helper/array/**/*.ts",
+          "libs/immutable-helper/array/**/*.html"
+        ]
+      }
+    }
+  }
+}
