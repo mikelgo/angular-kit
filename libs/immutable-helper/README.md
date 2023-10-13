@@ -1,7 +1,11 @@
 # immutable-helper
 
-This library was generated with [Nx](https://nx.dev).
+Immutable helper functions to deal with objects and arrays.
 
-## Running unit tests
+## Installation
 
-Run `nx test immutable-helper` to execute the unit tests.
+```bash
+npm install @angular-kit/immutable-helper
+yarn add @angular-kit/immutable-helper
+pnpm add @angular-kit/immutable-helper
+```
