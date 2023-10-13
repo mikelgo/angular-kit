@@ -17,8 +17,8 @@ A set of 🔥 Angular packages tools.
 - [immutable-helper](./libs/immutable-helper/README.md) - immutable helper functions to deal with objects and arrays
 
 ## Info
-The main branch does always contain the latest version of the packages. If you want to use a specific version, please have a look at the [releases](https://github.com/mikelgo/angular-kit/releases).
-For version 1.x.x, please have a look at the [v1 branch](https://github.com/mikelgo/angular-kit/tree/v1.x.x).
+The main branch does always contain the latest version of the packages. If you want to use a specific version, there will be a v.x.x.x-package-name branch (e.g. v.1.x.x-rx-stateful) 
+if more than the current version is supported.
 
 ## ✍ Contributing
 All contributions are very welcome. Kindly have a look at the [contribution guide](./CONTRIBUTING.md)
