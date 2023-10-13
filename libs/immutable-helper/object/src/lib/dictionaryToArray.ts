@@ -1,0 +1,36 @@
+import { isDefined, isObjectGuard } from './_internals/guards';
+
+/**
+ * @description
+ * Converts a dictionary of type {[key: string]: T} to array T[].
+ *
+ * @example
+ *
+ * const creaturesDictionary = {
+ *   '1': {id: 1, type: 'cat'},
+ *   '2': {id: 2, type: 'dog'},
+ *   '3': {id: 3, type: 'parrot'}
+ * };
+ *
+ * const creaturesArray = dictionaryToArray(creaturesDictionary);
+ *
+ * // creaturesArray will be:
+ * // [{id: 1, type: 'cat'}, {id: 2, type: 'dog'}, {id: 3, type: 'parrot'}];
+ *
+ * @example
+ * // Usage with RxState
+ *
+ * @returns T[];
+ */
+export function dictionaryToArray<T>(dictionary: { [key: string]: T }): T[] {
+  if (!isDefined(dictionary)) {
+    return dictionary;
+  }
+
+  if (!isObjectGuard(dictionary)) {
+    console.warn(`DictionaryToArray: unexpected input.`);
+    return [];
+  }
+
+  return Object.values(dictionary);
+}
