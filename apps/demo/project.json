@@ -87,6 +87,12 @@
         "skipServe": true,
         "devServerTarget": "demo:build"
       }
+    },
+    "version": {
+      "executor": "@jscutlery/semver:version",
+      "options": {
+        "preset": "angular"
+      }
     }
   },
   "tags": []

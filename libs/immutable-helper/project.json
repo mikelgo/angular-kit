@@ -50,6 +50,12 @@
           "libs/immutable-helper/array/**/*.html"
         ]
       }
+    },
+    "version": {
+      "executor": "@jscutlery/semver:version",
+      "options": {
+        "preset": "angular"
+      }
     }
   }
 }

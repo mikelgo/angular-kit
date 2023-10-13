@@ -19,7 +19,8 @@
     "affected": "nx affected",
     "cdk:publish": "nx run cdk:publish",
     "rx:publish": "nx run rx:publish",
-    "stream:publish": "nx run stream:publish"
+    "stream:publish": "nx run stream:publish",
+    "prepare": "husky install"
   },
   "private": true,
   "dependencies": {
