@@ -1,6 +1,9 @@
 {
   "name": "@angular-kit/immutable-helper",
   "version": "1.0.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "@angular/common": ">=12.0.0",
     "@angular/core": ">=12.0.0"
@@ -8,5 +11,20 @@
   "dependencies": {
     "tslib": "^2.3.0"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "license": "MIT",
+  "description": "Helper functions to deal with immutable operations",
+  "keywords": [
+    "angular",
+    "immutable",
+    "immutable operations",
+    "immutable object",
+    "immutable array"
+  ],
+  "author": "Michael Berger",
+  "homepage": "https://github.com/code-workers-io/angular-kit/libs/immutable-helper#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/code-workers-io/angular-kit"
+  }
 }
