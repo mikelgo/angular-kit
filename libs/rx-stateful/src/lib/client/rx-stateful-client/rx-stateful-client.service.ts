@@ -12,9 +12,9 @@ export type RxStatefulRequestOptions<T, E> = RxStatefulConfig<T, E>;
 export class RxStatefulClient {
   private readonly config = injectRxStatefulConfig();
 
-  request<T, E>(source$: Observable<T>): RxStateful<T, E>;
-  request<T, E>(source$: Observable<T>, options: RxStatefulRequestOptions<T, E>): RxStateful<T, E>;
-  request<T, E>(source$: Observable<T>, options?: RxStatefulRequestOptions<T, E>): RxStateful<T, E> {
+  request<T, E>(source$: Observable<T>): Observable<RxStateful<T, E>>;
+  request<T, E>(source$: Observable<T>, options: RxStatefulRequestOptions<T, E>): Observable<RxStateful<T, E>>;
+  request<T, E>(source$: Observable<T>, options?: RxStatefulRequestOptions<T, E>): Observable<RxStateful<T, E>> {
 
     const strategies = [];
 

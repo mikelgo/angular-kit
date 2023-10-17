@@ -1,4 +1,4 @@
-import {Observable, Subject} from 'rxjs';
+import {Subject} from 'rxjs';
 import {RxStatefulAccumulationFn} from "./accumulation-fn";
 import {RefetchStrategy} from "../refetch-strategies/refetch-strategy";
 
@@ -10,10 +10,12 @@ import {RefetchStrategy} from "../refetch-strategies/refetch-strategy";
  */
 export type RxStatefulContext =  'suspense' | 'error' | 'next';
 
+
+
 /**
  * @publicApi
  */
-export interface Stateful<T, E = unknown>  {
+export interface RxStateful<T, E = unknown> {
   hasError: boolean;
   error: E | undefined;
 
@@ -23,23 +25,6 @@ export interface Stateful<T, E = unknown>  {
 
   value: T | null;
   hasValue: boolean;
-}
-
-/**
- * @publicApi
- */
-export interface RxStateful<T, E = unknown> {
-  hasError$: Observable<boolean>;
-  error$: Observable<E | never>;
-
-  isSuspense$: Observable<boolean>;
-
-  value$: Observable<T | null>;
-  hasValue$: Observable<boolean>;
-
-  context$: Observable<RxStatefulContext>;
-
-  state$: Observable<Stateful<T, E>>;
 }
 
 
