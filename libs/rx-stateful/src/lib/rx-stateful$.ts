@@ -1,19 +1,19 @@
 import {
-    BehaviorSubject,
-    catchError,
-    distinctUntilChanged,
-    map,
-    merge,
-    NEVER,
-    Observable,
-    pipe,
-    ReplaySubject,
-    scan,
-    share,
-    skip,
-    startWith,
-    Subject,
-    switchMap,
+  BehaviorSubject,
+  catchError,
+  distinctUntilChanged,
+  map,
+  merge,
+  NEVER,
+  Observable,
+  pipe,
+  ReplaySubject,
+  scan,
+  share,
+  skip,
+  startWith,
+  Subject,
+  switchMap, tap,
 } from 'rxjs';
 import {InternalRxState, RxStateful, RxStatefulConfig, RxStatefulWithError,} from './types/types';
 import {_handleSyncValue} from './util/handle-sync-value';
@@ -36,7 +36,7 @@ import {mergeRefetchStrategies} from "./refetch-strategies/merge-refetch-strateg
  *
  * @param source$ - The source$ to enhance with additional state information.
  */
-export function rxStateful$<T, E = unknown>(source$: Observable<T>): RxStateful<T, E>;
+export function rxStateful$<T, E = unknown>(source$: Observable<T>): Observable< RxStateful<T, E>>;
 /**
  * @publicApi
  *
@@ -47,8 +47,8 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>): RxStateful<
  * @param source$ - The source$ to enhance with additional state information.
  * @param config - Configuration for rxStateful$.
  */
-export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig<T, E>): RxStateful<T, E>;
-export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxStatefulConfig<T, E>): RxStateful<T, E> {
+export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig<T, E>): Observable<RxStateful<T, E>>;
+export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxStatefulConfig<T, E>): Observable<RxStateful<T, E>> {
   // todo Angular 16
   // const injector = config?.injector ?? inject(Injector);
   // todo Angular-16 runInInjectionContext(injector)
@@ -76,9 +76,7 @@ function createState$<T, E>(source$: Observable<T>, mergedConfig: RxStatefulConf
 
   const sharedSource$ = initSharedSource(source$, error$$, mergedConfig);
   const request$: Observable<Partial<InternalRxState<T, E>>> = requestSource(sharedSource$);
-  const refreshedRequest$: Observable<Partial<InternalRxState<T, E>>> = refreshedRequestSource(sharedSource$, refresh$, mergedConfig);
-
-
+  const refreshedRequest$: Observable<Partial<InternalRxState<T, E>>> = refreshedRequestSource(sharedSource$, refresh$, mergedConfig)
 
     return merge(request$, refreshedRequest$, error$$).pipe(
         /**
