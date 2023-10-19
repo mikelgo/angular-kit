@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Config, injectRxStatefulConfig} from '../config/rx-stateful-config.provider';
-import {Observable} from 'rxjs';
+import {map, Observable} from 'rxjs';
 import {RxStateful, RxStatefulConfig} from '../../types/types';
 import {rxStateful$} from '../../rx-stateful$';
 
@@ -12,18 +12,24 @@ export type RxStatefulRequestOptions<T, E> = RxStatefulConfig<T, E>;
 export class RxStatefulClient {
   private readonly config = injectRxStatefulConfig();
 
-  request<T, E>(source$: Observable<T>): Observable<RxStateful<T, E>>;
+  request<T, E>(source$: Observable<T>): Observable<RxStateful<T, E>>
+  request<T, E, K extends keyof RxStateful<T,E>>(source$: Observable<T>, key: K): Observable<RxStateful<T, E>[K]>;
+
   request<T, E>(source$: Observable<T>, options: RxStatefulRequestOptions<T, E>): Observable<RxStateful<T, E>>;
-  request<T, E>(source$: Observable<T>, options?: RxStatefulRequestOptions<T, E>): Observable<RxStateful<T, E>> {
+  request<T, E, K extends keyof RxStateful<T, E>>(source$: Observable<T>, options: RxStatefulRequestOptions<T, E>, key: K): Observable<RxStateful<T, E>[K]>;
+
+  request<T, E, K extends keyof RxStateful<T, E>>(source$: Observable<T>, optionsOrKey?: RxStatefulRequestOptions<T, E> | K, key?: K):Observable<RxStateful<T, E>> | Observable<RxStateful<T, E>[K]> {
 
     const strategies = [];
+    if (typeof optionsOrKey === 'object') {
 
-    if (options?.refetchStrategies){
-      if (Array.isArray(options.refetchStrategies)){
-        strategies.push(...options.refetchStrategies)
-      }
-      if (!Array.isArray(options.refetchStrategies)){
-        strategies.push(options.refetchStrategies)
+      if (optionsOrKey?.refetchStrategies) {
+        if (Array.isArray(optionsOrKey.refetchStrategies)) {
+          strategies.push(...optionsOrKey.refetchStrategies)
+        }
+        if (!Array.isArray(optionsOrKey.refetchStrategies)) {
+          strategies.push(optionsOrKey.refetchStrategies)
+        }
       }
     }
 
@@ -31,15 +37,21 @@ export class RxStatefulClient {
         (this.config?.autoRefetch ?? void 0),
         ...strategies
     ]
-
+    const options = typeof optionsOrKey === 'object' ? optionsOrKey : {};
     const mergedConfig: RxStatefulConfig<T,  E> = {
       ...(this.config as Config<T, E>),
-      ...options,
+       ...options,
       // @ts-ignore
       refetchStrategies: [...refetchstrategies].filter(Boolean)
     };
 
+    const k = typeof optionsOrKey === 'string' ? optionsOrKey : key;
 
+    if (k){
+      return rxStateful$<T, E>(source$, mergedConfig).pipe(
+        map(state => state[k])
+      );
+    }
     return rxStateful$<T, E>(source$, mergedConfig);
   }
 }

@@ -23,6 +23,26 @@ describe('RxStatefulClientService', () => {
 
   });
 
+  describe('Pick response by key', () => {
+    it('should pick response by key', () => {
+      const {client} = setup();
+      const result = subscribeSpyTo(
+          client.request(of({test: 1}), 'value')
+      )
+
+      expect(result.getLastValue()).toEqual({test: 1});
+    });
+
+    it('should work correctly when passing options', () => {
+      const {client} = setup();
+      const result = subscribeSpyTo(
+          client.request(of({test: 1}), {}, 'value')
+      )
+
+      expect(result.getLastValue()).toEqual({test: 1});
+    });
+  })
+
   describe('Data Service', () => {
     it('should create services', () => {
       const {client, dataService} = setupDataService();
@@ -57,6 +77,8 @@ describe('RxStatefulClientService', () => {
 
     });
   });
+
+
 });
 
 interface TestModel {
