@@ -3,7 +3,7 @@ import {TestBed} from '@angular/core/testing';
 import {RxStatefulClient} from './rx-stateful-client.service';
 import {provideRxStatefulClient} from "../config/provide-rx-stateful-client";
 import {RxStatefulClientFeature} from "../config/config-feature";
-import {Observable, of, Subject, switchMap} from "rxjs";
+import {map, Observable, of, Subject, switchMap} from "rxjs";
 import {inject, Injectable} from "@angular/core";
 import {subscribeSpyTo} from "@hirez_io/observer-spy";
 
@@ -34,7 +34,9 @@ describe('RxStatefulClientService', () => {
     it('should call request', () => {
       const {client, dataService} = setupDataService();
       jest.spyOn(client, 'request')
-      const result = subscribeSpyTo(dataService.getData().value$)
+      const result = subscribeSpyTo(dataService.getData().pipe(
+        map(v => v.value)
+      ))
 
       expect(client.request).toHaveBeenCalled();
       expect(result.getLastValue()).toEqual(dataService.data);
@@ -44,7 +46,8 @@ describe('RxStatefulClientService', () => {
       const trigger$$ = new Subject<any>()
 
       const result = subscribeSpyTo(trigger$$.pipe(
-          switchMap(() => dataService.getData().value$)
+          switchMap(() => dataService.getData()),
+        map(v => v.value)
       ))
 
       trigger$$.next(null)
