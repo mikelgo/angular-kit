@@ -36,7 +36,7 @@ import {ActivatedRoute} from '@angular/router';
   styles: [],
   providers: [
     provideRxStatefulClient(
-      withConfig({ keepValueOnRefresh: true, errorMappingFn: (e) => e, autoRefetch: withAutoRefetch(1000, 10000) })
+      withConfig({ keepValueOnRefresh: true, errorMappingFn: (e) => e})
     ),
     // provideRxStatefulConfig({keepValueOnRefresh: true, errorMappingFn: (e) => e})
   ],
@@ -50,15 +50,17 @@ export class DemoRxStatefulComponent {
 
   query$ = this.route.params;
 
-  value$ = this.query$.pipe(switchMap(() => this.client.request(this.fetch()).value$));
+  value$ = this.query$.pipe(switchMap(() => this.client.request(this.fetch()).pipe(
+      map(v => v.value)
+  )));
 
   instance = this.client.request(this.fetch(), {
-    keepValueOnRefresh: false,
+    keepValueOnRefresh: true,
     keepErrorOnRefresh: false,
     refreshTrigger$: this.refresh$$,
     //refetchStrategies: [withAutoRefetch(10000, 20000)],
   });
-  state$ = this.instance.state$;
+  state$ = this.instance;
   stateAccumulated$ = this.state$.pipe(
     scan((acc, value, index) => {
       // @ts-ignore
@@ -68,7 +70,7 @@ export class DemoRxStatefulComponent {
     }, [])
   );
 
-  fetch(delayInMs = 1500) {
+  fetch(delayInMs = 800) {
     return this.http.get<any>('https://jsonplaceholder.typicode.com/todos/1').pipe(
       delay(delayInMs),
       map((v) => v?.title)
