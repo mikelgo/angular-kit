@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, ErrorHandler, inject, Injectable, OnDestroy, Optional, ViewRef } from '@angular/core';
+import {  ErrorHandler, inject, Injectable, OnDestroy,  } from '@angular/core';
 import { catchError, EMPTY, Observable, ReplaySubject, Subscription, tap } from 'rxjs';
 
 /**
@@ -137,18 +137,8 @@ export function reactiveEffects(setupFn: ReactiveEffectsSetupFn): ReactiveEffect
       effects.ngOnDestroy();
     }
 
-    onDestroy(() => terminate());
-
     return {
       terminate: () => terminate()
     }
 }
 
-function onDestroy(teardown: () => void) {
-    // todo Angular-16: replace with DestroyRef
-    const viewRef = inject(ChangeDetectorRef) as ViewRef;
-
-    viewRef?.onDestroy(() => {
-        teardown();
-    });
-}

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, ErrorHandler, inject, ViewRef } from "@angular/core";
+import { ErrorHandler, inject } from "@angular/core";
 import { Actions, ActionTransforms, ReactiveActions } from "./types";
 import { ReactiveActionFactory } from "./actions.factory";
 
@@ -41,14 +41,6 @@ export function reactiveActions<T extends Partial<Actions>, U extends ActionTran
     const factory = new ReactiveActionFactory<T>(errorHandler);
     let transformsMap = {} as U;
 
-    /**
-     * @internal
-     * Internally used to clean up potential subscriptions to the subjects. (For Actions it is most probably a rare case but still important to care about)
-     */
-    onDestroy(() => {
-        factory.ngOnDestroy();
-    });
-
     // run setup function if given
     setupFn &&
         setupFn({
@@ -57,11 +49,4 @@ export function reactiveActions<T extends Partial<Actions>, U extends ActionTran
 
     return factory.create<U>(transformsMap);
 }
-function onDestroy(teardown: () => void) {
-    // todo Angular-16: replace with DestroyRef
-    const viewRef = inject(ChangeDetectorRef) as ViewRef;
 
-    viewRef?.onDestroy(() => {
-        teardown();
-    });
-}

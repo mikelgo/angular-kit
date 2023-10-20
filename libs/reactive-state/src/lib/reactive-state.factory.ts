@@ -1,4 +1,3 @@
-import { ChangeDetectorRef, inject, OnChanges, ViewRef } from '@angular/core';
 import { State } from './types/state';
 import { ReactiveState } from './reactive-state';
 
@@ -61,20 +60,13 @@ export function reactiveState<T extends State>(setupFn?: SetupFn<T>): ReactiveSt
         initialize:  state.initialize.bind(state)
     });
 
-    onDestroy(() => {
-        state.ngOnDestroy();
+
+
         if (teardown) {
             teardown();
+          state.ngOnDestroy();
         }
-    });
+
     return state;
 }
 
-function onDestroy(teardown: TeardownFn) {
-    // todo Angular-16: replace with DestroyRef
-    const viewRef = inject(ChangeDetectorRef) as ViewRef;
-
-    viewRef?.onDestroy(() => {
-        teardown();
-    });
-}
