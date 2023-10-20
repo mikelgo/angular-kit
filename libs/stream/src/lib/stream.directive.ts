@@ -143,8 +143,8 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
   private embeddedView!: EmbeddedViewRef<StreamDirectiveContext<T>>;
 
   private context: StreamDirectiveContext<T> = {
-    $implicit: null,
-    stream: null,
+    $implicit: undefined as T,
+    stream: undefined as T,
     error: undefined,
     completed: false,
     loading: false,
@@ -267,8 +267,11 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
            * only update the view if the value has changed and the view is visible
            */
           if (visible && v !== this.context.$implicit) {
-            this.context.$implicit = v;
-            this.context.stream = v;
+            if (v){
+              this.context.$implicit = v;
+              this.context.stream = v;
+            }
+
             this.context.loading = false;
             this.context.renderCount++;
 

@@ -31,8 +31,8 @@ import {ReplaySubject} from "rxjs";
   imports: [NgxDirtyCheckerModule, StreamDirective],
 })
 export class L2Component {
-  value$ = new ReplaySubject(1)
-  @Input() set value(v: any){
+  value$ = new ReplaySubject<number>(1)
+  @Input() set value(v: number){
     this.value$.next(v)
   }
 }
