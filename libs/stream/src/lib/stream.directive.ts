@@ -32,7 +32,7 @@ import {coerceObservable} from './util/coerce-observable';
 import {RenderContext} from './types/render-context';
 import {StreamDirectiveContext} from './types/stream-directive-context';
 import {setupOperator$} from './util/setup-operator';
-import {createIntersectionObserver} from '@angular-kit/rx/platform';
+import {createIntersectionObserver} from './util/create-intersection-observer';
 import {supportsIntersectionObserver} from './util/supports-intersection-observer';
 
 @Directive({
