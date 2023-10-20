@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.2.3](https://github.com/mikelgo/angular-kit/compare/stream-2.2.2...stream-2.2.3) (2023-10-20)
+
+
+### Bug Fixes
+
+* **stream:** fix template context typing ([f5b4e05](https://github.com/mikelgo/angular-kit/commit/f5b4e05a5075150436f8afa2b93eb24c8a534021))
+
+
+
 ## [2.2.2](https://github.com/mikelgo/angular-kit/compare/stream-2.2.1...stream-2.2.2) (2023-10-20)
 
 
