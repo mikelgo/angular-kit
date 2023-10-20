@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [2.2.0](https://github.com/mikelgo/angular-kit/compare/stream-2.1.0...stream-2.2.0) (2023-10-20)
+
+
+### Reverts
+
+* Revert "chore(stream): release version 2.1.0" ([c5ad7bd](https://github.com/mikelgo/angular-kit/commit/c5ad7bdd76aed85c4bcd4fed1c5af619570a9360))
+
+
+
 ## [2.0.1](https://github.com/mikelgo/angular-kit/compare/stream-2.0.0...stream-2.0.1) (2023-10-20)
 
 
