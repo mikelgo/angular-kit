@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.2.4](https://github.com/mikelgo/angular-kit/compare/stream-2.2.3...stream-2.2.4) (2023-10-20)
+
+
+### Bug Fixes
+
+* **stream:** remove null union from context ([37e5553](https://github.com/mikelgo/angular-kit/commit/37e55530743cf8deaf487f87eb6bb0cedfad0a3a))
+
+
+
 ## [2.2.3](https://github.com/mikelgo/angular-kit/compare/stream-2.2.2...stream-2.2.3) (2023-10-20)
 
 
