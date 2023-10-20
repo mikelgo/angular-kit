@@ -1,4 +1,13 @@
-import { ChangeDetectorRef, ErrorHandler, inject, Injectable, OnDestroy, Optional, ViewRef } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  DestroyRef,
+  ErrorHandler,
+  inject,
+  Injectable, Injector,
+  OnDestroy,
+  Optional, runInInjectionContext,
+  ViewRef
+} from '@angular/core';
 import { catchError, EMPTY, Observable, ReplaySubject, Subscription, tap } from 'rxjs';
 
 /**
@@ -118,35 +127,39 @@ type ReactiveEffectsTeardown = {
  *     }
  * })
  */
-export function reactiveEffects(setupFn: ReactiveEffectsSetupFn): ReactiveEffectsTeardown {
+export function reactiveEffects(setupFn: ReactiveEffectsSetupFn, options?: {
+  injector?: Injector
+}): ReactiveEffectsTeardown {
     // todo Angular-16 assertInInjectionContext(reactiveEffects);
-    const errorHandler = inject(ErrorHandler, { optional: true });
-    const effects = new RxEffects(errorHandler);
+    return runInInjectionContext(options?.injector ?? inject(Injector), () => {
+      const errorHandler = inject(ErrorHandler, { optional: true });
+      const effects = new RxEffects(errorHandler);
 
-    const teardownFn = setupFn?.({
+      const teardownFn = setupFn?.({
         register: effects.register.bind(effects),
         registerOnTeardown: effects.registerOnTeardown.bind(effects),
         unregister: effects.unregister.bind(effects)
-    });
+      });
 
-    const terminate = () => {
-      if (typeof teardownFn === 'function'){
-        teardownFn();
+      const terminate = () => {
+        if (typeof teardownFn === 'function'){
+          teardownFn();
+        }
+
+        effects.ngOnDestroy();
       }
 
-      effects.ngOnDestroy();
-    }
+      onDestroy(() => terminate());
 
-    onDestroy(() => terminate());
+      return {
+        terminate: () => terminate()
+      }
+    })
 
-    return {
-      terminate: () => terminate()
-    }
 }
 
 function onDestroy(teardown: () => void) {
-    // todo Angular-16: replace with DestroyRef
-    const viewRef = inject(ChangeDetectorRef) as ViewRef;
+    const viewRef = inject(DestroyRef) ;
 
     viewRef?.onDestroy(() => {
         teardown();

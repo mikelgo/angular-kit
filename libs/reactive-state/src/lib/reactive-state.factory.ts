@@ -1,4 +1,12 @@
-import { ChangeDetectorRef, inject, OnChanges, ViewRef } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  DestroyRef,
+  inject,
+  Injector,
+  OnChanges,
+  runInInjectionContext,
+  ViewRef
+} from '@angular/core';
 import { State } from './types/state';
 import { ReactiveState } from './reactive-state';
 
@@ -48,31 +56,33 @@ export type SetupFn<T extends State> = (
  *     connect({...)})
  * })
  */
-export function reactiveState<T extends State>(setupFn?: SetupFn<T>): ReactiveState<T> {
-    const state = new ReactiveState<T>();
+export function reactiveState<T extends State>(setupFn?: SetupFn<T>, options?: {
+  injector?: Injector
+}): ReactiveState<T> {
+    const injector = options?.injector ?? inject(Injector)
+    return runInInjectionContext(injector, () => {
+      const state = new ReactiveState<T>();
 
-    // TODO check if i want to use this
-    // I think I will remove the useOnChangea$ from the API
-    // @ts-ignore
-    const teardown = setupFn?.({
+      const teardown = setupFn?.({
         connect: state.connect.bind(state),
         useAccumulatorFn: state.useAccumulatorFn.bind(state),
         select: state.select.bind(state),
         initialize:  state.initialize.bind(state)
-    });
+      });
 
-    onDestroy(() => {
+      onDestroy(() => {
         state.ngOnDestroy();
         if (teardown) {
-            teardown();
+          teardown();
         }
-    });
-    return state;
+      });
+      return state;
+    })
+
 }
 
 function onDestroy(teardown: TeardownFn) {
-    // todo Angular-16: replace with DestroyRef
-    const viewRef = inject(ChangeDetectorRef) as ViewRef;
+    const viewRef = inject(DestroyRef) ;
 
     viewRef?.onDestroy(() => {
         teardown();

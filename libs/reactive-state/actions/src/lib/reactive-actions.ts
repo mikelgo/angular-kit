@@ -1,4 +1,12 @@
-import { ChangeDetectorRef, ErrorHandler, inject, ViewRef } from "@angular/core";
+import {
+  ChangeDetectorRef,
+  DestroyRef,
+  ErrorHandler,
+  inject,
+  Injector,
+  runInInjectionContext,
+  ViewRef
+} from "@angular/core";
 import { Actions, ActionTransforms, ReactiveActions } from "./types";
 import { ReactiveActionFactory } from "./actions.factory";
 
@@ -33,33 +41,35 @@ import { ReactiveActionFactory } from "./actions.factory";
  *
  */
 export function reactiveActions<T extends Partial<Actions>, U extends ActionTransforms<T> = object>(
-    setupFn?: (cfg: { transforms: (t: U) => void }) => void
+    setupFn?: (cfg: { transforms: (t: U) => void }) => void, options?: {injector?: Injector}
 ): ReactiveActions<T, U> {
     // todo Angular-16
     // assertInInjectionContext(rxActions);
-    const errorHandler = inject(ErrorHandler, { optional: true });
-    const factory = new ReactiveActionFactory<T>(errorHandler);
-    let transformsMap = {} as U;
+    return runInInjectionContext(options?.injector ?? inject(Injector), () => {
+      const errorHandler = inject(ErrorHandler, { optional: true });
+      const factory = new ReactiveActionFactory<T>(errorHandler);
+      let transformsMap = {} as U;
 
-    /**
-     * @internal
-     * Internally used to clean up potential subscriptions to the subjects. (For Actions it is most probably a rare case but still important to care about)
-     */
-    onDestroy(() => {
+      /**
+       * @internal
+       * Internally used to clean up potential subscriptions to the subjects. (For Actions it is most probably a rare case but still important to care about)
+       */
+      onDestroy(() => {
         factory.ngOnDestroy();
-    });
+      });
 
-    // run setup function if given
-    setupFn &&
-        setupFn({
-            transforms: (t: U) => (transformsMap = t)
-        });
+      // run setup function if given
+      setupFn &&
+      setupFn({
+        transforms: (t: U) => (transformsMap = t)
+      });
 
-    return factory.create<U>(transformsMap);
+      return factory.create<U>(transformsMap);
+  })
+
 }
 function onDestroy(teardown: () => void) {
-    // todo Angular-16: replace with DestroyRef
-    const viewRef = inject(ChangeDetectorRef) as ViewRef;
+    const viewRef = inject(DestroyRef) ;
 
     viewRef?.onDestroy(() => {
         teardown();
