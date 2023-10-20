@@ -41,10 +41,10 @@ import {supportsIntersectionObserver} from './util/supports-intersection-observe
 })
 export class StreamDirective<T> implements OnInit, OnDestroy {
   private readonly config: StreamDirectiveConfig | null = injectStreamDirectiveConfig();
-  private readonly templateRef: TemplateRef<StreamDirectiveContext<T>> = inject(TemplateRef);
+  private readonly templateRef: TemplateRef<StreamDirectiveContext<T>> = inject(TemplateRef<StreamDirectiveContext<T>>);
   private readonly viewContainerRef: ViewContainerRef = inject(ViewContainerRef);
 
-  private source$$ = new ReplaySubject<Observable<any>>(1);
+  private source$$ = new ReplaySubject<Observable<T | null>>(1);
   private refreshEffect$$ = new ReplaySubject<Subject<any>>(1);
   private loadingTemplate$$ = new ReplaySubject<TemplateRef<StreamDirectiveContext<T>>>(1);
   private renderCallback$$: ReplaySubject<RenderContext<T>> | undefined;
@@ -59,7 +59,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
    * The source of the values to be rendered.
    * @param source
    */
-  @Input() set stream(source: Observable<any>) {
+  @Input() set stream(source: Observable<T | null>) {
     if (source) {
       this.source$$.next(source);
     }
@@ -214,6 +214,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
   ): context is StreamDirectiveContext<T> {
     return true;
   }
+  static ngTemplateGuard_stream: 'binding';
 
 
 
@@ -260,7 +261,7 @@ export class StreamDirective<T> implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (val) => {
-          const v = val[0] as any;
+          const v = val[0] as T | null;
           const visible = val[1] ?? true;
           /**
            * only update the view if the value has changed and the view is visible

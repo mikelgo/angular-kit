@@ -2,7 +2,7 @@
  * @description
  * Context for the *stream-directive.
  */
-export interface StreamDirectiveContext<T = any> {
+export interface StreamDirectiveContext<T> {
   $implicit: T | null;
   stream: T | null;
   error: any;

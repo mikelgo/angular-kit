@@ -13,7 +13,8 @@ export interface StreamDirectiveConfig {
 
 const STREAM_DIR_CONFIG = new InjectionToken<StreamDirectiveConfig>('STREAM_DIR_CONFIG');
 
-export const STREAM_DIR_CONTEXT = new InjectionToken<StreamDirectiveContext>('STREAM_DIR_CONTEXT');
+// todo fix any
+export const STREAM_DIR_CONTEXT = new InjectionToken<StreamDirectiveContext<any>>('STREAM_DIR_CONTEXT');
 
 
 export function provideStreamDirectiveConfig(config: StreamDirectiveConfig): Provider {
@@ -28,6 +29,6 @@ export function injectStreamDirectiveConfig(): StreamDirectiveConfig | null{
   return inject(STREAM_DIR_CONFIG, {optional: true});
 }
 
-export function injectStreamDirectiveContext(): StreamDirectiveContext {
+export function injectStreamDirectiveContext<T>(): StreamDirectiveContext<T> {
   return inject(STREAM_DIR_CONTEXT);
 }
