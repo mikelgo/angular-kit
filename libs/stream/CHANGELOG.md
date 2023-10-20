@@ -2,6 +2,16 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [2.1.0](https://github.com/mikelgo/angular-kit/compare/stream-2.0.0...stream-2.1.0) (2023-10-20)
+
+
+### Bug Fixes
+
+* **stream:** correct peer dependency for standalone directive to 15.0.0 ([51fd99c](https://github.com/mikelgo/angular-kit/commit/51fd99c0b99239d40d21b2899752d66a9f273a4a))
+* **stream:** handle subscription correctly ([0ffa5e1](https://github.com/mikelgo/angular-kit/commit/0ffa5e1fb2c4dec3b8e3c04a1efb33170eaf6538)), closes [#69](https://github.com/mikelgo/angular-kit/issues/69)
+
+
+
 ## [2.0.1](https://github.com/mikelgo/angular-kit/compare/stream-2.0.0...stream-2.0.1) (2023-10-20)
 
 
