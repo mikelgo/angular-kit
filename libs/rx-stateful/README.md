@@ -30,7 +30,7 @@ import { rxStateful$ } from '@angular-kit/rx-stateful';
  * { value: 3, hasValue: true, context: 'next', hasError: false, error: undefined },
  * ]
  */
-const stateful$ = rxStateful$(of(1, 2, 3)).state$;
+const stateful$ = rxStateful$(of(1, 2, 3));
 ```
 
 #### Async source Observable
@@ -45,18 +45,18 @@ import { rxStateful$ } from '@angular-kit/rx-stateful';
  * ]
  */
 
-const stateful$ = rxStateful$(from(fetch('...'))).state$;
+const stateful$ = rxStateful$(from(fetch('...')));
 ```
 
 ### API
 #### Observable based API
-`rxStateful$` returns several Observables:
-- `state$` - the stateful stream with all information combined
-- `value$` - the value
-- `hasValue$` - boolean if a value is present
-- `context$` - the context of the stream ('suspense', 'next', 'error', 'complete')
-- `hasError$` - boolean if an error is present
-- `error$` - the error, if present
+`rxStateful$` returns a Observable of with following properties:
+- `value` - the value
+- `hasValue` - boolean if a value is present
+- `context` - the context of the stream ('suspense', 'next', 'error', 'complete')
+- `hasError` - boolean if an error is present
+- `error` - the error, if present
+- `isSuspense` - suspense/loading state
 
 
 ### Configuration
