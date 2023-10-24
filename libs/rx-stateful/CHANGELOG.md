@@ -2,6 +2,26 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.5.0](https://github.com/mikelgo/angular-kit/compare/rx-stateful-1.4.0...rx-stateful-1.5.0) (2023-10-24)
+
+
+### Bug Fixes
+
+* **rx-stateful:** refetchOnTrigger strategy does now not emit additional value when trigger is BehaviorSubject ([2919a79](https://github.com/mikelgo/angular-kit/commit/2919a79e3af2d639b3d478d7e560ad4fcbfd696d)), closes [#92](https://github.com/mikelgo/angular-kit/issues/92)
+
+
+### Features
+
+* **rx-stateful:** add refetch strategies ([6ab36bc](https://github.com/mikelgo/angular-kit/commit/6ab36bcf62a5e813e75e12df6f92be2bce529570))
+* **rx-stateful:** allow refetchStrategies to be RefetchStragegy or array of RefetchStrategies ([e7c06cc](https://github.com/mikelgo/angular-kit/commit/e7c06cc2ad3a27d5b52dfce067ec5855f4e14f0f))
+* **rx-stateful:** default generic E to unkown on RxStatefulMock to improve developer ergonomics ([eb87731](https://github.com/mikelgo/angular-kit/commit/eb877318dcf884d7c07dc8633cb0ba6bd4de2e15))
+* **rx-stateful:** enhance RestClient request signature ([0c34496](https://github.com/mikelgo/angular-kit/commit/0c3449637d3fd10e8b956b1ea6eb6e5cfdc5c836))
+* **rx-stateful:** enhance RxStatefulClient config with AutoRefetchStrategy ([a5060b7](https://github.com/mikelgo/angular-kit/commit/a5060b70896d632139feea772fae3ccc8b9bf83f))
+* **rx-stateful:** simplify API ([9847578](https://github.com/mikelgo/angular-kit/commit/98475781d799ffddfb7fb64cc1044e76c8feb327))
+* **rx-stateful:** update testing package to simplified API ([aba0b34](https://github.com/mikelgo/angular-kit/commit/aba0b34b776c73fe69aa91d99ca5f5199bea4261))
+
+
+
 # [1.4.0](https://github.com/mikelgo/angular-kit/compare/rx-stateful-1.3.7...rx-stateful-1.4.0) (2023-09-07)
 
 
