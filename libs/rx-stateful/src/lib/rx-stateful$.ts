@@ -96,7 +96,7 @@ function createState$<T, E>(source$: Observable<T>, mergedConfig: RxStatefulConf
     distinctUntilChanged(),
     share({
       connector: () => new ReplaySubject(1),
-      resetOnError: false,
+      resetOnError: true,
       resetOnComplete: true,
       resetOnRefCountZero: true,
     }),
