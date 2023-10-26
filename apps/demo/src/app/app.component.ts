@@ -25,7 +25,6 @@ import {HttpClient} from "@angular/common/http";
         NavComponent,
         RouterOutlet,
         DemoOnchangesComponent,
-        StreamDirective,
         RxObserveResizeDirective,
         RxRenderInViewportDirective,
         RxObserveVisibilityDirective,
