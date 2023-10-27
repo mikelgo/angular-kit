@@ -71,7 +71,7 @@ export class DemoRxStatefulComponent {
   );
 
   fetch(delayInMs = 800) {
-    return this.http.get<any>('https://jsonplaceholder.typicode.com/todos/1').pipe(
+    return this.http.get<any>('https://jsonplaceholder.typicode.com/todos/1s').pipe(
       delay(delayInMs),
       map((v) => v?.title)
     );

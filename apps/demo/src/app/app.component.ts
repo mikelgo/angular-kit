@@ -35,13 +35,7 @@ import {HttpClient} from "@angular/common/http";
 export class AppComponent {
 
     constructor() {
-        const http = inject(HttpClient)
-        const source = http.get('https://jsonplaceholder.typicode.com/todos/1').pipe(
-            delay(400),
-        )
 
-        const query = createQuery$(source)
-        query.subscribe(console.log)
     }
 }
 interface Query<T> {
