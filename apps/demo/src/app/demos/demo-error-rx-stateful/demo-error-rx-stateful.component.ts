@@ -1,18 +1,18 @@
 import {Component, inject} from '@angular/core';
-import {CommonModule} from '@angular/common';
+import { CommonModule } from '@angular/common';
 import {rxStateful$, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
 import {
+  catchError,
   concatMap,
-  map,
-  MonoTypeOperatorFunction,
-  Observable,
+  debounceTime,
+  EMPTY, map, MonoTypeOperatorFunction,
+  NEVER, Observable,
   of,
-  ReplaySubject,
-  scan,
-  share,
-  Subject,
-  switchMap,
-  tap
+  ReplaySubject, scan,
+  share, shareReplay,
+  Subject, switchMap,
+  tap,
+  throwError
 } from "rxjs";
 import {HttpClient} from "@angular/common/http";
 
@@ -59,9 +59,7 @@ import {HttpClient} from "@angular/common/http";
       <div>
         <div>current id{{id$ | async}}</div>
         <div>
-          <ul *ngFor="let v of newPlainRx$ | async">
-            <li>{{ v | json }}</li>
-          </ul>
+
         </div>
       </div>
     </div>
@@ -109,7 +107,7 @@ export class DemoErrorRxStatefulComponent {
   )
 
   chainRx$ = this.idRx$.pipe(
-    concatMap(id => rxStateful$(this.http.get(`https://jsonplaceholder.typicode.com/posts/${id}`)).pipe(
+    switchMap(id => rxStateful$(this.http.get(`https://jsonplaceholder.typicode.com/posts/${id}`)).pipe(
       log('chainRx inner$')
     )),
     log('chainRx$'),
@@ -122,43 +120,16 @@ export class DemoErrorRxStatefulComponent {
     )),
     log('chainErrorRx$ outer')
   )
-  plainRx$ = rxStateful$(this.http.get('https://jsonplaceholder.typicode.com/posts/1'), {
-    refetchStrategies: [withRefetchOnTrigger(this.idRx$$)]
-  }).pipe(
-    log('plainRx$'),
-      share({
-        connector: () => new ReplaySubject(1),
-        resetOnRefCountZero: true
-      }),
-      scan((acc, value, index) => {
-          // @ts-ignore
-          acc.push({ index, value });
-
-          return acc;
-      }, [])
-  )
-
-  newPlainRx$ = rxStateful$((id) => this.http.get(`https://jsonplaceholder.typicode.com/posts/${id}`), this.idRx$).pipe(
-     // log('newPlainRx$'),
-      scan((acc, value, index) => {
-        // @ts-ignore
-        acc.push({ index, value });
-
-        return acc;
-      }, [])
+  plainRx$ = rxStateful$(this.http.get('https://jsonplaceholder.typicode.com/posts/1')).pipe(
+    log('plainRx$')
   )
 
   constructor() {
     //this.chainError$.subscribe()
     //this.chainError$.subscribe()
 
-    //this.chainRx$.subscribe()
-    //this.chainRx$.subscribe()
-
-    //this.plainRx$.subscribe()
-    //this.plainRx$.subscribe()
-
-    // todo newPlainRx$
+    this.chainRx$.subscribe()
+    this.chainRx$.subscribe()
   }
 
 
