@@ -20,9 +20,6 @@ import {_handleSyncValue} from './util/handle-sync-value';
 import {defaultAccumulationFn} from './types/accumulation-fn';
 import {createRxStateful} from './util/create-rx-stateful';
 import {mergeRefetchStrategies} from "./refetch-strategies/merge-refetch-strategies";
-import {isFunctionGuard, isRxStatefulConfigOrObsGuard} from "./types/guards";
-import {isObservableOrSubject} from "./refetch-strategies/refetch-on-auto.strategy";
-
 
 /**
  * @publicApi
@@ -40,10 +37,6 @@ import {isObservableOrSubject} from "./refetch-strategies/refetch-on-auto.strate
  * @param source$ - The source$ to enhance with additional state information.
  */
 export function rxStateful$<T, E = unknown>(source$: Observable<T>): Observable< RxStateful<T, E>>;
-
-export function rxStateful$<T,A, E = unknown>(sourceFn$: (arg: A) => Observable<T>, sourceTrigger$: Observable<A> | Subject<A>): Observable< RxStateful<T, E>>;
-export function rxStateful$<T,A, E = unknown>(sourceFn$: (arg: A) => Observable<T>, sourceTrigger$: Observable<A> | Subject<A>, config: RxStatefulConfig<T, E>): Observable< RxStateful<T, E>>;
-
 /**
  * @publicApi
  *
@@ -55,16 +48,13 @@ export function rxStateful$<T,A, E = unknown>(sourceFn$: (arg: A) => Observable<
  * @param config - Configuration for rxStateful$.
  */
 export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig<T, E>): Observable<RxStateful<T, E>>;
-// previous: export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxStatefulConfig<T, E>): Observable<RxStateful<T, E>>
-export function rxStateful$<T,A, E = unknown>(
-    sourceOrFn$: Observable<T> | ((arg: A) => Observable<T>),
-    configOrSourceTrigger?: RxStatefulConfig<T, E> | Observable<A> | Subject<A>,
-    config?: RxStatefulConfig<T, E>
-): Observable<RxStateful<T, E>> {
+export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxStatefulConfig<T, E>): Observable<RxStateful<T, E>> {
   // todo Angular 16
   // const injector = config?.injector ?? inject(Injector);
   // todo Angular-16 runInInjectionContext(injector)
-
+  // todo add overload: (arg: A) => source$, requestTrigger$: Observable/Subject<A>, config$
+  // ---> todo when this overload is uses make sure tat emission is done from beginning
+  // --> potentiaonally also easier impl then for non flicker loader
     /**
      * requestTrigger$ gegeben:
      *  requestTrigger$ nutzen, um requests auszuführen
@@ -78,41 +68,24 @@ export function rxStateful$<T,A, E = unknown>(
      * kein requestTrigger$ gegeben w/ refetchStrategies
      *  Artificial starter -> BehaviorSubject
      */
-    let configFromParams: RxStatefulConfig<T, E> | undefined = undefined
-    if (config){
-        configFromParams = config
-    } else {
-        if(configOrSourceTrigger){
-            if (isRxStatefulConfigOrObsGuard(configOrSourceTrigger)){
-                configFromParams = configOrSourceTrigger as RxStatefulConfig<T, E>
-            }
-        }
-    }
-
     const mergedConfig: RxStatefulConfig<T, E> = {
       keepValueOnRefresh: false,
       keepErrorOnRefresh: false,
-      ...configFromParams,
+      ...config,
     };
 
-    const sourceTrigger$ = isObservableOrSubject(configOrSourceTrigger) ? configOrSourceTrigger : undefined;
-
-    return createRxStateful<T, E>(createState$<T,A, E>(sourceOrFn$, mergedConfig, sourceTrigger$), mergedConfig);
+    return createRxStateful<T, E>(createState$<T, E>(source$, mergedConfig), mergedConfig);
 
 
 }
 
 
 
-function createState$<T, A, E>(
-    sourceOrFn$: Observable<T> | ((arg: A) => Observable<T>),
-    mergedConfig: RxStatefulConfig<T, E>,
-    sourceTrigger$?: Observable<A> | Subject<A>
-    ) {
+function createState$<T, E>(source$: Observable<T>, mergedConfig: RxStatefulConfig<T, E>) {
   const accumulationFn = mergedConfig.accumulationFn ?? defaultAccumulationFn;
   const error$$ = new Subject<RxStatefulWithError<T, E>>();
 
-  const sharedSource$ = initSharedSource(sourceOrFn$, error$$, mergedConfig, sourceTrigger$);
+  const sharedSource$ = initSharedSource(source$, error$$, mergedConfig);
   const refreshedRequest$: Observable<Partial<InternalRxState<T, E>>> = refreshedRequestSource(sharedSource$, mergedConfig)
 
     return merge( refreshedRequest$, error$$).pipe(
@@ -141,57 +114,26 @@ function createState$<T, A, E>(
   );
 }
 
-function initSharedSource<T,A, E>(
-  sourceOrFn$: Observable<T> | ((arg: A) => Observable<T>),
+function initSharedSource<T, E>(
+  source$: Observable<T>,
   error$$: Subject<RxStatefulWithError<T, E>>,
-  mergedConfig: RxStatefulConfig<T, E>,
-  sourceTrigger$?: Observable<A> | Subject<A>
+  mergedConfig: RxStatefulConfig<T, E>
 ): Observable<T> {
-    /**
-     * TODO cope with sourceOrFn$: Observable<T> | ((arg: A) => Observable<T>)
-     * not entirly correct, now my suspense states do no longer work
-     * Ich muss loc 161 eigentlich in der refreshed source anwenden
-     */
-
-    if (isFunctionGuard(sourceOrFn$)){
-        // effectTrigger.asObservable().pipe(concatMap((arg: Targ) => effectSource(arg)));
-        if (!sourceTrigger$){
-            throw new Error('sourceTrigger$ is required when sourceOrFn$ is a function')
-        }
-        return sourceTrigger$?.pipe(
-            switchMap(arg => sourceOrFn$(arg)),
-            share({
-                connector: () => new ReplaySubject(1),
-                resetOnError: true,
-                resetOnComplete: true,
-                resetOnRefCountZero: true,
-            }),
-            catchError((error: E) => {
-                mergedConfig?.beforeHandleErrorFn?.(error);
-                const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E) => (error as any)?.message);
-                error$$.next({ error: errorMappingFn(error), context: 'error',   isLoading: false,
-                    isRefreshing: false, value: null });
-                return NEVER;
-            }),
-        );
-    } else {
-        return sourceOrFn$.pipe(
-            share({
-                connector: () => new ReplaySubject(1),
-                resetOnError: true,
-                resetOnComplete: true,
-                resetOnRefCountZero: true,
-            }),
-            catchError((error: E) => {
-                mergedConfig?.beforeHandleErrorFn?.(error);
-                const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E) => (error as any)?.message);
-                error$$.next({ error: errorMappingFn(error), context: 'error',   isLoading: false,
-                    isRefreshing: false, value: null });
-                return NEVER;
-            })
-        );
-    }
-
+  return source$.pipe(
+    share({
+      connector: () => new ReplaySubject(1),
+      resetOnError: true,
+      resetOnComplete: true,
+      resetOnRefCountZero: true,
+    }),
+    catchError((error: E) => {
+      mergedConfig?.beforeHandleErrorFn?.(error);
+      const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E) => (error as any)?.message);
+      error$$.next({ error: errorMappingFn(error), context: 'error',   isLoading: false,
+          isRefreshing: false, value: null });
+      return NEVER;
+    })
+  );
 }
 
 
@@ -253,5 +195,3 @@ function deriveInitialValue<T, E>(mergedConfig: RxStatefulConfig<T,E>){
 
     return startWith(value)
 }
-
-
