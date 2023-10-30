@@ -149,7 +149,8 @@ function initSharedSource<T,A, E>(
 ): Observable<T> {
     /**
      * TODO cope with sourceOrFn$: Observable<T> | ((arg: A) => Observable<T>)
-     * wenn we have function we know that we also have requesttrigger
+     * not entirly correct, now my suspense states do no longer work
+     * Ich muss loc 161 eigentlich in der refreshed source anwenden
      */
 
     if (isFunctionGuard(sourceOrFn$)){
@@ -171,7 +172,7 @@ function initSharedSource<T,A, E>(
                 error$$.next({ error: errorMappingFn(error), context: 'error',   isLoading: false,
                     isRefreshing: false, value: null });
                 return NEVER;
-            })
+            }),
         );
     } else {
         return sourceOrFn$.pipe(
