@@ -1,19 +1,19 @@
 import {
-  BehaviorSubject,
-  catchError,
-  distinctUntilChanged,
-  map,
-  merge,
-  NEVER,
-  Observable,
-  pipe,
-  ReplaySubject,
-  scan,
-  share,
-  skip,
-  startWith,
-  Subject,
-  switchMap, tap,
+    BehaviorSubject,
+    catchError,
+    distinctUntilChanged,
+    map,
+    merge,
+    NEVER,
+    Observable,
+    pipe,
+    ReplaySubject,
+    scan,
+    share,
+    skip,
+    startWith,
+    Subject,
+    switchMap,
 } from 'rxjs';
 import {InternalRxState, RxStateful, RxStatefulConfig, RxStatefulWithError,} from './types/types';
 import {_handleSyncValue} from './util/handle-sync-value';
@@ -52,7 +52,22 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxS
   // todo Angular 16
   // const injector = config?.injector ?? inject(Injector);
   // todo Angular-16 runInInjectionContext(injector)
-
+  // todo add overload: (arg: A) => source$, requestTrigger$: Observable/Subject<A>, config$
+  // ---> todo when this overload is uses make sure tat emission is done from beginning
+  // --> potentiaonally also easier impl then for non flicker loader
+    /**
+     * requestTrigger$ gegeben:
+     *  requestTrigger$ nutzen, um requests auszuführen
+     *  Argument nutzen
+     *  refreshVerhalten: gleicher Request mit gleichem Argument wiederholen (bzw. letzem)
+     *  referesh$.pipe(withLatestFrom(requestTrigger$)) ?
+     *
+     * kein requestTrigger$ gegeben w/o refetchStrategies
+     *  Artificial starter -> BehaviorSubject
+     *
+     * kein requestTrigger$ gegeben w/ refetchStrategies
+     *  Artificial starter -> BehaviorSubject
+     */
     const mergedConfig: RxStatefulConfig<T, E> = {
       keepValueOnRefresh: false,
       keepErrorOnRefresh: false,
@@ -69,16 +84,11 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>, config?: RxS
 function createState$<T, E>(source$: Observable<T>, mergedConfig: RxStatefulConfig<T, E>) {
   const accumulationFn = mergedConfig.accumulationFn ?? defaultAccumulationFn;
   const error$$ = new Subject<RxStatefulWithError<T, E>>();
-  const refresh$ = merge(
-      mergedConfig?.refreshTrigger$ ?? new Subject<unknown>(),
-      ...mergeRefetchStrategies(mergedConfig?.refetchStrategies)
-  )
 
   const sharedSource$ = initSharedSource(source$, error$$, mergedConfig);
-  const request$: Observable<Partial<InternalRxState<T, E>>> = requestSource(sharedSource$);
-  const refreshedRequest$: Observable<Partial<InternalRxState<T, E>>> = refreshedRequestSource(sharedSource$, refresh$, mergedConfig)
+  const refreshedRequest$: Observable<Partial<InternalRxState<T, E>>> = refreshedRequestSource(sharedSource$, mergedConfig)
 
-    return merge(request$, refreshedRequest$, error$$).pipe(
+    return merge( refreshedRequest$, error$$).pipe(
         /**
          * todo
          * this is a bit hacky as value can not be undefined (it is typed
@@ -127,25 +137,18 @@ function initSharedSource<T, E>(
 }
 
 
-function requestSource<T, E>(source$: Observable<T>): Observable<Partial<InternalRxState<T, E>>> {
-  return source$.pipe(
-    map(
-      (v) =>
-        ({ value: v, isLoading: false, isRefreshing: false, context: 'next', error: undefined } as Partial<
-          InternalRxState<T, E>
-        >)
-    ),
-    startWith({ isLoading: true, isRefreshing: false, context: 'suspense' } as Partial<InternalRxState<T, E>>)
-  );
-}
-
 function refreshedRequestSource<T, E>(
   sharedSource$: Observable<T>,
-  refresh$: Observable<any>,
   mergedConfig: RxStatefulConfig<T, E>
 ): Observable<Partial<InternalRxState<T, E>>> {
   const refreshTriggerIsBehaivorSubject = (config: RxStatefulConfig<T, E>) =>
     config.refreshTrigger$ instanceof BehaviorSubject;
+
+  const refresh$ = merge(
+        new BehaviorSubject(null),
+        mergedConfig?.refreshTrigger$ ?? new Subject<unknown>(),
+        ...mergeRefetchStrategies(mergedConfig?.refetchStrategies)
+    )
   return refresh$.pipe(
     /**
      * in case the refreshTrigger$ is a BehaviorSubject, we want to skip the first value
@@ -169,6 +172,7 @@ function refreshedRequestSource<T, E>(
 }
 
 function deriveInitialValue<T, E>(mergedConfig: RxStatefulConfig<T,E>){
+    // TODO for first emission set isRefreshing to false
     let value: Partial<InternalRxState<T, E>> = {
         isLoading: true,
         isRefreshing: true,
