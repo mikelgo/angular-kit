@@ -11,6 +11,10 @@ export function isRxStatefulConfigOrObsGuard<T,E>(arg: any): arg is RxStatefulCo
     return !(isObservableOrSubjectGuard(arg))
 }
 
+export function isRxStatefulConfigOrSourceTriggerConfigGuard<T,E>(arg: any): arg is RxStatefulConfig<T, E>{
+    // write type guard for RxStatefulConfig
+    return (arg as any)?.trigger !== undefined
+}
 export function isFunctionGuard(value: any): value is (...args: any[]) => any {
     return typeof value === 'function';
 }
