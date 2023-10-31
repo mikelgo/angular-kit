@@ -1,19 +1,7 @@
 import {Component, inject} from '@angular/core';
-import { CommonModule } from '@angular/common';
-import {rxStateful$, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
-import {
-  catchError,
-  concatMap,
-  debounceTime,
-  EMPTY, map, MonoTypeOperatorFunction,
-  NEVER, Observable,
-  of,
-  ReplaySubject, scan,
-  share, shareReplay,
-  Subject, switchMap,
-  tap,
-  throwError
-} from "rxjs";
+import {CommonModule} from '@angular/common';
+import {rxStateful$} from "@angular-kit/rx-stateful";
+import {map, MonoTypeOperatorFunction, Observable, of, scan, share, Subject, switchMap, tap} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 
 
@@ -59,7 +47,9 @@ import {HttpClient} from "@angular/common/http";
       <div>
         <div>current id{{id$ | async}}</div>
         <div>
-
+          <ul *ngFor="let v of newPlainRx$ | async">
+            <li>{{ v | json }}</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -108,9 +98,9 @@ export class DemoErrorRxStatefulComponent {
 
   chainRx$ = this.idRx$.pipe(
     switchMap(id => rxStateful$(this.http.get(`https://jsonplaceholder.typicode.com/posts/${id}`)).pipe(
-      log('chainRx inner$')
+        // log('chainRx inner$')
     )),
-    log('chainRx$'),
+   // log('chainRx$'),
     share()
   )
 
@@ -124,12 +114,26 @@ export class DemoErrorRxStatefulComponent {
     log('plainRx$')
   )
 
+  newPlainRx$ = of(null)
+  /*
+  newPlainRx$ = rxStateful$((id) => this.http.get(`https://jsonplaceholder.typicode.com/posts/${id}`), this.idRx$).pipe(
+      // log('newPlainRx$'),
+      scan((acc, value, index) => {
+        // @ts-ignore
+        acc.push({ index, value });
+
+        return acc;
+      }, [])
+  )
+  */
+
+
   constructor() {
     //this.chainError$.subscribe()
     //this.chainError$.subscribe()
 
-    this.chainRx$.subscribe()
-    this.chainRx$.subscribe()
+    //this.chainRx$.subscribe()
+    //this.chainRx$.subscribe()
   }
 
 
