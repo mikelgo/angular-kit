@@ -20,5 +20,5 @@ export function isFunctionGuard(value: any): value is (...args: any[]) => any {
 }
 
 export function isSourceTriggerConfigGuard<T>(arg: any): arg is SourceTriggerConfig<T>{
-    return isObservableOrSubjectGuard(arg?.trigger) ;
+    return arg?.sourceTriggerConfig !== undefined;
 }

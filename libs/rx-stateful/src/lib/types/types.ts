@@ -114,3 +114,10 @@ export interface SourceTriggerConfig<A> {
    */
   operator?: 'switch' | 'merge' | 'concat' | 'exhaust';
 }
+
+export type RxStatefulSourceTriggerConfig<T,A, E = unknown> = RxStatefulConfig<T, E> &{
+  /**
+   *
+   */
+  sourceTriggerConfig: SourceTriggerConfig<A>
+}

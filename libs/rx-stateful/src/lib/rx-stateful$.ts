@@ -22,12 +22,17 @@ import {
     switchMap,
     tap,
 } from 'rxjs';
-import {InternalRxState, RxStateful, RxStatefulConfig, RxStatefulWithError, SourceTriggerConfig,} from './types/types';
+import {
+    InternalRxState,
+    RxStateful,
+    RxStatefulConfig,
+    RxStatefulSourceTriggerConfig,
+    RxStatefulWithError,
+} from './types/types';
 import {_handleSyncValue} from './util/handle-sync-value';
 import {defaultAccumulationFn} from './types/accumulation-fn';
 import {createRxStateful} from './util/create-rx-stateful';
 import {mergeRefetchStrategies} from "./refetch-strategies/merge-refetch-strategies";
-import {deriveConfigFromParams} from "./util/derive-config-from-params";
 import {isFunctionGuard, isSourceTriggerConfigGuard} from "./types/guards";
 
 
@@ -47,9 +52,6 @@ import {isFunctionGuard, isSourceTriggerConfigGuard} from "./types/guards";
  * @param source$ - The source$ to enhance with additional state information.
  */
 export function rxStateful$<T, E = unknown>(source$: Observable<T>): Observable< RxStateful<T, E>>;
-
-export function rxStateful$<T,A, E = unknown>(sourceFn$: (arg: A) => Observable<T>, sourceTrigger: SourceTriggerConfig<A>): Observable< RxStateful<T, E>>;
-export function rxStateful$<T,A, E = unknown>(sourceFn$: (arg: A) => Observable<T>, sourceTrigger: SourceTriggerConfig<A>, config: RxStatefulConfig<T, E>): Observable< RxStateful<T, E>>;
 /**
  * @publicApi
  *
@@ -61,10 +63,12 @@ export function rxStateful$<T,A, E = unknown>(sourceFn$: (arg: A) => Observable<
  * @param config - Configuration for rxStateful$.
  */
 export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig<T, E>): Observable<RxStateful<T, E>>;
+export function rxStateful$<T,A, E = unknown>(sourceFn$: (arg: A) => Observable<T>, sourceTriggerConfig: RxStatefulSourceTriggerConfig<T,A, E>): Observable< RxStateful<T, E>>;
+
+
 export function rxStateful$<T,A, E = unknown>(
     sourceOrSourceFn$: Observable<T> | ((arg: A) => Observable<T>),
-    configOrSourceTrigger?: RxStatefulConfig<T, E> | SourceTriggerConfig<A>,
-    config?: RxStatefulConfig<T, E>,
+    config?: RxStatefulConfig<T, E> | RxStatefulSourceTriggerConfig<T,A,E>,
 ): Observable<RxStateful<T, E>> {
     // todo Angular 16
     // const injector = config?.injector ?? inject(Injector);
@@ -73,18 +77,17 @@ export function rxStateful$<T,A, E = unknown>(
     const mergedConfig: RxStatefulConfig<T, E> = {
         keepValueOnRefresh: false,
         keepErrorOnRefresh: false,
-        ...deriveConfigFromParams(configOrSourceTrigger, config),
+        ...config
     };
 
-    return createRxStateful<T, E>(createState$<T,A, E>(sourceOrSourceFn$, mergedConfig, configOrSourceTrigger), mergedConfig);
+    return createRxStateful<T, E>(createState$<T,A, E>(sourceOrSourceFn$, mergedConfig), mergedConfig);
 
 }
 
 
 function createState$<T,A, E>(
     sourceOrSourceFn$: Observable<T> | ((arg: A) => Observable<T>),
-    mergedConfig: RxStatefulConfig<T, E>,
-    configOrSourceTrigger?: RxStatefulConfig<T, E> | SourceTriggerConfig<A>,
+    mergedConfig: RxStatefulConfig<T, E> | RxStatefulSourceTriggerConfig<T,A,E>,
 ) {
     /**
      * TODO
@@ -94,8 +97,11 @@ function createState$<T,A, E>(
     const accumulationFn = mergedConfig.accumulationFn ?? defaultAccumulationFn;
     const error$$ = new Subject<RxStatefulWithError<T, E>>();
 
+    const refreshTriggerIsBehaivorSubject = (config: RxStatefulConfig<T, E>) =>
+        config.refreshTrigger$ instanceof BehaviorSubject;
+
     // case 1: SourceTriggerConfig given --> sourceOrSourceFn$ is function
-    if (isFunctionGuard(sourceOrSourceFn$) && isSourceTriggerConfigGuard(configOrSourceTrigger)){
+    if (isFunctionGuard(sourceOrSourceFn$) && isSourceTriggerConfigGuard(mergedConfig)){
    /*     let cachedArgument: A | undefined = undefined
         const s$ = sourceTrigger.pipe(
             tap(arg => cachedArgument = arg),
@@ -114,7 +120,7 @@ function createState$<T,A, E>(
         );
         return merge(refreshed$, s$);*/
         let cachedArgument: A | undefined = undefined
-        const valueFromSourceTrigger$ = configOrSourceTrigger.trigger.pipe(
+        const valueFromSourceTrigger$ = (mergedConfig as RxStatefulSourceTriggerConfig<T,A,E>)?.sourceTriggerConfig.trigger.pipe(
             tap(arg => cachedArgument = arg),
             // TODO consider operator
             switchMap(arg => sourceOrSourceFn$(arg).pipe(
@@ -137,7 +143,7 @@ function createState$<T,A, E>(
         )
 
         const refreshTrigger$ = merge(
-            new BehaviorSubject(null),
+            // new BehaviorSubject(null),
             mergedConfig?.refreshTrigger$ ?? new Subject<unknown>(),
             ...mergeRefetchStrategies(mergedConfig?.refetchStrategies)
         );
@@ -155,6 +161,8 @@ function createState$<T,A, E>(
              * TODO
              * verify if we can safely ignore that cachedArgument is undefined.
              * Theoretically we need to check if s$ has emitted a value before then cachedArgument is defined.
+             *
+             * TODO --> we definately need to handle it
              */
             // @ts-ignore
             switchMap(() => sourceOrSourceFn$(cachedArgument).pipe(
@@ -203,7 +211,7 @@ function createState$<T,A, E>(
         );
 
 
-        return of({} as InternalRxState<T>)
+        //return of({} as InternalRxState<T>)
     }
 
     // case 2: no SourceTriggerConfig given --> sourceOrSourceFn$ is Observable
@@ -224,8 +232,7 @@ function createState$<T,A, E>(
             })
         );
 
-        const refreshTriggerIsBehaivorSubject = (config: RxStatefulConfig<T, E>) =>
-            config.refreshTrigger$ instanceof BehaviorSubject;
+
 
         const refresh$ = merge(
             new BehaviorSubject(null),
