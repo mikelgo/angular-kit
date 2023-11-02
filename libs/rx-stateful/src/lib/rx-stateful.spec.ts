@@ -1,4 +1,4 @@
-import {map, mergeAll, Observable, Subject, throwError} from 'rxjs';
+import {mergeAll, Observable, of, scan, Subject, throwError} from 'rxjs';
 import {subscribeSpyTo} from '@hirez_io/observer-spy';
 import {rxStateful$} from './rx-stateful$';
 import {fakeAsync, TestBed, tick} from '@angular/core/testing';
@@ -22,8 +22,8 @@ describe('rxStateful$', () => {
 
       source$.next(10);
       expect(result.getValues()).toEqual([
-        { hasValue: false, isSuspense: true, hasError: false, context: 'suspense' },
-        { hasValue: true, isSuspense: false, value: 10, hasError: false, context: 'next' },
+        { hasValue: false, isSuspense: true, hasError: false, context: 'suspense', value: null, error: undefined },
+        { hasValue: true, isSuspense: false, value: 10, hasError: false, context: 'next', error: undefined },
       ]);
     });
     test('should emit correct state when error happens', () => {
@@ -33,7 +33,7 @@ describe('rxStateful$', () => {
       source$.next(throwError(() => new Error('error')));
 
       expect(result.getValues()).toEqual([
-        { hasValue: false, isSuspense: true, hasError: false, context: 'suspense' },
+        { hasValue: false, isSuspense: true, hasError: false, context: 'suspense', value: null, error: undefined  },
         { hasValue: false, isSuspense: false, value: null, hasError: true, context: 'error', error: 'error' },
       ]);
     })
@@ -52,10 +52,10 @@ describe('rxStateful$', () => {
         //source$.next(throwError(() => new Error('error')));
 
         expect(result.getValues()).toEqual([
-          { hasValue: false, isSuspense: true, hasError: false, context: 'suspense' },
-          { hasValue: true, isSuspense: false, value: 10, hasError: false, context: 'next' },
-          { hasValue: false, isSuspense: true, value: null, context: 'suspense', hasError: false },
-          { hasValue: true, isSuspense: false, value: 10, context: 'next', hasError: false },
+          { hasValue: false, isSuspense: true, hasError: false, context: 'suspense', value: null, error: undefined  },
+          { hasValue: true, isSuspense: false, value: 10, hasError: false, context: 'next', error: undefined },
+          { hasValue: false, isSuspense: true, value: null, context: 'suspense', hasError: false , error: undefined},
+          { hasValue: true, isSuspense: false, value: 10, context: 'next', hasError: false, error: undefined },
           // { hasValue: true, isSuspense: true, value: null, context: 'suspense', hasError: false },
           //{ hasValue: false, isSuspense: false, value: null, context: 'error', hasError: true, error: 'error' },
         ]);
@@ -71,7 +71,7 @@ describe('rxStateful$', () => {
       source$.next(throwError(() => new Error('error')));
 
       expect(result.getValues()).toEqual([
-        { hasValue: false, isSuspense: true, hasError: false, context: 'suspense' },
+        { hasValue: false, isSuspense: true, hasError: false, context: 'suspense', error: undefined, value: null },
         { hasValue: false, isSuspense: false, value: null, hasError: true, context: 'error', error: 'error' },
         { hasValue: false, isSuspense: true, value: null, hasError: false, context: 'suspense', error: undefined },
         { hasValue: false, isSuspense: false, value: null, hasError: true, context: 'error', error: 'error' },
@@ -94,7 +94,7 @@ describe('rxStateful$', () => {
 
           expect(result.getValues()).toEqual([
             // todo first emission does not contain value: null?
-            { hasValue: false, isSuspense: true, hasError: false, context: 'suspense', error: undefined },
+            { hasValue: false, isSuspense: true, hasError: false, context: 'suspense', error: undefined, value: null },
             { hasValue: false, isSuspense: false, hasError: true, context: 'error', error: 'error', value: null },
             { hasValue: false, isSuspense: true, hasError: false, context: 'suspense', error: undefined, value: null },
             { hasValue: false, isSuspense: false, value: null, hasError: true, context: 'error', error: 'error' },
@@ -114,7 +114,7 @@ describe('rxStateful$', () => {
 
           expect(result.getValues()).toEqual([
               // todo first emission does not contain value: null?
-            { hasValue: false, isSuspense: true,  hasError: false, context: 'suspense', error: undefined },
+            { hasValue: false, isSuspense: true,  hasError: false, context: 'suspense', error: undefined, value:null },
             { hasValue: false, isSuspense: false, value: null, hasError: true, context: 'error', error: 'error' },
             { hasValue: false, isSuspense: true, value: null, hasError: true, context: 'suspense', error: 'error' },
             { hasValue: false, isSuspense: false, value: null, hasError: true, context: 'error', error: 'error' },
@@ -158,7 +158,9 @@ describe('rxStateful$', () => {
           "context": "suspense",
           "hasError": false,
           "hasValue": false,
-          "isSuspense": true
+          "isSuspense": true,
+          value: undefined,
+          error: undefined
         },
         {
           "context": "next",
@@ -376,5 +378,36 @@ describe('rxStateful$', () => {
       ]);
     }));
   });
+  describe('sourcetrigger', () => {
+    it('should use argument of sourceTrigger', () => {
+      const trigger$$ = new Subject<number>()
+      const trigger$ = trigger$$.pipe(
+          scan((acc, val )=> acc + val, 0)
+      )
+      const refetch$$ = new Subject<null>()
+      const result = subscribeSpyTo(
+          rxStateful$((n: number) => of(n), {
+            sourceTriggerConfig: {
+              trigger: trigger$
+            },
+            refetchStrategies: [
+                withRefetchOnTrigger(refetch$$)
+            ]
+          })
+      )
+
+        trigger$$.next(1)
+        trigger$$.next(1)
+        refetch$$.next(null)
+      expect(result.getValues()).toEqual([
+        { hasValue: false, isSuspense: true, hasError: false, context: 'suspense', value: null, error: undefined },
+        { hasValue: true, isSuspense: false, value: 1, hasError: false, context: 'next', error: undefined },
+        { hasValue: false, isSuspense: true, hasError: false, context: 'suspense', value: null, error: undefined },
+        { hasValue: true, isSuspense: false, value: 2, hasError: false, context: 'next', error: undefined },
+        { hasValue: false, isSuspense: true, hasError: false, context: 'suspense', value: null, error: undefined },
+        { hasValue: true, isSuspense: false, value: 2, hasError: false, context: 'next', error: undefined },
+      ])
+    })
+  })
 
 });
