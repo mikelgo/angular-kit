@@ -1,11 +1,17 @@
 import {
     BehaviorSubject,
     catchError,
+    concatMap,
     distinctUntilChanged,
+    exhaustMap,
+    isObservable,
     map,
     merge,
+    mergeMap,
+    MonoTypeOperatorFunction,
     NEVER,
     Observable,
+    of,
     pipe,
     ReplaySubject,
     scan,
@@ -21,8 +27,8 @@ import {defaultAccumulationFn} from './types/accumulation-fn';
 import {createRxStateful} from './util/create-rx-stateful';
 import {mergeRefetchStrategies} from "./refetch-strategies/merge-refetch-strategies";
 import {deriveConfigFromParams} from "./util/derive-config-from-params";
+import {isFunctionGuard, isSourceTriggerConfigGuard} from "./types/guards";
 
-type FlatteningStrategy = 'switch' | 'merge' | 'concat' | 'exhaust';
 
 /**
  * @publicApi
@@ -87,81 +93,94 @@ function createState$<T,A, E>(
     const accumulationFn = mergedConfig.accumulationFn ?? defaultAccumulationFn;
     const error$$ = new Subject<RxStatefulWithError<T, E>>();
 
-    const sharedSource$ =  sourceOrSourceFn$.pipe(
-        share({
-            connector: () => new ReplaySubject(1),
-            resetOnError: true,
-            resetOnComplete: true,
-            resetOnRefCountZero: true,
-        }),
-        catchError((error: E) => {
-            mergedConfig?.beforeHandleErrorFn?.(error);
-            const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E) => (error as any)?.message);
-            error$$.next({ error: errorMappingFn(error), context: 'error',   isLoading: false,
-                isRefreshing: false, value: null });
-            return NEVER;
-        })
-    );
+    // case 1: SourceTriggerConfig given --> sourceOrSourceFn$ is function
+    if (isFunctionGuard(sourceOrSourceFn$) && isSourceTriggerConfigGuard(configOrSourceTrigger)){
 
-    // const refreshedRequest$: Observable<Partial<InternalRxState<T, E>>> = refreshedRequestSource(sharedSource$, mergedConfig)
 
-    const refreshTriggerIsBehaivorSubject = (config: RxStatefulConfig<T, E>) =>
-        config.refreshTrigger$ instanceof BehaviorSubject;
 
-    const refresh$ = merge(
-        new BehaviorSubject(null),
-        mergedConfig?.refreshTrigger$ ?? new Subject<unknown>(),
-        ...mergeRefetchStrategies(mergedConfig?.refetchStrategies)
-    )
-    const refreshedRequest$: Observable<Partial<InternalRxState<T, E>>> = refresh$.pipe(
-        /**
-         * in case the refreshTrigger$ is a BehaviorSubject, we want to skip the first value
-         * bc otherwise the emissions are not correct. It will then emit 4 vales instead of 2.
-         * the 2 additional values come from isRefreshing which is not correct.
-         */
-        // @ts-ignore todo
-        refreshTriggerIsBehaivorSubject(mergedConfig) ? skip(1) : pipe(),
-        switchMap(() =>
-            sharedSource$.pipe(
-                map(
-                    (v) =>
-                        ({ value: v, isLoading: false, isRefreshing: false, context: 'next', error: undefined } as Partial<
-                            InternalRxState<T, E>
-                        >)
-                ),
-                deriveInitialValue<T,E>(mergedConfig)
-            )
+        return of({} as InternalRxState<T>)
+    }
+
+    // case 2: no SourceTriggerConfig given --> sourceOrSourceFn$ is Observable
+    if(isObservable(sourceOrSourceFn$)){
+        const sharedSource$ =  sourceOrSourceFn$.pipe(
+            share({
+                connector: () => new ReplaySubject(1),
+                resetOnError: true,
+                resetOnComplete: true,
+                resetOnRefCountZero: true,
+            }),
+            catchError((error: E) => {
+                mergedConfig?.beforeHandleErrorFn?.(error);
+                const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E) => (error as any)?.message);
+                error$$.next({ error: errorMappingFn(error), context: 'error',   isLoading: false,
+                    isRefreshing: false, value: null });
+                return NEVER;
+            })
+        );
+
+        const refreshTriggerIsBehaivorSubject = (config: RxStatefulConfig<T, E>) =>
+            config.refreshTrigger$ instanceof BehaviorSubject;
+
+        const refresh$ = merge(
+            new BehaviorSubject(null),
+            mergedConfig?.refreshTrigger$ ?? new Subject<unknown>(),
+            ...mergeRefetchStrategies(mergedConfig?.refetchStrategies)
         )
-    ) as Observable<Partial<InternalRxState<T, E>>>
+        const refreshedRequest$: Observable<Partial<InternalRxState<T, E>>> = refresh$.pipe(
+            /**
+             * in case the refreshTrigger$ is a BehaviorSubject, we want to skip the first value
+             * bc otherwise the emissions are not correct. It will then emit 4 vales instead of 2.
+             * the 2 additional values come from isRefreshing which is not correct.
+             */
+            // @ts-ignore todo
+            refreshTriggerIsBehaivorSubject(mergedConfig) ? skip(1) : pipe(),
+            switchMap(() =>
+                sharedSource$.pipe(
+                    map(
+                        (v) =>
+                            ({ value: v, isLoading: false, isRefreshing: false, context: 'next', error: undefined } as Partial<
+                                InternalRxState<T, E>
+                            >)
+                    ),
+                    deriveInitialValue<T,E>(mergedConfig)
+                )
+            )
+        ) as Observable<Partial<InternalRxState<T, E>>>
+
+        return merge( refreshedRequest$, error$$).pipe(
+            /**
+             * todo
+             * this is a bit hacky as value can not be undefined (it is typed
+             * as T | null). However when I change to null some side effets happen.
+             * Need investigation!!!
+             */
+            // @ts-ignore
+            scan(accumulationFn, {
+                isLoading: false,
+                isRefreshing: false,
+                value: undefined,
+                error: undefined,
+                context: 'suspense',
+            }),
+            distinctUntilChanged(),
+            share({
+                connector: () => new ReplaySubject(1),
+                resetOnError: true,
+                resetOnComplete: true,
+                resetOnRefCountZero: true,
+            }),
+            _handleSyncValue()
+        );
+    }
+
+
+
+    return of({} as InternalRxState<T>)
 
 
 
 
-
-    return merge( refreshedRequest$, error$$).pipe(
-        /**
-         * todo
-         * this is a bit hacky as value can not be undefined (it is typed
-         * as T | null). However when I change to null some side effets happen.
-         * Need investigation!!!
-         */
-        // @ts-ignore
-        scan(accumulationFn, {
-            isLoading: false,
-            isRefreshing: false,
-            value: undefined,
-            error: undefined,
-            context: 'suspense',
-        }),
-        distinctUntilChanged(),
-        share({
-            connector: () => new ReplaySubject(1),
-            resetOnError: true,
-            resetOnComplete: true,
-            resetOnRefCountZero: true,
-        }),
-        _handleSyncValue()
-    );
 }
 
 
@@ -189,4 +208,25 @@ function deriveInitialValue<T, E>(mergedConfig: RxStatefulConfig<T,E>){
 
 
     return startWith(value)
+}
+
+
+function applyFlatteningOperator<T>(
+    operator: 'switch' | 'merge' | 'concat' | 'exhaust' | undefined,
+    sourceFn: (arg: T) => Observable<T>
+): MonoTypeOperatorFunction<T>{
+    return source => {
+        switch (operator) {
+            case 'switch':
+                return source.pipe(switchMap(sourceFn))
+            case 'merge':
+                return source.pipe(mergeMap(sourceFn))
+            case 'concat':
+                return source.pipe(concatMap(sourceFn))
+            case 'exhaust':
+                return source.pipe(exhaustMap(sourceFn))
+            default:
+                return source.pipe(switchMap(sourceFn))
+        }
+    }
 }
