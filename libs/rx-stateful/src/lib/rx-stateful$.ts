@@ -143,16 +143,10 @@ function createState$<T,A, E>(
              */
             // @ts-ignore
             switchMap(() => sourceOrSourceFn$(cachedArgument).pipe(
-                map(
-                    (v) =>
-                        ({ value: v, isLoading: false, isRefreshing: false, context: 'next', error: undefined } as Partial<
-                            InternalRxState<T, E>
-                        >)
-                ),
+                map(v => mapToValue(v)),
                 deriveInitialValue<T,E>(mergedConfig),
                 catchError((error: E) => handleError<T,E>(error, mergedConfig, error$$))
             )),
-            map((value) => value)
         );
         return merge(refreshedValue$, valueFromSourceTrigger$, error$$).pipe(
             /**
@@ -210,12 +204,7 @@ function createState$<T,A, E>(
             refreshTriggerIsBehaivorSubject(mergedConfig) ? skip(1) : pipe(),
             switchMap(() =>
                 sharedSource$.pipe(
-                    map(
-                        (v) =>
-                            ({ value: v, isLoading: false, isRefreshing: false, context: 'next', error: undefined } as Partial<
-                                InternalRxState<T, E>
-                            >)
-                    ),
+                    map(v => mapToValue(v)),
                     deriveInitialValue<T,E>(mergedConfig)
                 )
             )
@@ -286,4 +275,8 @@ function handleError<T,E>(error: E, mergedConfig: RxStatefulConfig<T, E>, error$
         error$$.next({ error: errorMappingFn(error), context: 'error',   isLoading: false,
             isRefreshing: false, value: null });
         return NEVER;
+}
+
+function mapToValue<T,E>(value: T):  Partial<InternalRxState<T, E>>{
+    return ({ value, isLoading: false, isRefreshing: false, context: 'next', error: undefined } )
 }
