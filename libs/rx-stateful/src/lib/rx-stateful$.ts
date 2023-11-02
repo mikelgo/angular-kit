@@ -102,23 +102,6 @@ function createState$<T,A, E>(
 
     // case 1: SourceTriggerConfig given --> sourceOrSourceFn$ is function
     if (isFunctionGuard(sourceOrSourceFn$) && isSourceTriggerConfigGuard(mergedConfig)){
-   /*     let cachedArgument: A | undefined = undefined
-        const s$ = sourceTrigger.pipe(
-            tap(arg => cachedArgument = arg),
-            switchMap((arg) => source(arg).pipe(startWith({ isSuspense: true }))),
-            share({
-                connector: () => new ReplaySubject(1),
-                resetOnRefCountZero: true,
-            })
-        );
-        const trigger = refreshTrigger;
-
-        const refreshed$ = trigger.pipe(
-            //refreshTrigger instanceof BehaviorSubject ? pipe() : startWith(null),
-            switchMap((arg) => source(cachedArgument).pipe(startWith({ isSuspense: true }))),
-            map((value) => value)
-        );
-        return merge(refreshed$, s$);*/
         let cachedArgument: A | undefined = undefined
         const valueFromSourceTrigger$ = (mergedConfig as RxStatefulSourceTriggerConfig<T,A,E>)?.sourceTriggerConfig.trigger.pipe(
             tap(arg => cachedArgument = arg),
@@ -210,8 +193,11 @@ function createState$<T,A, E>(
             _handleSyncValue()
         );
 
+        /**
+         * TODO 's left
+         * Why do we get isLoading and isRefreshing in the suspense emission?
+         */
 
-        //return of({} as InternalRxState<T>)
     }
 
     // case 2: no SourceTriggerConfig given --> sourceOrSourceFn$ is Observable
