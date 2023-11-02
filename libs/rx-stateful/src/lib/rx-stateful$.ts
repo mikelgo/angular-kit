@@ -1,14 +1,10 @@
 import {
     BehaviorSubject,
     catchError,
-    concatMap,
     distinctUntilChanged,
-    exhaustMap,
     isObservable,
     map,
     merge,
-    mergeMap,
-    MonoTypeOperatorFunction,
     NEVER,
     Observable,
     of,
@@ -34,6 +30,7 @@ import {defaultAccumulationFn} from './types/accumulation-fn';
 import {createRxStateful} from './util/create-rx-stateful';
 import {mergeRefetchStrategies} from "./refetch-strategies/merge-refetch-strategies";
 import {isFunctionGuard, isSourceTriggerConfigGuard} from "./types/guards";
+import {applyFlatteningOperator} from "./util/apply-flattening-operator";
 
 
 /**
@@ -105,11 +102,13 @@ function createState$<T,A, E>(
         let cachedArgument: A | undefined = undefined
         const valueFromSourceTrigger$ = (mergedConfig as RxStatefulSourceTriggerConfig<T,A,E>)?.sourceTriggerConfig.trigger.pipe(
             tap(arg => cachedArgument = arg),
-            // TODO consider operator
-            switchMap(arg => sourceOrSourceFn$(arg).pipe(
-                // TODO is this correct?
-                deriveInitialValue<T,E>(mergedConfig)
-            )),
+            applyFlatteningOperator(
+                (mergedConfig as RxStatefulSourceTriggerConfig<T, A,E>)?.sourceTriggerConfig?.operator,
+                arg => sourceOrSourceFn$(arg).pipe(
+                    // TODO is this correct?
+                    deriveInitialValue<T,E>(mergedConfig)
+                )
+            ),
             map(
                 (v) =>
                     ({ value: v, isLoading: false, isRefreshing: false, context: 'next', error: undefined } as Partial<
@@ -273,7 +272,7 @@ function createState$<T,A, E>(
     }
 
 
-
+    // todo throw error?
     return of({} as InternalRxState<T>)
 
 
@@ -309,22 +308,3 @@ function deriveInitialValue<T, E>(mergedConfig: RxStatefulConfig<T,E>){
 }
 
 
-function applyFlatteningOperator<T>(
-    operator: 'switch' | 'merge' | 'concat' | 'exhaust' | undefined,
-    sourceFn: (arg: T) => Observable<T>
-): MonoTypeOperatorFunction<T>{
-    return source => {
-        switch (operator) {
-            case 'switch':
-                return source.pipe(switchMap(sourceFn))
-            case 'merge':
-                return source.pipe(mergeMap(sourceFn))
-            case 'concat':
-                return source.pipe(concatMap(sourceFn))
-            case 'exhaust':
-                return source.pipe(exhaustMap(sourceFn))
-            default:
-                return source.pipe(switchMap(sourceFn))
-        }
-    }
-}
