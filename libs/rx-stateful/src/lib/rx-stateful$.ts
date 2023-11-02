@@ -107,12 +107,7 @@ function createState$<T,A, E>(
             applyFlatteningOperator(
                 (mergedConfig as RxStatefulSourceTriggerConfig<T, A,E>)?.sourceTriggerConfig?.operator,
                 arg => sourceOrSourceFn$(arg).pipe(
-                    map(
-                        (v) =>
-                            ({ value: v, isLoading: false, isRefreshing: false, context: 'next', error: undefined } as Partial<
-                                InternalRxState<T, E>
-                            >)
-                    ),
+                    map(v => mapToValue(v)),
                     deriveInitialValue<T,E>(mergedConfig),
                 )
             ),
@@ -120,13 +115,11 @@ function createState$<T,A, E>(
         )
 
         const refreshTrigger$ = merge(
-            // new BehaviorSubject(null),
             mergedConfig?.refreshTrigger$ ?? new Subject<unknown>(),
             ...mergeRefetchStrategies(mergedConfig?.refetchStrategies)
         );
 
         const refreshedValue$ = refreshTrigger$.pipe(
-            //refreshTrigger instanceof BehaviorSubject ? pipe() : startWith(null),
             /**
              * in case the refreshTrigger$ is a BehaviorSubject, we want to skip the first value
              * bc otherwise the emissions are not correct. It will then emit 4 vales instead of 2.

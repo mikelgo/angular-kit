@@ -1,7 +1,7 @@
 import {Component, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {rxStateful$} from "@angular-kit/rx-stateful";
-import {map, MonoTypeOperatorFunction, Observable, of, scan, share, Subject, switchMap, tap} from "rxjs";
+import {rxStateful$, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
+import {concatMap, map, MonoTypeOperatorFunction, Observable, of, scan, share, Subject, switchMap, tap} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 
 
@@ -43,10 +43,20 @@ import {HttpClient} from "@angular/common/http";
     <div>
       <button (click)="id$$.next(1)">trigger</button>
       <button (click)="plainMethod()">plainMethod</button>
-      <button (click)="idRx$$.next(1)">trigger rx</button>
+      <button (click)="refreshRx$.next(null)">refresh trigger rx</button>
+      <button (click)="idRx$$.next(1)">source trigger rx</button>
+
       <div>
         <div>current id{{id$ | async}}</div>
         <div>
+          <h2>only with refresh</h2>
+          <ul *ngFor="let v of rxNormal$ | async">
+            <li>{{ v | json }}</li>
+          </ul>
+        </div>
+        <hr>
+        <div>
+          <h2>new source trigger</h2>
           <ul *ngFor="let v of newPlainRx$ | async">
             <li>{{ v | json }}</li>
           </ul>
@@ -68,7 +78,7 @@ export class DemoErrorRxStatefulComponent {
   plainMethodResult: any = null
 
   chain$ = this.id$.pipe(
-    switchMap(id => this.http.get(`https://jsonplaceholder.typicode.com/posts/${id}`).pipe(
+    concatMap(id => this.http.get(`https://jsonplaceholder.typicode.com/posts/${id}`).pipe(
       log('chain inner$')
     )),
     log('chain$')
@@ -90,21 +100,46 @@ export class DemoErrorRxStatefulComponent {
     this.plainhttp$.subscribe()
   }
 
-
+  refreshRx$ = new Subject<any>()
   idRx$$ = new Subject<number>()
   idRx$ =  this.idRx$$.pipe(
     scan((acc, val )=> acc + val, 0)
   )
 
-  chainRx$ = this.idRx$.pipe(
+  /*chainRx$ = this.idRx$.pipe(
     switchMap(id => rxStateful$(this.http.get(`https://jsonplaceholder.typicode.com/posts/${id}`)).pipe(
         // log('chainRx inner$')
     )),
+      scan((acc, value, index) => {
+        // @ts-ignore
+        acc.push({ index, value });
+
+        return acc;
+      }, []),
    // log('chainRx$'),
     share()
+  )*/
+
+  rxNormal$ = rxStateful$(this.http.get(`https://jsonplaceholder.typicode.com/posts/1`), {
+    refetchStrategies: [
+        withRefetchOnTrigger(this.refreshRx$),
+        withRefetchOnTrigger(this.idRx$$),
+        //withAutoRefetch(1000, 5000)
+    ],
+      keepValueOnRefresh: true
+
+  }).pipe(
+      scan((acc, value, index) => {
+        // @ts-ignore
+        acc.push({ index, value });
+
+        return acc;
+      }, []),
+      // log('chainRx$'),
+      share()
   )
 
-  chainErrorRx$ = this.idRx$.pipe(
+  /*chainErrorRx$ = this.idRx$.pipe(
     switchMap(id => rxStateful$(this.http.get(`https://jsonplaceholder.typicode.com/posts/${id}xx`)).pipe(
       log('chainErrorRx$ inner')
     )),
@@ -112,11 +147,17 @@ export class DemoErrorRxStatefulComponent {
   )
   plainRx$ = rxStateful$(this.http.get('https://jsonplaceholder.typicode.com/posts/1')).pipe(
     log('plainRx$')
-  )
+  )*/
 
-  newPlainRx$ = of(null)
-  /*
-  newPlainRx$ = rxStateful$((id) => this.http.get(`https://jsonplaceholder.typicode.com/posts/${id}`), this.idRx$).pipe(
+  //newPlainRx$ = of(null)
+
+  newPlainRx$ = rxStateful$(
+      (id) => this.http.get(`https://jsonplaceholder.typicode.com/posts/${id}`),
+      {
+          sourceTriggerConfig: {trigger: this.idRx$},
+          refetchStrategies: withRefetchOnTrigger(this.refreshRx$),
+      },
+  ).pipe(
       // log('newPlainRx$'),
       scan((acc, value, index) => {
         // @ts-ignore
@@ -125,7 +166,7 @@ export class DemoErrorRxStatefulComponent {
         return acc;
       }, [])
   )
-  */
+
 
 
   constructor() {
@@ -134,6 +175,8 @@ export class DemoErrorRxStatefulComponent {
 
     //this.chainRx$.subscribe()
     //this.chainRx$.subscribe()
+
+    this.chain$.subscribe()
   }
 
 
