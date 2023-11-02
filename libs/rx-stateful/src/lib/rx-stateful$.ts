@@ -40,6 +40,7 @@ type FlatteningStrategy = 'switch' | 'merge' | 'concat' | 'exhaust';
  * @param source$ - The source$ to enhance with additional state information.
  */
 export function rxStateful$<T, E = unknown>(source$: Observable<T>): Observable< RxStateful<T, E>>;
+
 export function rxStateful$<T,A, E = unknown>(sourceFn$: (arg: A) => Observable<T>, sourceTrigger: SourceTriggerConfig<A>): Observable< RxStateful<T, E>>;
 export function rxStateful$<T,A, E = unknown>(sourceFn$: (arg: A) => Observable<T>, sourceTrigger: SourceTriggerConfig<A>, config: RxStatefulConfig<T, E>): Observable< RxStateful<T, E>>;
 /**
@@ -62,31 +63,80 @@ export function rxStateful$<T,A, E = unknown>(
     // const injector = config?.injector ?? inject(Injector);
     // todo Angular-16 runInInjectionContext(injector)
 
-    /**
-     * TODO
-     * CreateState anpassen so dass es auch mit sourceFn$ funktioniert
-     */
-
     const mergedConfig: RxStatefulConfig<T, E> = {
         keepValueOnRefresh: false,
         keepErrorOnRefresh: false,
         ...deriveConfigFromParams(configOrSourceTrigger, config),
     };
 
-    return createRxStateful<T, E>(createState$<T,A, E>(sourceOrSourceFn$, mergedConfig), mergedConfig);
+    return createRxStateful<T, E>(createState$<T,A, E>(sourceOrSourceFn$, mergedConfig, configOrSourceTrigger), mergedConfig);
 
 }
 
 
 function createState$<T,A, E>(
     sourceOrSourceFn$: Observable<T> | ((arg: A) => Observable<T>),
-    mergedConfig: RxStatefulConfig<T, E>
+    mergedConfig: RxStatefulConfig<T, E>,
+    configOrSourceTrigger?: RxStatefulConfig<T, E> | SourceTriggerConfig<A>,
 ) {
+    /**
+     * TODO
+     * CreateState anpassen so dass es auch mit sourceFn$ funktioniert
+     * todo von trigger config operator nutzen
+     */
     const accumulationFn = mergedConfig.accumulationFn ?? defaultAccumulationFn;
     const error$$ = new Subject<RxStatefulWithError<T, E>>();
 
-    const sharedSource$ = initSharedSource(sourceOrSourceFn$, error$$, mergedConfig);
-    const refreshedRequest$: Observable<Partial<InternalRxState<T, E>>> = refreshedRequestSource(sharedSource$, mergedConfig)
+    const sharedSource$ =  sourceOrSourceFn$.pipe(
+        share({
+            connector: () => new ReplaySubject(1),
+            resetOnError: true,
+            resetOnComplete: true,
+            resetOnRefCountZero: true,
+        }),
+        catchError((error: E) => {
+            mergedConfig?.beforeHandleErrorFn?.(error);
+            const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E) => (error as any)?.message);
+            error$$.next({ error: errorMappingFn(error), context: 'error',   isLoading: false,
+                isRefreshing: false, value: null });
+            return NEVER;
+        })
+    );
+
+    // const refreshedRequest$: Observable<Partial<InternalRxState<T, E>>> = refreshedRequestSource(sharedSource$, mergedConfig)
+
+    const refreshTriggerIsBehaivorSubject = (config: RxStatefulConfig<T, E>) =>
+        config.refreshTrigger$ instanceof BehaviorSubject;
+
+    const refresh$ = merge(
+        new BehaviorSubject(null),
+        mergedConfig?.refreshTrigger$ ?? new Subject<unknown>(),
+        ...mergeRefetchStrategies(mergedConfig?.refetchStrategies)
+    )
+    const refreshedRequest$: Observable<Partial<InternalRxState<T, E>>> = refresh$.pipe(
+        /**
+         * in case the refreshTrigger$ is a BehaviorSubject, we want to skip the first value
+         * bc otherwise the emissions are not correct. It will then emit 4 vales instead of 2.
+         * the 2 additional values come from isRefreshing which is not correct.
+         */
+        // @ts-ignore todo
+        refreshTriggerIsBehaivorSubject(mergedConfig) ? skip(1) : pipe(),
+        switchMap(() =>
+            sharedSource$.pipe(
+                map(
+                    (v) =>
+                        ({ value: v, isLoading: false, isRefreshing: false, context: 'next', error: undefined } as Partial<
+                            InternalRxState<T, E>
+                        >)
+                ),
+                deriveInitialValue<T,E>(mergedConfig)
+            )
+        )
+    ) as Observable<Partial<InternalRxState<T, E>>>
+
+
+
+
 
     return merge( refreshedRequest$, error$$).pipe(
         /**
@@ -114,62 +164,7 @@ function createState$<T,A, E>(
     );
 }
 
-function initSharedSource<T, E>(
-    source$: Observable<T>,
-    error$$: Subject<RxStatefulWithError<T, E>>,
-    mergedConfig: RxStatefulConfig<T, E>
-): Observable<T> {
-    return source$.pipe(
-        share({
-            connector: () => new ReplaySubject(1),
-            resetOnError: true,
-            resetOnComplete: true,
-            resetOnRefCountZero: true,
-        }),
-        catchError((error: E) => {
-            mergedConfig?.beforeHandleErrorFn?.(error);
-            const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E) => (error as any)?.message);
-            error$$.next({ error: errorMappingFn(error), context: 'error',   isLoading: false,
-                isRefreshing: false, value: null });
-            return NEVER;
-        })
-    );
-}
 
-
-function refreshedRequestSource<T, E>(
-    sharedSource$: Observable<T>,
-    mergedConfig: RxStatefulConfig<T, E>
-): Observable<Partial<InternalRxState<T, E>>> {
-    const refreshTriggerIsBehaivorSubject = (config: RxStatefulConfig<T, E>) =>
-        config.refreshTrigger$ instanceof BehaviorSubject;
-
-    const refresh$ = merge(
-        new BehaviorSubject(null),
-        mergedConfig?.refreshTrigger$ ?? new Subject<unknown>(),
-        ...mergeRefetchStrategies(mergedConfig?.refetchStrategies)
-    )
-    return refresh$.pipe(
-        /**
-         * in case the refreshTrigger$ is a BehaviorSubject, we want to skip the first value
-         * bc otherwise the emissions are not correct. It will then emit 4 vales instead of 2.
-         * the 2 additional values come from isRefreshing which is not correct.
-         */
-        // @ts-ignore todo
-        refreshTriggerIsBehaivorSubject(mergedConfig) ? skip(1) : pipe(),
-        switchMap(() =>
-            sharedSource$.pipe(
-                map(
-                    (v) =>
-                        ({ value: v, isLoading: false, isRefreshing: false, context: 'next', error: undefined } as Partial<
-                            InternalRxState<T, E>
-                        >)
-                ),
-                deriveInitialValue<T,E>(mergedConfig)
-            )
-        )
-    ) as Observable<Partial<InternalRxState<T, E>>>
-}
 
 function deriveInitialValue<T, E>(mergedConfig: RxStatefulConfig<T,E>){
     // TODO for first emission set isRefreshing to false
