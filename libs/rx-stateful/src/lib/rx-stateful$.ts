@@ -116,15 +116,7 @@ function createState$<T,A, E>(
                     deriveInitialValue<T,E>(mergedConfig),
                 )
             ),
-
-
-            catchError((error: E) => {
-                mergedConfig?.beforeHandleErrorFn?.(error);
-                const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E) => (error as any)?.message);
-                error$$.next({ error: errorMappingFn(error), context: 'error',   isLoading: false,
-                    isRefreshing: false, value: null });
-                return NEVER;
-            })
+            catchError((error: E) => handleError<T,E>(error, mergedConfig, error$$))
         )
 
         const refreshTrigger$ = merge(
@@ -158,14 +150,7 @@ function createState$<T,A, E>(
                         >)
                 ),
                 deriveInitialValue<T,E>(mergedConfig),
-                // TOOD is this correct?
-                catchError((error: E) => {
-                    mergedConfig?.beforeHandleErrorFn?.(error);
-                    const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E) => (error as any)?.message);
-                    error$$.next({ error: errorMappingFn(error), context: 'error',   isLoading: false,
-                        isRefreshing: false, value: null });
-                    return NEVER;
-                })
+                catchError((error: E) => handleError<T,E>(error, mergedConfig, error$$))
             )),
             map((value) => value)
         );
@@ -205,13 +190,7 @@ function createState$<T,A, E>(
                 resetOnComplete: true,
                 resetOnRefCountZero: true,
             }),
-            catchError((error: E) => {
-                mergedConfig?.beforeHandleErrorFn?.(error);
-                const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E) => (error as any)?.message);
-                error$$.next({ error: errorMappingFn(error), context: 'error',   isLoading: false,
-                    isRefreshing: false, value: null });
-                return NEVER;
-            })
+            catchError((error: E) => handleError<T,E>(error, mergedConfig, error$$))
         );
 
 
@@ -273,8 +252,6 @@ function createState$<T,A, E>(
     return of({} as InternalRxState<T>)
 
 
-
-
 }
 
 
@@ -300,8 +277,13 @@ function deriveInitialValue<T, E>(mergedConfig: RxStatefulConfig<T,E>){
         }
     }
 
-
     return startWith(value)
 }
 
-
+function handleError<T,E>(error: E, mergedConfig: RxStatefulConfig<T, E>, error$$: Subject<RxStatefulWithError<T, E>>){
+        mergedConfig?.beforeHandleErrorFn?.(error);
+        const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E) => (error as any)?.message);
+        error$$.next({ error: errorMappingFn(error), context: 'error',   isLoading: false,
+            isRefreshing: false, value: null });
+        return NEVER;
+}
