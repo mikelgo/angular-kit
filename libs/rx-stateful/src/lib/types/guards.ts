@@ -1,4 +1,4 @@
-import {RxStatefulConfig} from "./types";
+import {RxStatefulConfig, SourceTriggerConfig} from "./types";
 import {isObservable, Observable, Subject} from "rxjs";
 
 
@@ -17,4 +17,8 @@ export function isRxStatefulConfigOrSourceTriggerConfigGuard<T,E>(arg: any): arg
 }
 export function isFunctionGuard(value: any): value is (...args: any[]) => any {
     return typeof value === 'function';
+}
+
+export function isSourceTriggerConfigGuard<T>(arg: any): arg is SourceTriggerConfig<T>{
+    return isObservableOrSubjectGuard(arg?.trigger) ;
 }

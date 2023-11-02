@@ -20,6 +20,7 @@ import {
     startWith,
     Subject,
     switchMap,
+    tap,
 } from 'rxjs';
 import {InternalRxState, RxStateful, RxStatefulConfig, RxStatefulWithError, SourceTriggerConfig,} from './types/types';
 import {_handleSyncValue} from './util/handle-sync-value';
@@ -95,7 +96,111 @@ function createState$<T,A, E>(
 
     // case 1: SourceTriggerConfig given --> sourceOrSourceFn$ is function
     if (isFunctionGuard(sourceOrSourceFn$) && isSourceTriggerConfigGuard(configOrSourceTrigger)){
+   /*     let cachedArgument: A | undefined = undefined
+        const s$ = sourceTrigger.pipe(
+            tap(arg => cachedArgument = arg),
+            switchMap((arg) => source(arg).pipe(startWith({ isSuspense: true }))),
+            share({
+                connector: () => new ReplaySubject(1),
+                resetOnRefCountZero: true,
+            })
+        );
+        const trigger = refreshTrigger;
 
+        const refreshed$ = trigger.pipe(
+            //refreshTrigger instanceof BehaviorSubject ? pipe() : startWith(null),
+            switchMap((arg) => source(cachedArgument).pipe(startWith({ isSuspense: true }))),
+            map((value) => value)
+        );
+        return merge(refreshed$, s$);*/
+        let cachedArgument: A | undefined = undefined
+        const valueFromSourceTrigger$ = configOrSourceTrigger.trigger.pipe(
+            tap(arg => cachedArgument = arg),
+            // TODO consider operator
+            switchMap(arg => sourceOrSourceFn$(arg).pipe(
+                // TODO is this correct?
+                deriveInitialValue<T,E>(mergedConfig)
+            )),
+            map(
+                (v) =>
+                    ({ value: v, isLoading: false, isRefreshing: false, context: 'next', error: undefined } as Partial<
+                        InternalRxState<T, E>
+                    >)
+            ),
+            catchError((error: E) => {
+                mergedConfig?.beforeHandleErrorFn?.(error);
+                const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E) => (error as any)?.message);
+                error$$.next({ error: errorMappingFn(error), context: 'error',   isLoading: false,
+                    isRefreshing: false, value: null });
+                return NEVER;
+            })
+        )
+
+        const refreshTrigger$ = merge(
+            new BehaviorSubject(null),
+            mergedConfig?.refreshTrigger$ ?? new Subject<unknown>(),
+            ...mergeRefetchStrategies(mergedConfig?.refetchStrategies)
+        );
+
+        const refreshedValue$ = refreshTrigger$.pipe(
+            //refreshTrigger instanceof BehaviorSubject ? pipe() : startWith(null),
+            /**
+             * in case the refreshTrigger$ is a BehaviorSubject, we want to skip the first value
+             * bc otherwise the emissions are not correct. It will then emit 4 vales instead of 2.
+             * the 2 additional values come from isRefreshing which is not correct.
+             */
+            // @ts-ignore todo
+            refreshTriggerIsBehaivorSubject(mergedConfig) ? skip(1) : pipe(),
+            /**
+             * TODO
+             * verify if we can safely ignore that cachedArgument is undefined.
+             * Theoretically we need to check if s$ has emitted a value before then cachedArgument is defined.
+             */
+            // @ts-ignore
+            switchMap(() => sourceOrSourceFn$(cachedArgument).pipe(
+                map(
+                    (v) =>
+                        ({ value: v, isLoading: false, isRefreshing: false, context: 'next', error: undefined } as Partial<
+                            InternalRxState<T, E>
+                        >)
+                ),
+                // TODO is this correct?
+                deriveInitialValue<T,E>(mergedConfig),
+                // TOOD is this correct?
+                catchError((error: E) => {
+                    mergedConfig?.beforeHandleErrorFn?.(error);
+                    const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E) => (error as any)?.message);
+                    error$$.next({ error: errorMappingFn(error), context: 'error',   isLoading: false,
+                        isRefreshing: false, value: null });
+                    return NEVER;
+                })
+            )),
+            map((value) => value)
+        );
+        return merge(refreshedValue$, valueFromSourceTrigger$, error$$).pipe(
+            /**
+             * todo
+             * this is a bit hacky as value can not be undefined (it is typed
+             * as T | null). However when I change to null some side effets happen.
+             * Need investigation!!!
+             */
+            // @ts-ignore
+            scan(accumulationFn, {
+                isLoading: false,
+                isRefreshing: false,
+                value: undefined,
+                error: undefined,
+                context: 'suspense',
+            }),
+            distinctUntilChanged(),
+            share({
+                connector: () => new ReplaySubject(1),
+                resetOnError: true,
+                resetOnComplete: true,
+                resetOnRefCountZero: true,
+            }),
+            _handleSyncValue()
+        );
 
 
         return of({} as InternalRxState<T>)
