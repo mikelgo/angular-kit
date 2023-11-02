@@ -60,6 +60,15 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>): Observable<
  * @param config - Configuration for rxStateful$.
  */
 export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig<T, E>): Observable<RxStateful<T, E>>;
+/**
+ * @publicApi
+ *
+ * @example
+ * const sourceTrigger$$ = new Subject<string>()
+ * const rxStateful$ = rxStateful$((arg: string) => httpClient.get(`https://my-api.com/${arg}`), { keepValueOnRefresh: true, sourceTriggerConfig: {trigger: sourceTrigger$$}})
+ * @param sourceFn$
+ * @param sourceTriggerConfig
+ */
 export function rxStateful$<T,A, E = unknown>(sourceFn$: (arg: A) => Observable<T>, sourceTriggerConfig: RxStatefulSourceTriggerConfig<T,A, E>): Observable< RxStateful<T, E>>;
 
 
@@ -67,9 +76,6 @@ export function rxStateful$<T,A, E = unknown>(
     sourceOrSourceFn$: Observable<T> | ((arg: A) => Observable<T>),
     config?: RxStatefulConfig<T, E> | RxStatefulSourceTriggerConfig<T,A,E>,
 ): Observable<RxStateful<T, E>> {
-    // todo Angular 16
-    // const injector = config?.injector ?? inject(Injector);
-    // todo Angular-16 runInInjectionContext(injector)
 
     const mergedConfig: RxStatefulConfig<T, E> = {
         keepValueOnRefresh: false,
@@ -77,7 +83,7 @@ export function rxStateful$<T,A, E = unknown>(
         ...config
     };
 
-    return createRxStateful<T, E>(createState$<T,A, E>(sourceOrSourceFn$, mergedConfig), mergedConfig);
+    return createRxStateful<T, E>(createState$<T,A, E>(sourceOrSourceFn$, mergedConfig), mergedConfig)
 
 }
 
@@ -86,11 +92,7 @@ function createState$<T,A, E>(
     sourceOrSourceFn$: Observable<T> | ((arg: A) => Observable<T>),
     mergedConfig: RxStatefulConfig<T, E> | RxStatefulSourceTriggerConfig<T,A,E>,
 ) {
-    /**
-     * TODO
-     * CreateState anpassen so dass es auch mit sourceFn$ funktioniert
-     * todo von trigger config operator nutzen
-     */
+
     const accumulationFn = mergedConfig.accumulationFn ?? defaultAccumulationFn;
     const error$$ = new Subject<RxStatefulWithError<T, E>>();
 
@@ -105,16 +107,17 @@ function createState$<T,A, E>(
             applyFlatteningOperator(
                 (mergedConfig as RxStatefulSourceTriggerConfig<T, A,E>)?.sourceTriggerConfig?.operator,
                 arg => sourceOrSourceFn$(arg).pipe(
-                    // TODO is this correct?
-                    deriveInitialValue<T,E>(mergedConfig)
+                    map(
+                        (v) =>
+                            ({ value: v, isLoading: false, isRefreshing: false, context: 'next', error: undefined } as Partial<
+                                InternalRxState<T, E>
+                            >)
+                    ),
+                    deriveInitialValue<T,E>(mergedConfig),
                 )
             ),
-            map(
-                (v) =>
-                    ({ value: v, isLoading: false, isRefreshing: false, context: 'next', error: undefined } as Partial<
-                        InternalRxState<T, E>
-                    >)
-            ),
+
+
             catchError((error: E) => {
                 mergedConfig?.beforeHandleErrorFn?.(error);
                 const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E) => (error as any)?.message);
@@ -154,7 +157,6 @@ function createState$<T,A, E>(
                             InternalRxState<T, E>
                         >)
                 ),
-                // TODO is this correct?
                 deriveInitialValue<T,E>(mergedConfig),
                 // TOOD is this correct?
                 catchError((error: E) => {
@@ -190,12 +192,7 @@ function createState$<T,A, E>(
                 resetOnRefCountZero: true,
             }),
             _handleSyncValue()
-        );
-
-        /**
-         * TODO 's left
-         * Why do we get isLoading and isRefreshing in the suspense emission?
-         */
+        )
 
     }
 
