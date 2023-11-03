@@ -1,4 +1,4 @@
-import {Subject} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {RxStatefulAccumulationFn} from "./accumulation-fn";
 import {RefetchStrategy} from "../refetch-strategies/refetch-strategy";
 
@@ -106,4 +106,18 @@ export interface RxStatefulConfig<T, E = unknown> {
   suspenseConfig?: RxStatefulSuspenseConfig;
 }
 
+export interface SourceTriggerConfig<A> {
+  trigger: Observable<A> | Subject<A>;
+  /**
+   *
+   * default: 'switch'
+   */
+  operator?: 'switch' | 'merge' | 'concat' | 'exhaust';
+}
 
+export type RxStatefulSourceTriggerConfig<T,A, E = unknown> = RxStatefulConfig<T, E> &{
+  /**
+   *
+   */
+  sourceTriggerConfig: SourceTriggerConfig<A>
+}

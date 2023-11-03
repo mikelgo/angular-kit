@@ -34,6 +34,7 @@ const stateful$ = rxStateful$(of(1, 2, 3));
 ```
 
 #### Async source Observable
+#### Basic Usage
 ```typescript
 import { rxStateful$ } from '@angular-kit/rx-stateful';
 
@@ -48,8 +49,22 @@ import { rxStateful$ } from '@angular-kit/rx-stateful';
 const stateful$ = rxStateful$(from(fetch('...')));
 ```
 
+#### 
+
+```ts
+
+const trigger$$ = new Subject<number>()
+const refresh$$ = new Subject<void>()
+const stateful$ = rxStateful$((id: number) => from(fetch(`.../${id}`)), {
+    sourceTriggerConfig: {
+        trigger: trigger$$
+    },
+    refetchStrategy: withRefetchOnTrigger(refresh$$)
+});
+```
+
+
 ### API
-#### Observable based API
 `rxStateful$` returns a Observable of with following properties:
 - `value` - the value
 - `hasValue` - boolean if a value is present
