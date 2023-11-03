@@ -1,7 +1,7 @@
 import {Component, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {rxStateful$, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
-import {concatMap, map, MonoTypeOperatorFunction, Observable, of, scan, share, Subject, switchMap, tap} from "rxjs";
+import {map, MonoTypeOperatorFunction, Observable, of, ReplaySubject, scan, share, Subject, switchMap, tap} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 
 
@@ -78,10 +78,19 @@ export class DemoErrorRxStatefulComponent {
   plainMethodResult: any = null
 
   chain$ = this.id$.pipe(
-    concatMap(id => this.http.get(`https://jsonplaceholder.typicode.com/posts/${id}`).pipe(
-      log('chain inner$')
+    switchMap(id => of(Math.random()).pipe(
+        // share({
+        //     connector: () => new ReplaySubject(1),
+        //     resetOnRefCountZero: true,
+        // }),
+      // log('chain inner$')
     )),
-    log('chain$')
+   // log('chain$')
+      share({
+          connector: () => new ReplaySubject(1),
+          resetOnRefCountZero: true,
+      }),
+      tap(x => console.log('chain$ ', x))
   )
 
   chainError$ = this.id$.pipe(
@@ -136,7 +145,6 @@ export class DemoErrorRxStatefulComponent {
         return acc;
       }, []),
       // log('chainRx$'),
-      share()
   )
 
   /*chainErrorRx$ = this.idRx$.pipe(
@@ -176,7 +184,11 @@ export class DemoErrorRxStatefulComponent {
     //this.chainRx$.subscribe()
     //this.chainRx$.subscribe()
 
-    this.chain$.subscribe()
+    this.newPlainRx$.subscribe()
+    this.rxNormal$.subscribe()
+      //
+      // this.chain$.subscribe()
+      // this.chain$.subscribe()
   }
 
 
