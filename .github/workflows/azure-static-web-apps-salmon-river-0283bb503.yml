@@ -31,7 +31,10 @@ jobs:
           app_location: "/" # App source code path
           api_location: "api" # Api source code path - optional
           output_location: "dist/apps/demo-rx-stateful" # Built app content directory - optional
+          app_build_command: "npx nx build demo-rx-stateful"
           ###### End of Repository/Build Configurations ######
+        env:
+          NPM_CONFIG_FORCE: true
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
