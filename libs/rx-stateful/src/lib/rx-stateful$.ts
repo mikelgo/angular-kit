@@ -76,7 +76,9 @@ export function rxStateful$<T,A, E = unknown>(
     sourceOrSourceFn$: Observable<T> | ((arg: A) => Observable<T>),
     config?: RxStatefulConfig<T, E> | RxStatefulSourceTriggerConfig<T,A,E>,
 ): Observable<RxStateful<T, E>> {
-
+    /**
+     * Merge default config with user provided config
+     */
     const mergedConfig: RxStatefulConfig<T, E> = {
         keepValueOnRefresh: false,
         keepErrorOnRefresh: false,
@@ -87,7 +89,11 @@ export function rxStateful$<T,A, E = unknown>(
 
 }
 
-
+/**
+ * @internal
+ * @description
+ * helper function to create the rxStateful$ observable
+ */
 function createState$<T,A, E>(
     sourceOrSourceFn$: Observable<T> | ((arg: A) => Observable<T>),
     mergedConfig: RxStatefulConfig<T, E> | RxStatefulSourceTriggerConfig<T,A,E>,
@@ -101,7 +107,14 @@ function createState$<T,A, E>(
 
     // case 1: SourceTriggerConfig given --> sourceOrSourceFn$ is function
     if (isFunctionGuard(sourceOrSourceFn$) && isSourceTriggerConfigGuard(mergedConfig)){
+        /**
+         * we need to cache the argument which is passed to sourceOrSourceFn$ because
+         * we want to use it when we refresh the value
+         */
         let cachedArgument: A | undefined = undefined
+        /**
+         * Value when the sourcetrigger emits
+         */
         const valueFromSourceTrigger$ = (mergedConfig as RxStatefulSourceTriggerConfig<T,A,E>)?.sourceTriggerConfig.trigger.pipe(
             tap(arg => cachedArgument = arg),
             applyFlatteningOperator(
@@ -125,6 +138,9 @@ function createState$<T,A, E>(
             ...mergeRefetchStrategies(mergedConfig?.refetchStrategies)
         );
 
+        /**
+         * value when we refresh
+         */
         const refreshedValue$ = refreshTrigger$.pipe(
             /**
              * in case the refreshTrigger$ is a BehaviorSubject, we want to skip the first value
@@ -191,8 +207,6 @@ function createState$<T,A, E>(
             }),
             catchError((error: E) => handleError<T,E>(error, mergedConfig, error$$))
         );
-
-
 
         const refresh$ = merge(
             new BehaviorSubject(null),
