@@ -111,6 +111,12 @@ function createState$<T,A, E>(
                     deriveInitialValue<T,E>(mergedConfig),
                 )
             ),
+            share({
+                connector: () => new ReplaySubject(1),
+                resetOnError: true,
+                resetOnComplete: true,
+                resetOnRefCountZero: true,
+            }),
             catchError((error: E) => handleError<T,E>(error, mergedConfig, error$$))
         )
 
@@ -140,6 +146,12 @@ function createState$<T,A, E>(
                 deriveInitialValue<T,E>(mergedConfig),
                 catchError((error: E) => handleError<T,E>(error, mergedConfig, error$$))
             )),
+            share({
+                connector: () => new ReplaySubject(1),
+                resetOnError: true,
+                resetOnComplete: true,
+                resetOnRefCountZero: true,
+            }),
         );
         return merge(refreshedValue$, valueFromSourceTrigger$, error$$).pipe(
             /**
