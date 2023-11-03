@@ -9,7 +9,7 @@ import {NavigationComponent} from "./navigation.component";
   template: `
     <h1>RxStateful Demo</h1>
     <p>
-      Select one of the demos from below
+      Select one of the demos from the tabs below
     </p>
     <navigation/>
   `,

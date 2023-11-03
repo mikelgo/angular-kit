@@ -36,6 +36,7 @@
     "@angular/router": "16.2.3",
     "@code-workers.io/ngx-dirty-checker": "^1.0.1",
     "@nx/angular": "16.8.0",
+    "ngx-highlightjs": "^10.0.0",
     "nx-cloud": "^16.3.0",
     "rxjs": "7.8.1",
     "tslib": "^2.3.0",

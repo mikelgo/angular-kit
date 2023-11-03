@@ -8,19 +8,27 @@ import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import { Todo } from '../types';
 import {MatListModule} from "@angular/material/list";
+import {HighlightModule} from "ngx-highlightjs";
+import {MatExpansionModule} from "@angular/material/expansion";
 
 @Component({
   standalone: true,
-  imports: [RouterModule, MatButtonModule, NgIf, AsyncPipe, MatProgressSpinnerModule, MatListModule, NgForOf],
+  imports: [RouterModule, MatButtonModule, NgIf, AsyncPipe, MatProgressSpinnerModule, MatListModule, NgForOf, HighlightModule, MatExpansionModule],
   selector: 'demo-basic-usage',
   template: `
     <h1>Basic Usage</h1>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        Code example
+      </mat-expansion-panel-header>
+      <pre><code [highlight]="code"></code></pre>
+    </mat-expansion-panel>
     <div>
       <p>You can refetch the list by pressing refresh</p>
       <p>Automatically after {{refreshInterval}}ms it will also refresh</p>
     </div>
     <div>
-      <button mat-flat-button color="primary" (click)="refresh$$.next(null)"> Refresh </button>
+      <button mat-button color="primary" (click)="refresh$$.next(null)"> Refresh </button>
       <br>
       <div *ngIf="state$ | async as state">
         <ng-container *ngIf="state.value">
@@ -79,6 +87,25 @@ export class DemoBasicUsageComponent {
 
 
 
+  code = `
+  private readonly http = inject(HttpClient)
+  readonly refresh$$ = new Subject<null>()
+  refreshInterval = 10000
+
+  state$ = rxStateful$<Todo[], HttpErrorResponse>(
+    this.http.get<Todo[]>('https://jsonplaceholder.typicode.com/todos').pipe(
+      // simulate slow network
+      delay(2000)
+    ),
+    {
+      refetchStrategies: [
+        withRefetchOnTrigger(this.refresh$$),
+        withAutoRefetch(this.refreshInterval, 1000000)
+      ],
+      errorMappingFn: (error) => error.message,
+    }
+  )
+  `
 
 
 }
