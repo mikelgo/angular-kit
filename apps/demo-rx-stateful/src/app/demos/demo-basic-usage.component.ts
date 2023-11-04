@@ -10,10 +10,12 @@ import { Todo } from '../types';
 import {MatListModule} from "@angular/material/list";
 import {HighlightModule} from "ngx-highlightjs";
 import {MatExpansionModule} from "@angular/material/expansion";
+import {TodoItemComponent} from "./todo-item.component";
+import {MatCardModule} from "@angular/material/card";
 
 @Component({
   standalone: true,
-  imports: [RouterModule, MatButtonModule, NgIf, AsyncPipe, MatProgressSpinnerModule, MatListModule, NgForOf, HighlightModule, MatExpansionModule],
+  imports: [RouterModule, MatButtonModule, NgIf, AsyncPipe, MatProgressSpinnerModule, MatListModule, NgForOf, HighlightModule, MatExpansionModule, TodoItemComponent, MatCardModule],
   selector: 'demo-basic-usage',
   template: `
     <h1>Basic Usage</h1>
@@ -30,20 +32,19 @@ import {MatExpansionModule} from "@angular/material/expansion";
     <div>
       <button mat-button color="primary" (click)="refresh$$.next(null)"> Refresh </button>
       <br>
+      <mat-card class="px-8 py-4 h-[400px]">
       <div *ngIf="state$ | async as state">
         <ng-container *ngIf="state.value">
           <div class="list-container">
             <mat-list role="list" >
               <mat-list-item *ngFor="let item of state.value" role="listitem">
-                <div>
-                  {{item.title}}
-                </div>
+                <todo-item [todo]="item"/>
               </mat-list-item>
             </mat-list>
           </div>
         </ng-container>
         <ng-container *ngIf="state.isSuspense">
-          <mat-spinner></mat-spinner>
+          <div class="w-full h-full grid place-items-center\t"><mat-spinner></mat-spinner></div>
         </ng-container>
         <ng-container *ngIf="state.hasError">
           <div>
@@ -51,6 +52,7 @@ import {MatExpansionModule} from "@angular/material/expansion";
           </div>
         </ng-container>
       </div>
+      </mat-card>
     </div>
 `,
   styles: [`
