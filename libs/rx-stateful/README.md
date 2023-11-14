@@ -14,7 +14,7 @@ pnpm add @angular-kit/rx-stateful
   
   ```
 ## Demo
-A live demo is available on [here](https://salmon-river-0283bb503.4.azurestaticapps.net/pagination)
+A live demo is available on [here](https://salmon-river-0283bb503.4.azurestaticapps.net)
 
 ## Usage
 ### `rxStateful$` as standalone function
