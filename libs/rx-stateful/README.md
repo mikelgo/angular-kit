@@ -83,13 +83,19 @@ You can also provide a configuration on instance level. This will also override 
 
 `rxStateful$` takes a configuration object as second parameter. The following options are available:
 - `keepValueOnRefresh` - boolean if the value should be kept when the `refreshTrigger$` emits. Default: `false`
-- `refreshTrigger$` - a Subject that triggers the source again. Default: not set
+- `keepErrorOnRefresh` - boolean if thel last error should be kept when the `refreshTrigger$` emits. Default: `false`
+- `refreshTrigger$` - a Subject or Observable that triggers the source again. Default: not set. *deprecated* use `refetchStrategies`
+- `refetchStrategies` - single or multiple `RefetchStrategies` to trigger the source again. Default: not set
 
+##### Configuration Example
 ```typescript
 import { rxStateful$ } from '@angular-kit/rx-stateful';
 
 const rxStateful$ = rxStateful$(someSource$, { keepValueOnRefresh: true });
 ```
+##### `refetchStrategies`
+- `withRefetchOnTrigger`
+- `withAutoRefetch`
 
 ### Usage via `RxStatefulClient`
 In order to use `RxStatefulClient` you first need to provide it, e.g. in your `AppModule`:
