@@ -1,7 +1,14 @@
 # @angular-kit/rx-stateful
 
 `rxStateful$` is a powerful RxJs operator that wraps any sync or async Observable and provides a
-stateful stream.
+stateful stream. It does offer out of the box
+
+- 🔄 loading state
+- ❌ automatic error handling
+- 🔄 refresh-mechanisms
+- 🔴 multicasted stream
+- ⚙️ powerful configuration possibilities e.g. to keep the last value on refresh
+- ⚡️ soon: a non-flickering loading state
 
 Hint: You can use it on both sync and async Observables. However the real benefits you will get for async Observables.
 
