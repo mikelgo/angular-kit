@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 import {Config, injectRxStatefulConfig} from '../config/rx-stateful-config.provider';
 import {map, Observable} from 'rxjs';
-import {RxStateful, RxStatefulConfig} from '../../types/types';
-import {rxStateful$} from '../../rx-stateful$';
+import {RxStateful, RxStatefulConfig, rxStateful$} from '@angular-kit/rx-stateful';
+
 
 export type RxStatefulRequestOptions<T, E> = RxStatefulConfig<T, E>;
 

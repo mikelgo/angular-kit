@@ -1,7 +1,6 @@
 import {inject, InjectionToken} from "@angular/core";
-import {RxStatefulConfig} from "../../types/types";
+import {RxStatefulConfig, RefetchStrategy} from "@angular-kit/rx-stateful";
 import {makeFeature} from "./config-feature";
-import {AutoRefetchStrategy} from "../../refetch-strategies/refetch-strategy";
 
 
 export type Config<T, E> = Pick<RxStatefulConfig<T, E>,
@@ -10,7 +9,7 @@ export type Config<T, E> = Pick<RxStatefulConfig<T, E>,
     | 'errorMappingFn'
     | 'beforeHandleErrorFn'
     | 'accumulationFn'> & {
-    autoRefetch?: AutoRefetchStrategy;
+    autoRefetch?: RefetchStrategy;
 }
 export const RX_STATEFUL_CONFIG = <T,E>() => new InjectionToken<Config<T, E>>('RX_STATEFUL_CONFIG');
 

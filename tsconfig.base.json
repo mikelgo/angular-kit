@@ -30,6 +30,7 @@
       "@angular-kit/rx": ["libs/rx/src/index.ts"],
       "@angular-kit/rx-hooks": ["libs/rx-hooks/src/index.ts"],
       "@angular-kit/rx-stateful": ["libs/rx-stateful/src/index.ts"],
+      "@angular-kit/rx-stateful/experimental": ["libs/rx-stateful/experimental/src/index.ts"],
       "@angular-kit/rx-stateful/testing": ["libs/rx-stateful/testing/src/index.ts"],
       "@angular-kit/rx/effect": ["libs/rx/effect/src/index.ts"],
       "@angular-kit/rx/operators": ["libs/rx/operators/src/index.ts"],
