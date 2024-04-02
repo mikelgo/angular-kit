@@ -1,9 +1,10 @@
 import {Component, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {HttpClient} from '@angular/common/http';
-import {provideRxStatefulClient, RxStatefulClient, withConfig,} from '@angular-kit/rx-stateful';
-import {delay, map, scan, Subject, switchMap} from 'rxjs';
+
+import {delay, map, scan, Subject, switchMap, tap} from 'rxjs';
 import {ActivatedRoute} from '@angular/router';
+import {provideRxStatefulClient, RxStatefulClient, withConfig} from "@angular-kit/rx-stateful/experimental";
 
 @Component({
   selector: 'angular-kit-demo-rx-stateful',
@@ -62,6 +63,7 @@ export class DemoRxStatefulComponent {
   });
   state$ = this.instance;
   stateAccumulated$ = this.state$.pipe(
+    tap(console.log),
     scan((acc, value, index) => {
       // @ts-ignore
       acc.push({ index, value });
