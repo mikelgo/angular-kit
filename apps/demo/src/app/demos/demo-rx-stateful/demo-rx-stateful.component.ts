@@ -5,6 +5,7 @@ import {HttpClient} from '@angular/common/http';
 import {delay, map, scan, Subject, switchMap, tap} from 'rxjs';
 import {ActivatedRoute} from '@angular/router';
 import {provideRxStatefulClient, RxStatefulClient, withConfig} from "@angular-kit/rx-stateful/experimental";
+import {rxStateful$} from "@angular-kit/rx-stateful";
 
 @Component({
   selector: 'angular-kit-demo-rx-stateful',
@@ -55,15 +56,32 @@ export class DemoRxStatefulComponent {
       map(v => v.value)
   )));
 
-  instance = this.client.request(this.fetch(), {
+  // instance = this.client.request(this.fetch(), {
+  //   keepValueOnRefresh: false,
+  //   keepErrorOnRefresh: false,
+  //   refreshTrigger$: this.refresh$$,
+  //   refetchStrategies: [withAutoRefetch(10000, 20000)],
+  // });
+  // state$ = this.instance;
+  // stateAccumulated$ = this.state$.pipe(
+  //   tap(console.log),
+  //   scan((acc, value, index) => {
+  //     @ts-ignore
+      // acc.push({ index, value });
+      //
+      // return acc;
+    // }, [])
+  // );
+
+
+  state$ = rxStateful$(this.fetch(2500), {
     keepValueOnRefresh: false,
     keepErrorOnRefresh: false,
     refreshTrigger$: this.refresh$$,
-    //refetchStrategies: [withAutoRefetch(10000, 20000)],
   });
-  state$ = this.instance;
+
   stateAccumulated$ = this.state$.pipe(
-    tap(console.log),
+    tap(x => console.log({state: x})),
     scan((acc, value, index) => {
       // @ts-ignore
       acc.push({ index, value });

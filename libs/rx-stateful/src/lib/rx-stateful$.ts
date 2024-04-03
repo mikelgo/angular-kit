@@ -1,29 +1,33 @@
 import {
-    BehaviorSubject,
-    catchError,
-    distinctUntilChanged,
-    isObservable,
-    map,
-    merge,
-    NEVER,
-    Observable,
-    of,
-    pipe,
-    ReplaySubject,
-    scan,
-    share,
-    skip,
-    startWith,
-    Subject,
-    switchMap,
-    tap,
+  BehaviorSubject,
+  catchError,
+  combineLatest,
+  distinctUntilChanged,
+  filter,
+  isObservable,
+  map,
+  merge,
+  NEVER,
+  Observable,
+  of,
+  pipe,
+  ReplaySubject,
+  scan,
+  share,
+  skip,
+  startWith,
+  Subject,
+  switchMap,
+  takeUntil,
+  tap,
+  timer,
 } from 'rxjs';
 import {
-    InternalRxState,
-    RxStateful,
-    RxStatefulConfig,
-    RxStatefulSourceTriggerConfig,
-    RxStatefulWithError,
+  InternalRxState,
+  RxStateful,
+  RxStatefulConfig,
+  RxStatefulSourceTriggerConfig,
+  RxStatefulWithError,
 } from './types/types';
 import {_handleSyncValue} from './util/handle-sync-value';
 import {defaultAccumulationFn} from './types/accumulation-fn';
@@ -213,7 +217,8 @@ function createState$<T,A, E>(
             mergedConfig?.refreshTrigger$ ?? new Subject<unknown>(),
             ...mergeRefetchStrategies(mergedConfig?.refetchStrategies)
         )
-        const refreshedRequest$: Observable<Partial<InternalRxState<T, E>>> = refresh$.pipe(
+
+      const refreshedRequest$: Observable<Partial<InternalRxState<T, E>>> = refresh$.pipe(
             /**
              * in case the refreshTrigger$ is a BehaviorSubject, we want to skip the first value
              * bc otherwise the emissions are not correct. It will then emit 4 vales instead of 2.
@@ -225,9 +230,44 @@ function createState$<T,A, E>(
                 sharedSource$.pipe(
                     map(v => mapToValue(v)),
                     deriveInitialValue<T,E>(mergedConfig)
-                )
+                ),
+
             )
+        ).pipe(
+        // @ts-ignore
+          tap(x => console.log({refreshedRequest: x}))
         ) as Observable<Partial<InternalRxState<T, E>>>
+
+      const suspenseThreshold: number = 1000;
+      const suspenseTime: number = 2000;
+      const hasResponse$ = refreshedRequest$.pipe(
+        // skip(1),
+        map(v => v.context === 'next' || v.context === 'error'),
+        filter(v => !!v),
+        // tap(x => console.log({hasResponse$: x}))
+      )
+      const showLoadingIndicator$ = refresh$.pipe(
+        switchMap(() => merge(
+          // ON after suspenseThreshold
+          timer(suspenseThreshold).pipe(map(() =>true),
+            // if response comes earlier than thresehold we do not want to emit loading
+            takeUntil(hasResponse$)
+          ),
+          // OFF once we receive a result, yet at least after suspenseTime + suspenseThreshold
+          combineLatest(
+            refreshedRequest$.pipe(
+              // with this we make sure that we do not turn off the suspsense state as long as a request is running
+              filter(v => !!v.value)
+            ),
+            timer(suspenseThreshold + suspenseTime)).pipe(map(() => false))
+        )
+          .pipe(
+            startWith(false),
+            distinctUntilChanged()
+          ))
+      );
+
+      showLoadingIndicator$.subscribe(x => console.log({showLoadingIndicator: x}))
 
         return merge( refreshedRequest$, error$$).pipe(
             /**
