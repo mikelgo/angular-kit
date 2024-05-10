@@ -11,6 +11,7 @@ import {
   Observable,
   of,
   pipe,
+  race,
   ReplaySubject,
   scan,
   share,
@@ -21,6 +22,7 @@ import {
   takeUntil,
   tap,
   timer,
+  withLatestFrom,
 } from 'rxjs';
 import {
   InternalRxState,
@@ -86,6 +88,8 @@ export function rxStateful$<T,A, E = unknown>(
     const mergedConfig: RxStatefulConfig<T, E> = {
         keepValueOnRefresh: false,
         keepErrorOnRefresh: false,
+        suspenseThresholdMs: 500,
+        suspenseTimeMs: 500,
         ...config
     };
 
@@ -109,7 +113,7 @@ function createState$<T,A, E>(
     const refreshTriggerIsBehaivorSubject = (config: RxStatefulConfig<T, E>) =>
         config.refreshTrigger$ instanceof BehaviorSubject;
 
-    // case 1: SourceTriggerConfig given --> sourceOrSourceFn$ is function
+  // case 1: SourceTriggerConfig given --> sourceOrSourceFn$ is function
     if (isFunctionGuard(sourceOrSourceFn$) && isSourceTriggerConfigGuard(mergedConfig)){
         /**
          * we need to cache the argument which is passed to sourceOrSourceFn$ because
@@ -119,7 +123,9 @@ function createState$<T,A, E>(
         /**
          * Value when the sourcetrigger emits
          */
-        const valueFromSourceTrigger$ = (mergedConfig as RxStatefulSourceTriggerConfig<T,A,E>)?.sourceTriggerConfig.trigger.pipe(
+        const sourceTrigger$ = (mergedConfig as RxStatefulSourceTriggerConfig<T,A,E>)?.sourceTriggerConfig.trigger
+
+      const valueFromSourceTrigger$ = sourceTrigger$.pipe(
             tap(arg => cachedArgument = arg),
             applyFlatteningOperator(
                 (mergedConfig as RxStatefulSourceTriggerConfig<T, A,E>)?.sourceTriggerConfig?.operator,
@@ -134,7 +140,7 @@ function createState$<T,A, E>(
                 resetOnComplete: true,
                 resetOnRefCountZero: true,
             }),
-            catchError((error: E) => handleError<T,E>(error, mergedConfig, error$$))
+            catchError((error: E) => handleError<T,E>(error, mergedConfig, error$$)),
         )
 
         const refreshTrigger$ = merge(
@@ -173,30 +179,115 @@ function createState$<T,A, E>(
                 resetOnRefCountZero: true,
             }),
         );
-        return merge(refreshedValue$, valueFromSourceTrigger$, error$$).pipe(
-            /**
-             * todo
-             * this is a bit hacky as value can not be undefined (it is typed
-             * as T | null). However when I change to null some side effets happen.
-             * Need investigation!!!
-             */
-            // @ts-ignore
-            scan(accumulationFn, {
-                isLoading: false,
-                isRefreshing: false,
-                value: undefined,
-                error: undefined,
-                context: 'suspense',
-            }),
-            distinctUntilChanged(),
-            share({
-                connector: () => new ReplaySubject(1),
-                resetOnError: true,
-                resetOnComplete: true,
-                resetOnRefCountZero: true,
-            }),
-            _handleSyncValue()
+
+      const suspenseThreshold: number = mergedConfig.suspenseThresholdMs!;
+      const suspenseTime: number = mergedConfig.suspenseTimeMs!;
+
+
+      const hasResponse1$ = refreshedValue$.pipe(
+        // @ts-ignore
+        map(v => v.context === 'next' || v.context === 'error'),
+        filter(v => !!v),
+      )
+      const hasResponse2$ = valueFromSourceTrigger$.pipe(
+        // @ts-ignore
+        map(v => v.context === 'next' || v.context === 'error'),
+        filter(v => !!v),
+      )
+
+      // refreshedValue$
+      const s1 = refreshTrigger$.pipe(
+        switchMap(() => merge(
+          // ON after suspenseThreshold
+          timer(suspenseThreshold).pipe(map(() =>true),
+            // if response comes earlier than thresehold we do not want to emit loading
+            takeUntil(hasResponse1$)
+          ),
+          // OFF once we receive a result, yet at least after suspenseTime + suspenseThreshold
+          combineLatest(
+            refreshedValue$.pipe(
+              // with this we make sure that we do not turn off the suspsense state as long as a request is running
+              // @ts-ignore
+              filter(v => !!v.value)
+            ),
+            timer(suspenseThreshold + suspenseTime)).pipe(map(() => false))
         )
+          .pipe(
+            startWith(false)
+          ))
+      );
+      // valueFromSourceTrigger$
+      const s2 = sourceTrigger$.pipe(
+        switchMap(() => merge(
+          // ON after suspenseThreshold
+          timer(suspenseThreshold).pipe(map(() =>true),
+            // if response comes earlier than thresehold we do not want to emit loading
+            takeUntil(hasResponse2$)
+          ),
+          // OFF once we receive a result, yet at least after suspenseTime + suspenseThreshold
+          combineLatest(
+            valueFromSourceTrigger$.pipe(
+              // with this we make sure that we do not turn off the suspsense state as long as a request is running
+              // @ts-ignore
+              filter(v => !!v.value)
+            ),
+            timer(suspenseThreshold + suspenseTime)).pipe(map(() => false))
+        )
+          .pipe(
+            startWith(false),
+          ))
+      );
+
+      // Correct Pairs
+      const pair1$ = s2
+        .pipe(
+          withLatestFrom(valueFromSourceTrigger$),
+          // @ts-ignore
+          filter(([loading, valueFromSourceTrigger]) => (!loading && valueFromSourceTrigger.context !== 'suspense') ||(loading)),
+          map(([loading, value]) => value)
+        )
+
+      const pair2$ =  s1
+        .pipe(
+          withLatestFrom(refreshedValue$),
+          // @ts-ignore
+          filter(([loading, valueFromSourceTrigger]) => (!loading && valueFromSourceTrigger.context !== 'suspense') ||(loading)),
+          map(([loading, value]) => value)
+        )
+
+      const finalResult$ = merge(
+        // @ts-ignore
+        race(pair1$, valueFromSourceTrigger$.pipe(filter(v => v?.context !== "suspense"))),
+        // @ts-ignore
+        race(pair2$, refreshedValue$.pipe(filter(v => v?.context !== "suspense")))
+      )
+
+      const result$ = merge(finalResult$, error$$).pipe(
+        /**
+         * todo
+         * this is a bit hacky as value can not be undefined (it is typed
+         * as T | null). However when I change to null some side effets happen.
+         * Need investigation!!!
+         */
+        // @ts-ignore
+        scan(accumulationFn, {
+          isLoading: false,
+          isRefreshing: false,
+          value: undefined,
+          error: undefined,
+          context: 'suspense',
+        }),
+        distinctUntilChanged(),
+        share({
+          connector: () => new ReplaySubject(1),
+          resetOnError: true,
+          resetOnComplete: true,
+          resetOnRefCountZero: true,
+        }),
+        _handleSyncValue()
+      )
+
+      return result$
 
     }
 
@@ -210,7 +301,7 @@ function createState$<T,A, E>(
                 resetOnRefCountZero: true,
             }),
             catchError((error: E) => handleError<T,E>(error, mergedConfig, error$$))
-        );
+        )
 
         const refresh$ = merge(
             new BehaviorSubject(null),
@@ -231,20 +322,14 @@ function createState$<T,A, E>(
                     map(v => mapToValue(v)),
                     deriveInitialValue<T,E>(mergedConfig)
                 ),
-
-            )
-        ).pipe(
-        // @ts-ignore
-          tap(x => console.log({refreshedRequest: x}))
+            ),
         ) as Observable<Partial<InternalRxState<T, E>>>
 
-      const suspenseThreshold: number = 1000;
-      const suspenseTime: number = 2000;
+      const suspenseThreshold: number = mergedConfig.suspenseThresholdMs!;
+      const suspenseTime: number = mergedConfig.suspenseTimeMs!;
       const hasResponse$ = refreshedRequest$.pipe(
-        // skip(1),
         map(v => v.context === 'next' || v.context === 'error'),
         filter(v => !!v),
-        // tap(x => console.log({hasResponse$: x}))
       )
       const showLoadingIndicator$ = refresh$.pipe(
         switchMap(() => merge(
@@ -263,36 +348,41 @@ function createState$<T,A, E>(
         )
           .pipe(
             startWith(false),
-            distinctUntilChanged()
           ))
       );
 
-      showLoadingIndicator$.subscribe(x => console.log({showLoadingIndicator: x}))
+      const pair$ = showLoadingIndicator$.pipe(
+        withLatestFrom(refreshedRequest$),
+        filter(([loading, valueFromSourceTrigger]) => (!loading && valueFromSourceTrigger.context !== 'suspense') ||(loading)),
+        map(([loading, value]) => value)
+      )
+      // We need to do this because if the response is coming immediatly/before the threshold is reached we would not get any value
+      const result$ = race(pair$, refreshedRequest$.pipe(filter(v => v.context !== "suspense")))
 
-        return merge( refreshedRequest$, error$$).pipe(
-            /**
-             * todo
-             * this is a bit hacky as value can not be undefined (it is typed
-             * as T | null). However when I change to null some side effets happen.
-             * Need investigation!!!
-             */
-            // @ts-ignore
-            scan(accumulationFn, {
-                isLoading: false,
-                isRefreshing: false,
-                value: undefined,
-                error: undefined,
-                context: 'suspense',
-            }),
-            distinctUntilChanged(),
-            share({
-                connector: () => new ReplaySubject(1),
-                resetOnError: true,
-                resetOnComplete: true,
-                resetOnRefCountZero: true,
-            }),
-            _handleSyncValue()
-        );
+      return merge( result$, error$$).pipe(
+        /**
+         * todo
+         * this is a bit hacky as value can not be undefined (it is typed
+         * as T | null). However when I change to null some side effets happen.
+         * Need investigation!!!
+         */
+        // @ts-ignore
+        scan(accumulationFn, {
+          isLoading: false,
+          isRefreshing: false,
+          value: undefined,
+          error: undefined,
+          context: 'suspense',
+        }),
+        distinctUntilChanged(),
+        share({
+          connector: () => new ReplaySubject(1),
+          resetOnError: true,
+          resetOnComplete: true,
+          resetOnRefCountZero: true,
+        }),
+        _handleSyncValue()
+      );
     }
 
 
