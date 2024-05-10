@@ -41,19 +41,6 @@ export interface InternalRxState<T, E = unknown> {
   context: RxStatefulContext;
 }
 
-export interface RxStatefulSuspenseConfig{
-  /**
-   * Time in ms after which the suspense state is emitted.
-   * For faster suspense times as the threshold no suspense state is emitted
-   */
-  thresholdMs: number;
-  /**
-   * Time in ms for which time interval the suspense state is valid before
-   * the next value is emitted.
-   */
-  suspenseTimeMs: number;
-}
-
 /**
  * @publicApi
  *
@@ -101,9 +88,15 @@ export interface RxStatefulConfig<T, E = unknown> {
    */
   beforeHandleErrorFn?: (error: E) => void;
   /**
-   *
+   * Time in ms after which the suspense state is emitted.
+   * For faster suspense times as the threshold no suspense state is emitted
    */
-  suspenseConfig?: RxStatefulSuspenseConfig;
+  suspenseThresholdMs?: number;
+  /**
+   * Time in ms for which time interval the suspense state is valid before
+   * the next value is emitted.
+   */
+  suspenseTimeMs?: number;
 }
 
 export interface SourceTriggerConfig<A> {
