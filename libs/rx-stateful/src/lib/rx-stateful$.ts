@@ -88,8 +88,9 @@ export function rxStateful$<T,A, E = unknown>(
     const mergedConfig: RxStatefulConfig<T, E> = {
         keepValueOnRefresh: false,
         keepErrorOnRefresh: false,
-        suspenseThresholdMs: 500,
-        suspenseTimeMs: 500,
+        // to not break existing behavior we set the default to 0 for suspenseThresholdMs and suspenseTimeMs
+        suspenseThresholdMs: 0,
+        suspenseTimeMs: 0,
         ...config
     };
 
@@ -112,6 +113,9 @@ function createState$<T,A, E>(
 
     const refreshTriggerIsBehaivorSubject = (config: RxStatefulConfig<T, E>) =>
         config.refreshTrigger$ instanceof BehaviorSubject;
+
+  const suspenseThreshold: number = mergedConfig.suspenseThresholdMs!;
+  const suspenseTime: number = mergedConfig.suspenseTimeMs!;
 
   // case 1: SourceTriggerConfig given --> sourceOrSourceFn$ is function
     if (isFunctionGuard(sourceOrSourceFn$) && isSourceTriggerConfigGuard(mergedConfig)){
@@ -180,8 +184,7 @@ function createState$<T,A, E>(
             }),
         );
 
-      const suspenseThreshold: number = mergedConfig.suspenseThresholdMs!;
-      const suspenseTime: number = mergedConfig.suspenseTimeMs!;
+
 
 
       const hasResponse1$ = refreshedValue$.pipe(
@@ -205,12 +208,14 @@ function createState$<T,A, E>(
           ),
           // OFF once we receive a result, yet at least after suspenseTime + suspenseThreshold
           combineLatest(
-            refreshedValue$.pipe(
+            [
+              refreshedValue$.pipe(
               // with this we make sure that we do not turn off the suspsense state as long as a request is running
               // @ts-ignore
               filter(v => !!v.value)
             ),
-            timer(suspenseThreshold + suspenseTime)).pipe(map(() => false))
+            timer(suspenseThreshold + suspenseTime)]
+          ).pipe(map(() => false))
         )
           .pipe(
             startWith(false)
@@ -225,13 +230,14 @@ function createState$<T,A, E>(
             takeUntil(hasResponse2$)
           ),
           // OFF once we receive a result, yet at least after suspenseTime + suspenseThreshold
-          combineLatest(
+          combineLatest([
             valueFromSourceTrigger$.pipe(
               // with this we make sure that we do not turn off the suspsense state as long as a request is running
               // @ts-ignore
               filter(v => !!v.value)
             ),
-            timer(suspenseThreshold + suspenseTime)).pipe(map(() => false))
+            timer(suspenseThreshold + suspenseTime)
+          ]).pipe(map(() => false))
         )
           .pipe(
             startWith(false),
@@ -325,8 +331,7 @@ function createState$<T,A, E>(
             ),
         ) as Observable<Partial<InternalRxState<T, E>>>
 
-      const suspenseThreshold: number = mergedConfig.suspenseThresholdMs!;
-      const suspenseTime: number = mergedConfig.suspenseTimeMs!;
+
       const hasResponse$ = refreshedRequest$.pipe(
         map(v => v.context === 'next' || v.context === 'error'),
         filter(v => !!v),
@@ -339,12 +344,13 @@ function createState$<T,A, E>(
             takeUntil(hasResponse$)
           ),
           // OFF once we receive a result, yet at least after suspenseTime + suspenseThreshold
-          combineLatest(
+          combineLatest([
             refreshedRequest$.pipe(
               // with this we make sure that we do not turn off the suspsense state as long as a request is running
               filter(v => !!v.value)
             ),
-            timer(suspenseThreshold + suspenseTime)).pipe(map(() => false))
+            timer(suspenseThreshold + suspenseTime)]
+          ).pipe(map(() => false))
         )
           .pipe(
             startWith(false),
