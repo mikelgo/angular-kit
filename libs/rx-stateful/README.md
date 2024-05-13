@@ -8,7 +8,7 @@ stateful stream. It does offer out of the box
 - 🔄 refresh-mechanisms
 - 🔴 multicasted stream
 - ⚙️ powerful configuration possibilities e.g. to keep the last value on refresh
-- ⚡️ soon: a non-flickering loading state
+- ⚡️ non-flickering loading state for great UX
 
 Hint: You can use it on both sync and async Observables. However the real benefits you will get for async Observables.
 
@@ -93,6 +93,23 @@ You can also provide a configuration on instance level. This will also override 
 - `keepErrorOnRefresh` - boolean if thel last error should be kept when the `refreshTrigger$` emits. Default: `false`
 - `refreshTrigger$` - a Subject or Observable that triggers the source again. Default: not set. *deprecated* use `refetchStrategies`
 - `refetchStrategies` - single or multiple `RefetchStrategies` to trigger the source again. Default: not set
+- `suspenseThresholdMs` - number of milliseconds to wait before emitting the suspense state. Default: 0
+- `suspenseTimeMs` - number of milliseconds to wait before the next state after the suspense state. Default: 0
+
+> [!TIP]
+> A few more words about the `suspenseThresholdMs` and `suspenseTimeMs` configuration. This is a quite powerful feature which will
+> result in a better UX when preventing flickering loading states. What does flickering loading states mean? When you show a loading indicator/spinner based on the 
+> `isSuspense`-property then a common scenario is that you show a spinner for a very short tim for fast requests resulting in some flickering. To prevent this it is better to
+> wait a certain amount of time before showing a spinner (suspenseThreshold). If then the request takes longer thant the threshold-time a spinner will be shown for at least another amount of time
+> (suspenseTime). That way you can prevent flickering spinners.
+> 
+> `rxStateful$` provides exactly this feature and will only emit the suspense-state if a async-operation takes longer than the specified `suspenseThresholdMs` for at least `suspenseTimeMs`.
+> A reasonable configuration of these two values would be to set them both to 500ms.
+
+> [!IMPORTANT]
+> The default value for `suspenseThresholdMs` and `suspenseTimeMs` is 0, therefor by default you will not use the non-flickering loading state feature. 
+> It is choosen that way to break existing behavior. This might change in a future major version.
+
 
 ##### Configuration Example
 ```typescript
