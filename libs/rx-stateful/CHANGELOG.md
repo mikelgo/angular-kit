@@ -2,6 +2,17 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.7.0](https://github.com/mikelgo/angular-kit/compare/rx-stateful-1.6.0...rx-stateful-1.7.0) (2024-05-14)
+
+
+### Features
+
+* **rx-stateful:** default suspense threshold and time set to 0 to be non-breaking ([40609f5](https://github.com/mikelgo/angular-kit/commit/40609f5d4cf13acbf6bfb7a8b6dd971b2a26d593))
+* **rx-stateful:** move RxStatefulClient to experimental package ([4593991](https://github.com/mikelgo/angular-kit/commit/4593991ed20a6c5ba1425d76b184b30739946f03))
+* **rx-stateful:** support non-flicker suspense state ([1d60706](https://github.com/mikelgo/angular-kit/commit/1d60706e4feab544bdd4e095b802598af6c9e899))
+
+
+
 # [1.6.0](https://github.com/mikelgo/angular-kit/compare/rx-stateful-1.5.0...rx-stateful-1.6.0) (2023-11-15)
 
 
