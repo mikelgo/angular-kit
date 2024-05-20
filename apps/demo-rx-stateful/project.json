@@ -8,25 +8,15 @@
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:browser",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/demo-rx-stateful",
         "index": "apps/demo-rx-stateful/src/index.html",
         "main": "apps/demo-rx-stateful/src/main.ts",
-        "polyfills": [
-          "zone.js"
-        ],
+        "polyfills": ["zone.js"],
         "tsConfig": "apps/demo-rx-stateful/tsconfig.app.json",
-        "assets": [
-          "apps/demo-rx-stateful/src/favicon.ico",
-          "apps/demo-rx-stateful/src/assets"
-        ],
-        "styles": [
-          "@angular/material/prebuilt-themes/indigo-pink.css",
-          "apps/demo-rx-stateful/src/styles.scss"
-        ],
+        "assets": ["apps/demo-rx-stateful/src/favicon.ico", "apps/demo-rx-stateful/src/assets"],
+        "styles": ["@angular/material/prebuilt-themes/indigo-pink.css", "apps/demo-rx-stateful/src/styles.scss"],
         "scripts": []
       },
       "configurations": {
@@ -75,22 +65,15 @@
       }
     },
     "lint": {
-      "executor": "@nx/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "apps/demo-rx-stateful/**/*.ts",
-          "apps/demo-rx-stateful/**/*.html"
-        ]
+        "lintFilePatterns": ["apps/demo-rx-stateful/**/*.ts", "apps/demo-rx-stateful/**/*.html"]
       }
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/{projectRoot}"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
         "jestConfig": "apps/demo-rx-stateful/jest.config.ts",
         "passWithNoTests": true
