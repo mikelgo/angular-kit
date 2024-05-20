@@ -9,8 +9,7 @@
       "executor": "@nx/angular:package",
       "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
       "options": {
-        "project": "libs/rx-stateful/ng-package.json",
-        "updateBuildableProjectDepsInPackageJson": true
+        "project": "libs/rx-stateful/ng-package.json"
       },
       "configurations": {
         "production": {
@@ -26,23 +25,12 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "libs/rx-stateful/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "libs/rx-stateful/jest.config.ts"
       }
     },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": [
-          "libs/rx-stateful/**/*.ts",
-          "libs/rx-stateful/**/*.html",
-          "libs/rx-stateful/testing/**/*.ts",
-          "libs/rx-stateful/testing/**/*.html",
-          "libs/rx-stateful/experimental/**/*.ts",
-          "libs/rx-stateful/experimental/**/*.html"
-        ]
-      }
+      "outputs": ["{options.outputFile}"]
     },
     "version": {
       "executor": "@jscutlery/semver:version",

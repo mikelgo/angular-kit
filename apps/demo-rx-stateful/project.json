@@ -50,10 +50,10 @@
       "executor": "@angular-devkit/build-angular:dev-server",
       "configurations": {
         "production": {
-          "browserTarget": "demo-rx-stateful:build:production"
+          "buildTarget": "demo-rx-stateful:build:production"
         },
         "development": {
-          "browserTarget": "demo-rx-stateful:build:development"
+          "buildTarget": "demo-rx-stateful:build:development"
         }
       },
       "defaultConfiguration": "development"
@@ -61,28 +61,18 @@
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
       "options": {
-        "browserTarget": "demo-rx-stateful:build"
+        "buildTarget": "demo-rx-stateful:build"
       }
     },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["apps/demo-rx-stateful/**/*.ts", "apps/demo-rx-stateful/**/*.html"]
-      }
+      "outputs": ["{options.outputFile}"]
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "apps/demo-rx-stateful/jest.config.ts",
-        "passWithNoTests": true
-      },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "codeCoverage": true
-        }
+        "jestConfig": "apps/demo-rx-stateful/jest.config.ts"
       }
     },
     "serve-static": {
