@@ -15,7 +15,8 @@
         "reactive-state",
         "rx-hooks",
         "ci",
-        "immutable-helper"
+        "immutable-helper",
+        "effects"
       ]
     ],
     "type-empty": [2, "never"],
