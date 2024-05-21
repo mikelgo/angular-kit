@@ -1,13 +1,4 @@
-import {
-  DestroyRef,
-  ErrorHandler,
-  inject,
-  Injectable,
-  Injector,
-  OnDestroy,
-  Optional,
-  runInInjectionContext,
-} from '@angular/core';
+import { DestroyRef, ErrorHandler, inject, Injectable, Injector, Optional, runInInjectionContext } from '@angular/core';
 import { catchError, EMPTY, Observable, pipe, ReplaySubject, Subscription, tap } from 'rxjs';
 import { assertInjector } from './assert-injector';
 
@@ -15,8 +6,12 @@ export type CleanUpRef = {
   cleanUp: () => void;
 };
 
-export function isCleanUpRefGuard(obj: any): obj is CleanUpRef {
-  return typeof obj === 'object' && obj?.cleanUp !== undefined && typeof obj.cleanUp === 'function';
+type RunOptions = {
+  onCleanUp?: () => void;
+};
+
+export function isRunOptionsGuard(obj: any): obj is RunOptions {
+  return typeof obj === 'object' && obj?.onCleanUp !== undefined && typeof obj.onCleanUp === 'function';
 }
 
 /**
@@ -27,7 +22,7 @@ export function isCleanUpRefGuard(obj: any): obj is CleanUpRef {
  *
  */
 @Injectable()
-export class Effects implements OnDestroy {
+export class Effects {
   private static nextId = 0;
   private readonly sub = new Subscription();
   private readonly idSubMap = new Map<number, Subscription>();
@@ -50,12 +45,7 @@ export class Effects implements OnDestroy {
    * @param sub
    * @param options
    */
-  run(
-    sub: Subscription,
-    options?: {
-      cleanUp?: () => void;
-    }
-  ): CleanUpRef;
+  run(sub: Subscription, options?: RunOptions): CleanUpRef;
   /**
    * @description
    * Subscribe to the passed observable and execute the side effect.
@@ -72,12 +62,7 @@ export class Effects implements OnDestroy {
    * @param o$
    * @param options
    */
-  run<T>(
-    o$: Observable<T>,
-    options?: {
-      cleanUp?: () => void;
-    }
-  ): CleanUpRef;
+  run<T>(o$: Observable<T>, options?: RunOptions): CleanUpRef;
   /**
    * @description
    * Subscribe to the passed observable and execute the side effect.
@@ -97,14 +82,14 @@ export class Effects implements OnDestroy {
    * @param sideEffectFn
    * @param options
    */
-  run<T>(o$: Observable<T>, sideEffectFn: (arg: T) => void, options?: { cleanUp?: () => void }): CleanUpRef;
+  run<T>(o$: Observable<T>, sideEffectFn: (arg: T) => void, options?: RunOptions): CleanUpRef;
   /**
    * @internal
    */
   run<T>(
     obsOrSub$: Observable<T> | Subscription,
-    sideEffectFn?: ((arg: T) => void) | { cleanUp?: () => void },
-    options?: { cleanUp?: () => void }
+    sideEffectFn?: ((arg: T) => void) | RunOptions,
+    options?: RunOptions
   ): CleanUpRef {
     const effectId = Effects.nextId++;
 
@@ -112,14 +97,14 @@ export class Effects implements OnDestroy {
       this.sub.add(obsOrSub$);
       this.idSubMap.set(effectId, obsOrSub$);
       let runOnInstanceDestroySub: undefined | CleanUpRef = undefined;
-      if (sideEffectFn ?? isCleanUpRefGuard(sideEffectFn)) {
-        runOnInstanceDestroySub = this.runOnInstanceDestroy(() => (sideEffectFn as CleanUpRef).cleanUp?.());
+      if (sideEffectFn ?? isRunOptionsGuard(sideEffectFn)) {
+        runOnInstanceDestroySub = this.runOnCleanUp(() => (sideEffectFn as RunOptions).onCleanUp?.());
       }
 
       return {
         cleanUp: () => {
-          if (sideEffectFn ?? isCleanUpRefGuard(sideEffectFn)) {
-            (sideEffectFn as CleanUpRef).cleanUp?.();
+          if (sideEffectFn ?? isRunOptionsGuard(sideEffectFn)) {
+            (sideEffectFn as RunOptions).onCleanUp?.();
             runOnInstanceDestroySub?.cleanUp();
           }
           this.unregister(effectId);
@@ -142,21 +127,21 @@ export class Effects implements OnDestroy {
 
     // cases sideEffectFn is a CleanUpRef OR options given
     let runOnInstanceDestroySub: undefined | CleanUpRef = undefined;
-    if (options && options.cleanUp) {
-      runOnInstanceDestroySub = this.runOnInstanceDestroy(() => options.cleanUp?.());
+    if (options && options.onCleanUp) {
+      runOnInstanceDestroySub = this.runOnCleanUp(() => options.onCleanUp?.());
     }
-    if (sideEffectFn && isCleanUpRefGuard(sideEffectFn)) {
-      runOnInstanceDestroySub = this.runOnInstanceDestroy(() => (sideEffectFn as CleanUpRef).cleanUp?.());
+    if (sideEffectFn && isRunOptionsGuard(sideEffectFn)) {
+      runOnInstanceDestroySub = this.runOnCleanUp(() => (sideEffectFn as RunOptions).onCleanUp?.());
     }
 
     return {
       cleanUp: () => {
-        if (options && options.cleanUp) {
-          options.cleanUp?.();
+        if (options && options.onCleanUp) {
+          options.onCleanUp?.();
           runOnInstanceDestroySub?.cleanUp();
         }
-        if (sideEffectFn && isCleanUpRefGuard(sideEffectFn)) {
-          (sideEffectFn as CleanUpRef).cleanUp?.();
+        if (sideEffectFn && isRunOptionsGuard(sideEffectFn)) {
+          (sideEffectFn as RunOptions).onCleanUp?.();
           runOnInstanceDestroySub?.cleanUp();
         }
         this.unregister(effectId);
@@ -168,7 +153,7 @@ export class Effects implements OnDestroy {
    * Execute a sideEffect when the instance OnDestroy hook is executed
    * @param sideEffectFn
    */
-  runOnInstanceDestroy(sideEffectFn: () => void) {
+  runOnCleanUp(sideEffectFn: () => void) {
     return this.run(this.destroyHook$$.pipe(tap(sideEffectFn)).subscribe());
   }
 
@@ -184,17 +169,13 @@ export class Effects implements OnDestroy {
   }
 
   cleanUp() {
-    this.ngOnDestroy();
-  }
-
-  ngOnDestroy(): void {
     this.destroyHook$$.next(void 0);
     this.sub.unsubscribe();
   }
 }
 
 type TeardownFn = (() => void) | void;
-type EffectsSetupFn = (rxEffect: Pick<Effects, 'run' | 'runOnInstanceDestroy' | 'cleanUp'>) => TeardownFn;
+type EffectsSetupFn = (rxEffect: Pick<Effects, 'run' | 'runOnCleanUp' | 'cleanUp'>) => TeardownFn;
 
 // TODO update JSdoc and update main documentation /README
 /**
@@ -220,15 +201,22 @@ type EffectsSetupFn = (rxEffect: Pick<Effects, 'run' | 'runOnInstanceDestroy' | 
  *     })
  * })
  */
-export function effects(setupFn?: EffectsSetupFn, options?: { injector?: Injector }): Effects {
+export function effects(
+  setupFn?: EffectsSetupFn,
+  options?: {
+    injector?: Injector;
+    destroyRef?: DestroyRef;
+  }
+): Effects {
   const injector = assertInjector(effects, options?.injector);
   return runInInjectionContext(injector, () => {
     const errorHandler = inject(ErrorHandler, { optional: true });
+    const destroyRef = options?.destroyRef ?? inject(DestroyRef);
     const effects = new Effects(errorHandler);
-    const destroyRef = inject(DestroyRef);
+
     const teardownFn = setupFn?.({
       run: effects.run.bind(effects),
-      runOnInstanceDestroy: effects.runOnInstanceDestroy.bind(effects),
+      runOnCleanUp: effects.runOnCleanUp.bind(effects),
       cleanUp: effects.cleanUp.bind(effects),
     });
 
@@ -236,7 +224,7 @@ export function effects(setupFn?: EffectsSetupFn, options?: { injector?: Injecto
       if (typeof teardownFn === 'function') {
         teardownFn();
       }
-      effects.ngOnDestroy();
+      effects.cleanUp();
     };
     destroyRef.onDestroy(() => terminate());
 

@@ -112,17 +112,17 @@ describe(effects.name, () => {
         const cleanUpSpy3 = jest.fn();
 
         const effect = effects.run(trigger$$, (v) => service.triggerEffect(v), {
-          cleanUp: cleanUpSpy,
+          onCleanUp: cleanUpSpy,
         });
         const effect2 = effects.run(
           trigger$$.subscribe((v) => service.triggerEffect(v)),
           {
-            cleanUp: cleanUpSpy2,
+            onCleanUp: cleanUpSpy2,
           }
         );
 
         const effect3 = effects.run(trigger$$.pipe(tap((v) => service.triggerEffect(v))), {
-          cleanUp: cleanUpSpy3,
+          onCleanUp: cleanUpSpy3,
         });
 
         trigger$$.next(10);
@@ -146,16 +146,16 @@ describe(effects.name, () => {
         const effect = effects.run(
           trigger$$.subscribe((v) => service.triggerEffect(v)),
           {
-            cleanUp: cleanUpSpy,
+            onCleanUp: cleanUpSpy,
           }
         );
 
         const effect2 = effects.run(trigger$$, (v) => service.triggerEffect(v), {
-          cleanUp: cleanUpSpy2,
+          onCleanUp: cleanUpSpy2,
         });
 
         const effect3 = effects.run(trigger$$.pipe(tap((v) => service.triggerEffect(v))), {
-          cleanUp: cleanUpSpy3,
+          onCleanUp: cleanUpSpy3,
         });
 
         trigger$$.next(10);
@@ -178,15 +178,15 @@ describe(effects.name, () => {
         const effect = effects.run(
           trigger$$.subscribe((v) => service.triggerEffect(v)),
           {
-            cleanUp: cleanUpSpy,
+            onCleanUp: cleanUpSpy,
           }
         );
 
         const effect2 = effects.run(trigger$$, (v) => service.triggerEffect(v), {
-          cleanUp: cleanUpSpy2,
+          onCleanUp: cleanUpSpy2,
         });
         const effect3 = effects.run(trigger$$.pipe(tap((v) => service.triggerEffect(v))), {
-          cleanUp: cleanUpSpy3,
+          onCleanUp: cleanUpSpy3,
         });
 
         trigger$$.next(10);
@@ -277,7 +277,7 @@ class TestComponent implements OnDestroy {
   source$ = of(10);
   clearInterval$$ = new Subject();
 
-  effects = effects(({ run, runOnInstanceDestroy }) => {
+  effects = effects(({ run, runOnCleanUp }) => {
     run(this.source$, (v) => this.service.sourceEffect(v));
     const triggerEffect = run(this.trigger$$, (v) => this.service.triggerEffect(v));
 
@@ -285,7 +285,7 @@ class TestComponent implements OnDestroy {
       triggerEffect.cleanUp();
     });
 
-    runOnInstanceDestroy(() => {
+    runOnCleanUp(() => {
       this.service.teardownEffect();
       this.clearInterval$$.next(void 0);
     });
