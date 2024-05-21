@@ -2,6 +2,11 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## 1.1.0 (2024-05-21)
+
+
+
+
 ## 1.0.0 (2024-05-21)
 
 * feat(effects): add effects factory function to manage subs ([7254e4f](https://github.com/mikelgo/angular-kit/commit/7254e4f))
