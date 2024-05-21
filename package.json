@@ -58,7 +58,7 @@
     "@eslint/eslintrc": "^2.1.1",
     "@eslint/js": "^8.48.0",
     "@hirez_io/observer-spy": "^2.2.0",
-    "@jscutlery/semver": "^3.0.0",
+    "@jscutlery/semver": "^5.0.0",
     "@ngneat/spectator": "^13.0.0",
     "@nx/cypress": "18.3.2",
     "@nx/eslint": "18.3.2",
