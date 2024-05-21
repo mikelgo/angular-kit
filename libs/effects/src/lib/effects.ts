@@ -11,9 +11,14 @@ import {
 import { catchError, EMPTY, Observable, pipe, ReplaySubject, Subscription, tap } from 'rxjs';
 import { assertInjector } from './assert-injector';
 
-export type CleanUp = {
+export type CleanUpRef = {
   cleanUp: () => void;
 };
+
+export function isCleanUpRefGuard(obj: any): obj is CleanUpRef {
+  return typeof obj === 'object' && obj?.cleanUp !== undefined && typeof obj.cleanUp === 'function';
+}
+
 /**
  * @internal
  *
@@ -31,65 +36,97 @@ export class Effects implements OnDestroy {
   constructor(@Optional() private readonly errorHandler: ErrorHandler | null) {}
 
   /**
+   * @description
+   * Manage the subscription of an observable and execute the side effect.
+   *
+   * Unsubscribes automatically when the provided {@link DestroyRef} is destroyed.
+   *
+   * Manually unsubscribe by calling {@link CleanUpRef.cleanUp}.
    *
    * @example
    * ```typescript
-   * effects.register(of(1).subscribe(console.log));
+   * ef = effects(({run})=> run(source$.subscribe(console.log)))
    * ```
+   * @param sub
+   * @param options
    */
   run(
     sub: Subscription,
-    o?: {
-      td?: () => void;
+    options?: {
+      cleanUp?: () => void;
     }
-  ): CleanUp;
+  ): CleanUpRef;
   /**
+   * @description
+   * Subscribe to the passed observable and execute the side effect.
+   *
+   * Unsubscribes automatically when the provided {@link DestroyRef} is destroyed.
+   *
+   * Manually unsubscribe by calling {@link CleanUpRef.cleanUp}.
    *
    * @example
    * ```typescript
-   * effects.register(of(1).pipe(tap(console.log)));
+   * ef = effects(({run})=> run(source$.pipe(tap(console.log))))
    * ```
+   *
+   * @param o$
+   * @param options
    */
   run<T>(
     o$: Observable<T>,
-    o?: {
-      td?: () => void;
+    options?: {
+      cleanUp?: () => void;
     }
-  ): CleanUp;
+  ): CleanUpRef;
   /**
+   * @description
+   * Subscribe to the passed observable and execute the side effect.
+   *
+   * Unsubscribes automatically when the provided {@link DestroyRef} is destroyed.
+   *
+   * Manually unsubscribe by calling {@link CleanUpRef.cleanUp}.
    *
    * @example
    * ```typescript
    * const trigger$ = of(1);
    * const effect = console.log;
-   * effects.register(trigger$, effect);
+   * ef = effects(({run})=> run(trigger$, effect))
    * ```
+   *
+   * @param o$
+   * @param sideEffectFn
+   * @param options
    */
-  run<T>(o$: Observable<T>, sideEffectFn: (arg: T) => void, o?: { td?: () => void }): CleanUp;
+  run<T>(o$: Observable<T>, sideEffectFn: (arg: T) => void, options?: { cleanUp?: () => void }): CleanUpRef;
+  /**
+   * @internal
+   */
   run<T>(
     obsOrSub$: Observable<T> | Subscription,
-    sideEffectFn?: ((arg: T) => void) | { td?: () => void },
-    o?: { td?: () => void }
-  ): CleanUp {
+    sideEffectFn?: ((arg: T) => void) | { cleanUp?: () => void },
+    options?: { cleanUp?: () => void }
+  ): CleanUpRef {
     const effectId = Effects.nextId++;
+
     if (obsOrSub$ instanceof Subscription) {
       this.sub.add(obsOrSub$);
       this.idSubMap.set(effectId, obsOrSub$);
+      let runOnInstanceDestroySub: undefined | CleanUpRef = undefined;
+      if (sideEffectFn ?? isCleanUpRefGuard(sideEffectFn)) {
+        runOnInstanceDestroySub = this.runOnInstanceDestroy(() => (sideEffectFn as CleanUpRef).cleanUp?.());
+      }
 
       return {
         cleanUp: () => {
-          // TODO
-          // if (sideEffectFn ?? typeof sideEffectFn === 'object') {
-          //   // TODO if sideEffectFn.td() has already been executed, it should not be executed again in registerOnTeardown
-          //   // @ts-ignore
-          //   sideEffectFn.td?.();
-          //   // @ts-ignore
-          //   this.registerOnTeardown(() => sideEffectFn.td?.())
-          // }
+          if (sideEffectFn ?? isCleanUpRefGuard(sideEffectFn)) {
+            (sideEffectFn as CleanUpRef).cleanUp?.();
+            runOnInstanceDestroySub?.cleanUp();
+          }
           this.unregister(effectId);
         },
       };
     }
+
     const subscription = obsOrSub$
       .pipe(
         // execute operation/ side effect
@@ -102,22 +139,26 @@ export class Effects implements OnDestroy {
       .subscribe();
     this.sub.add(subscription);
     this.idSubMap.set(effectId, subscription);
+
+    // cases sideEffectFn is a CleanUpRef OR options given
+    let runOnInstanceDestroySub: undefined | CleanUpRef = undefined;
+    if (options && options.cleanUp) {
+      runOnInstanceDestroySub = this.runOnInstanceDestroy(() => options.cleanUp?.());
+    }
+    if (sideEffectFn && isCleanUpRefGuard(sideEffectFn)) {
+      runOnInstanceDestroySub = this.runOnInstanceDestroy(() => (sideEffectFn as CleanUpRef).cleanUp?.());
+    }
+
     return {
       cleanUp: () => {
-        // TODO
-        // if (sideEffectFn ?? typeof sideEffectFn === 'object') {
-        //   // @ts-ignore
-        //   sideEffectFn.td?.();
-        //   // TODO if sideEffectFn.td() has already been executed, it should not be executed again in registerOnTeardown
-        //   // @ts-ignore
-        //   this.registerOnTeardown(() => sideEffectFn.td?.())
-        // }
-        // if (o){
-        //   o.td?.();
-        //   // TODO if sideEffectFn.td() has already been executed, it should not be executed again in registerOnTeardown
-        //   // @ts-ignore
-        //   this.registerOnTeardown(() => o.td?.());
-        // }
+        if (options && options.cleanUp) {
+          options.cleanUp?.();
+          runOnInstanceDestroySub?.cleanUp();
+        }
+        if (sideEffectFn && isCleanUpRefGuard(sideEffectFn)) {
+          (sideEffectFn as CleanUpRef).cleanUp?.();
+          runOnInstanceDestroySub?.cleanUp();
+        }
         this.unregister(effectId);
       },
     };
@@ -128,7 +169,7 @@ export class Effects implements OnDestroy {
    * @param sideEffectFn
    */
   runOnInstanceDestroy(sideEffectFn: () => void) {
-    this.run(this.destroyHook$$.asObservable(), sideEffectFn);
+    return this.run(this.destroyHook$$.pipe(tap(sideEffectFn)).subscribe());
   }
 
   /**
@@ -157,22 +198,26 @@ type EffectsSetupFn = (rxEffect: Pick<Effects, 'run' | 'runOnInstanceDestroy' | 
 
 // TODO update JSdoc and update main documentation /README
 /**
- * A helper function to manage any RxJs subscription
+ * @description
+ * Functional way to setup observable based side effects.
+ *
+ * It will destroy itself when the provided {@link DestroyRef} is destroyed.
+ *
  * @param setupFn
  * @param options
  *
  * @example
  *
- * const effects = reactiveEffects(({register}) => {
- *     register(source$, console.log)
+ * const ef = effects(({run, runOnInstanceDestroy}) => {
+ *     run(source$, console.log)
  *
- *     register(source$.subscribe(console.log))
+ *     run(source$.subscribe(console.log))
  *
- *     register(source$.pipe(tap(console.log)))
+ *     run(source$.pipe(tap(console.log)))
  *
- *     return () => {
- *         // any teardown logic, e.g unsubscribe from any source, clear timers etc.
- *     }
+ *     runOnInstanceDestroy(() => {
+ *       // any teardown logic, e.g unsubscribe from any source, clear timers etc.
+ *     })
  * })
  */
 export function effects(setupFn?: EffectsSetupFn, options?: { injector?: Injector }): Effects {
