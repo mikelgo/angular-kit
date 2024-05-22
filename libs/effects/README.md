@@ -41,10 +41,10 @@ The `onCleanUp`-function will be executed either when `intervalEffect.cleanUp()`
 the `effects`-instance is destroyed. **Note** the `onCleanUp`-function will run only **once**.
 
 #### Comparison
-
-###### Without `effects` pre Angular 16
 There are several well-established patterns to handle subscriptions in Angular. This example uses plain
 subscriptions and unsubscribes in the `ngOnDestroy` lifecycle hook.
+
+###### Without `effects` pre Angular 16
 ```ts
 @Component(...)
 export class AppComponent implements OnDestroy {
@@ -61,8 +61,6 @@ export class AppComponent implements OnDestroy {
 ```
 
 ###### Without `effects` post Angular 16
-There are several well-established patterns to handle subscriptions in Angular. This example uses plain
-subscriptions and unsubscribes in the `ngOnDestroy` lifecycle hook.
 ```ts
 @Component(...)
 export class AppComponent {
