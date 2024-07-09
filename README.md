@@ -11,7 +11,7 @@ A set of 🔥 Angular packages tools.
 
 - [stream](./libs/stream/README.md) - the better async pipe
 - [rx](./libs/rx/README.md) - reactive tools
-- [effects](./libs/effects/README.md) - modern util to manage subscriptions with zero-boilerplate code
+- [effects](https://github.com/mikelgo/angular-kit-effects) - modern util to manage subscriptions with zero-boilerplate code
 - [rx-hooks](./libs/rx-hooks/README.md) - reactive lifecycle hooks 
 - [rx-stateful](./libs/rx-stateful/README.md) - a powerful stateful wrapper for synchronous and asynchronous observables
 - [immutable-helper](./libs/immutable-helper/README.md) - immutable helper functions to deal with objects and arrays
