@@ -1,0 +1,11 @@
+<div>
+  <h1>Case 1</h1>
+  <div>
+    <button (click)="refresh$$.next(null)">refresh</button>
+    <div>
+      @if(case1$ | async ; as data){
+        <rx-stateful-state-visualizer [state]="data"/>
+      }
+    </div>
+  </div>
+</div>
