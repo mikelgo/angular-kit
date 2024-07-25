@@ -212,8 +212,8 @@ function createState$<T,A, E>(
               refreshedValue$.pipe(
               // with this we make sure that we do not turn off the suspsense state as long as a request is running
               // @ts-ignore
-              filter(v => !!v.value)
-            ),
+                filter(v => v.context !== 'suspense')
+              ),
             timer(suspenseThreshold + suspenseTime)]
           ).pipe(map(() => false))
         )
@@ -234,7 +234,7 @@ function createState$<T,A, E>(
             valueFromSourceTrigger$.pipe(
               // with this we make sure that we do not turn off the suspsense state as long as a request is running
               // @ts-ignore
-              filter(v => !!v.value)
+              filter(v => v.context !== 'suspense')
             ),
             timer(suspenseThreshold + suspenseTime)
           ]).pipe(map(() => false))
@@ -354,7 +354,7 @@ function createState$<T,A, E>(
           combineLatest([
             refreshedRequest$.pipe(
               // with this we make sure that we do not turn off the suspsense state as long as a request is running
-              filter(v => !!v.value)
+              filter(v => v.context !== 'suspense')
             ),
             timer(suspenseThreshold + suspenseTime)]
           ).pipe(map(() => false))
