@@ -323,12 +323,19 @@ function createState$<T,A, E>(
              */
             // @ts-ignore todo
             refreshTriggerIsBehaivorSubject(mergedConfig) ? skip(1) : pipe(),
+            // @ts-ignore
             switchMap(() =>
                 sharedSource$.pipe(
                     map(v => mapToValue(v)),
                     deriveInitialValue<T,E>(mergedConfig)
                 ),
             ),
+        share({
+          connector: () => new ReplaySubject(1),
+          resetOnError: true,
+          resetOnComplete: true,
+          resetOnRefCountZero: true,
+        }),
         ) as Observable<Partial<InternalRxState<T, E>>>
 
 
