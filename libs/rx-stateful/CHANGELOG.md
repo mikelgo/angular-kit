@@ -2,18 +2,8 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
-## <small>1.6.1 (2024-07-26)</small>
+## 1.7.0 (2024-07-26)
 
-* Bugfix/rx stateful no subs values (#112) ([034ce71](https://github.com/mikelgo/angular-kit/commit/034ce71)), closes [#112](https://github.com/mikelgo/angular-kit/issues/112)
-* chore: bump nx to 17.0.0 ([7721d63](https://github.com/mikelgo/angular-kit/commit/7721d63))
-* chore: bump nx to 18.0.0 ([530c496](https://github.com/mikelgo/angular-kit/commit/530c496))
-* chore(rx-stateful): release version 1.7.0 ([4f2f843](https://github.com/mikelgo/angular-kit/commit/4f2f843))
-* docs(rx-stateful): add key benefits ([8cb1718](https://github.com/mikelgo/angular-kit/commit/8cb1718))
-* docs(rx-stateful): update docs with non-flicker loading state ([a12222a](https://github.com/mikelgo/angular-kit/commit/a12222a))
-* feat(rx-stateful): default suspense threshold and time set to 0 to be non-breaking ([40609f5](https://github.com/mikelgo/angular-kit/commit/40609f5))
-* feat(rx-stateful): move RxStatefulClient to experimental package ([4593991](https://github.com/mikelgo/angular-kit/commit/4593991))
-* feat(rx-stateful): non-flicker suspense ([1d60706](https://github.com/mikelgo/angular-kit/commit/1d60706))
-* feat(rx-stateful): wip non-flicker suspense ([58f67d0](https://github.com/mikelgo/angular-kit/commit/58f67d0))
 
 
 
