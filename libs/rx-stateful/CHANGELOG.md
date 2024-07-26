@@ -2,6 +2,12 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## <small>1.7.1 (2024-07-26)</small>
+* Bugfix/rx stateful no subs values (#112) ([034ce71](https://github.com/mikelgo/angular-kit/commit/034ce71)), closes [#112](https://github.com/mikelgo/angular-kit/issues/112)
+
+
+
+
 ## 1.7.0 (2024-07-26)
 
 
