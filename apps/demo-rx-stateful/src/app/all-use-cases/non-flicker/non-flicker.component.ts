@@ -12,22 +12,22 @@ import {rxStateful$, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
   imports: [CommonModule],
   template: `
     <h1>DemoRxStatefulComponent</h1>
-    <div>
-      <button (click)="refresh$$.next(null)">refresh</button>
-    </div>
-    <div>
-      <h4>State</h4>
-      <div *ngIf="state$ | async as state">
-        <div *ngIf="state.value">{{ state.value | json }}</div>
-        <div *ngIf="state.isSuspense">loading</div>
-      </div>
-    </div>
-    <div>
-      <h4>State Accumulated</h4>
-      <ul *ngFor="let v of stateAccumulated$ | async">
-        <li>{{ v | json }}</li>
-      </ul>
-    </div>
+<!--    <div>-->
+<!--      <button (click)="refresh$$.next(null)">refresh</button>-->
+<!--    </div>-->
+<!--    <div>-->
+<!--      <h4>State</h4>-->
+<!--      <div *ngIf="state$ | async as state">-->
+<!--        <div *ngIf="state.value">{{ state.value | json }}</div>-->
+<!--        <div *ngIf="state.isSuspense">loading</div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <div>-->
+<!--      <h4>State Accumulated</h4>-->
+<!--      <ul *ngFor="let v of stateAccumulated$ | async">-->
+<!--        <li>{{ v | json }}</li>-->
+<!--      </ul>-->
+<!--    </div>-->
     <!--    <div>-->
     <!--      <h4>Query Params</h4>-->
     <!--      <div>{{ query$ | async | json }}</div>-->
@@ -35,17 +35,17 @@ import {rxStateful$, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
     <!--    </div>-->
 
     <!--    <br>-->
-    <!--    <div>-->
-    <!--      <button mat-button color="primary" (click)="page$$.next(-1)"> previous page </button>-->
-    <!--      <button mat-button color="primary" (click)="page$$.next(1)"> next page </button>-->
-    <!--      <button mat-button color="primary" (click)="refresh$$.next(null)"> Refresh current page </button>-->
-    <!--      <div>-->
-    <!--        <h4>State Accumulated</h4>-->
-    <!--        <ul *ngFor="let v of state2Accumulated$ | async">-->
-    <!--          <li>{{ v | json }}</li>-->
-    <!--        </ul>-->
-    <!--      </div>-->
-    <!--    </div>-->
+        <div>
+          <button mat-button color="primary" (click)="page$$.next(-1)"> previous page </button>
+          <button mat-button color="primary" (click)="page$$.next(1)"> next page </button>
+          <button mat-button color="primary" (click)="refresh$$.next(null)"> Refresh current page </button>
+          <div>
+            <h4>State Accumulated</h4>
+            <ul *ngFor="let v of state2Accumulated$ | async">
+              <li>{{ v | json }}</li>
+            </ul>
+          </div>
+        </div>
   `,
   styles: `
     :host {
@@ -90,11 +90,11 @@ export class NonFlickerComponent {
   // );
 
 
-  state$ = rxStateful$(this.fetch(400), {
+  state$ = rxStateful$(this.fetch(450), {
     keepValueOnRefresh: false,
     keepErrorOnRefresh: false,
     refreshTrigger$: this.refresh$$,
-    suspenseTimeMs: 1000,
+    suspenseTimeMs: 3000,
     suspenseThresholdMs: 500
   });
 
@@ -115,11 +115,13 @@ export class NonFlickerComponent {
   state2$ = rxStateful$(
     (page) => this.fetchPage({
       page,
-      delayInMs: 1000
+      delayInMs: 5000
     }).pipe(
 
     ),
     {
+      suspenseThresholdMs: 500,
+      suspenseTimeMs: 2000,
       sourceTriggerConfig: {
         trigger: this.page$
       },

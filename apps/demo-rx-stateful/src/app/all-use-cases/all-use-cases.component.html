@@ -11,17 +11,17 @@
 <!--</div>-->
 
 
-<!--<div>-->
-<!--  <h1>Bugfix Reproduction</h1>-->
-<!--  <div>-->
-<!--    <button (click)="deleteAction$.next(1)">trigger delete</button>-->
-<!--    <div>-->
-<!--      @if(delete$ | async ; as data){-->
-<!--        <rx-stateful-state-visualizer [state]="data"/>-->
-<!--      }-->
-<!--    </div>-->
-<!--  </div>-->
-<!--</div>-->
+<div>
+  <h1>Bugfix Reproduction</h1>
+  <div>
+    <button (click)="deleteAction$.next(1)">trigger delete</button>
+    <div>
+      @if(delete$ | async ; as data){
+        <rx-stateful-state-visualizer [state]="data"/>
+      }
+    </div>
+  </div>
+</div>
 
 
 

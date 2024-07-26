@@ -88,7 +88,7 @@ export class DemoRxStatefulComponent {
   // );
 
 
-  state$ = rxStateful$(this.fetch(4000), {
+  state$ = rxStateful$(this.fetch(400), {
     keepValueOnRefresh: false,
     keepErrorOnRefresh: false,
     refreshTrigger$: this.refresh$$,
