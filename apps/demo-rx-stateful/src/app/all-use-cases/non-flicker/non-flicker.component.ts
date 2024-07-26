@@ -1,55 +1,57 @@
 import {Component, inject} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {HttpClient} from '@angular/common/http';
-
-import {BehaviorSubject, concatAll, delay, map, scan, Subject, switchMap, tap, toArray} from 'rxjs';
-import {ActivatedRoute} from '@angular/router';
+import { CommonModule } from '@angular/common';
+import {HttpClient} from "@angular/common/http";
+import {ActivatedRoute} from "@angular/router";
+import {BehaviorSubject, concatAll, delay, map, scan, Subject, switchMap, tap, toArray} from "rxjs";
 import {provideRxStatefulClient, RxStatefulClient, withConfig} from "@angular-kit/rx-stateful/experimental";
 import {rxStateful$, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
-import {MatButtonModule} from "@angular/material/button";
 
 @Component({
-  selector: 'angular-kit-demo-rx-stateful',
+  selector: 'demo-non-flicker',
   standalone: true,
-  imports: [CommonModule, MatButtonModule],
+  imports: [CommonModule],
   template: `
     <h1>DemoRxStatefulComponent</h1>
-    <div>
-      <button (click)="refresh$$.next(null)">refresh</button>
-    </div>
-    <div>
-      <h4>State</h4>
-      <div *ngIf="state$ | async as state">
-        <div *ngIf="state.value">{{ state.value | json }}</div>
-        <div *ngIf="state.isSuspense">loading</div>
-      </div>
-    </div>
-    <div>
-      <h4>State Accumulated</h4>
-      <ul *ngFor="let v of stateAccumulated$ | async">
-        <li>{{ v | json }}</li>
-      </ul>
-    </div>
 <!--    <div>-->
-<!--      <h4>Query Params</h4>-->
-<!--      <div>{{ query$ | async | json }}</div>-->
-<!--      <div>{{ value$ | async | json }}</div>-->
+<!--      <button (click)="refresh$$.next(null)">refresh</button>-->
 <!--    </div>-->
-
-<!--    <br>-->
 <!--    <div>-->
-<!--      <button mat-button color="primary" (click)="page$$.next(-1)"> previous page </button>-->
-<!--      <button mat-button color="primary" (click)="page$$.next(1)"> next page </button>-->
-<!--      <button mat-button color="primary" (click)="refresh$$.next(null)"> Refresh current page </button>-->
-<!--      <div>-->
-<!--        <h4>State Accumulated</h4>-->
-<!--        <ul *ngFor="let v of state2Accumulated$ | async">-->
-<!--          <li>{{ v | json }}</li>-->
-<!--        </ul>-->
+<!--      <h4>State</h4>-->
+<!--      <div *ngIf="state$ | async as state">-->
+<!--        <div *ngIf="state.value">{{ state.value | json }}</div>-->
+<!--        <div *ngIf="state.isSuspense">loading</div>-->
 <!--      </div>-->
 <!--    </div>-->
+<!--    <div>-->
+<!--      <h4>State Accumulated</h4>-->
+<!--      <ul *ngFor="let v of stateAccumulated$ | async">-->
+<!--        <li>{{ v | json }}</li>-->
+<!--      </ul>-->
+<!--    </div>-->
+    <!--    <div>-->
+    <!--      <h4>Query Params</h4>-->
+    <!--      <div>{{ query$ | async | json }}</div>-->
+    <!--      <div>{{ value$ | async | json }}</div>-->
+    <!--    </div>-->
+
+    <!--    <br>-->
+        <div>
+          <button mat-button color="primary" (click)="page$$.next(-1)"> previous page </button>
+          <button mat-button color="primary" (click)="page$$.next(1)"> next page </button>
+          <button mat-button color="primary" (click)="refresh$$.next(null)"> Refresh current page </button>
+          <div>
+            <h4>State Accumulated</h4>
+            <ul *ngFor="let v of state2Accumulated$ | async">
+              <li>{{ v | json }}</li>
+            </ul>
+          </div>
+        </div>
   `,
-  styles: [],
+  styles: `
+    :host {
+      display: block;
+    }
+  `,
   providers: [
     provideRxStatefulClient(
       withConfig({ keepValueOnRefresh: false, errorMappingFn: (e) => e})
@@ -57,7 +59,7 @@ import {MatButtonModule} from "@angular/material/button";
     // provideRxStatefulConfig({keepValueOnRefresh: true, errorMappingFn: (e) => e})
   ],
 })
-export class DemoRxStatefulComponent {
+export class NonFlickerComponent {
   private http = inject(HttpClient);
   private route = inject(ActivatedRoute);
   refresh$$ = new Subject<any>();
@@ -67,7 +69,7 @@ export class DemoRxStatefulComponent {
   query$ = this.route.params;
 
   value$ = this.query$.pipe(switchMap(() => this.client.request(this.fetch()).pipe(
-      map(v => v.value)
+    map(v => v.value)
   )));
 
   // instance = this.client.request(this.fetch(), {
@@ -81,18 +83,18 @@ export class DemoRxStatefulComponent {
   //   tap(console.log),
   //   scan((acc, value, index) => {
   //     @ts-ignore
-      // acc.push({ index, value });
-      //
-      // return acc;
-    // }, [])
+  // acc.push({ index, value });
+  //
+  // return acc;
+  // }, [])
   // );
 
 
-  state$ = rxStateful$(this.fetch(400), {
+  state$ = rxStateful$(this.fetch(450), {
     keepValueOnRefresh: false,
     keepErrorOnRefresh: false,
     refreshTrigger$: this.refresh$$,
-    suspenseTimeMs: 1000,
+    suspenseTimeMs: 3000,
     suspenseThresholdMs: 500
   });
 
@@ -113,11 +115,13 @@ export class DemoRxStatefulComponent {
   state2$ = rxStateful$(
     (page) => this.fetchPage({
       page,
-      delayInMs: 1000
+      delayInMs: 5000
     }).pipe(
 
     ),
     {
+      suspenseThresholdMs: 500,
+      suspenseTimeMs: 2000,
       sourceTriggerConfig: {
         trigger: this.page$
       },
