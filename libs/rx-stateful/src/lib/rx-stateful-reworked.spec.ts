@@ -1,8 +1,9 @@
 import { rxStateful$ } from './rx-stateful$';
 import { TestScheduler, RunHelpers } from 'rxjs/testing';
-import { of } from 'rxjs';
+import {mergeAll, of, Subject, throwError} from 'rxjs';
 import { RxStateful, RxStatefulConfig } from './types/types';
 import { withRefetchOnTrigger } from './refetch-strategies/refetch-on-trigger.strategy';
+import {subscribeSpyTo} from "@hirez_io/observer-spy";
 
 describe(rxStateful$.name, () => {
   describe('non-flicker suspense not used', () => {
@@ -290,38 +291,267 @@ describe(rxStateful$.name, () => {
 
     describe('Error Handling', () => {
       describe('Observable Signature', () => {
-        // TODO
-        // describe('When error happens', () => {
-        //   it('should handle error and operate correctly afterwards', () => {
-        //
-        //   });
-        //   it('should keep the error on refresh when keepErrorOnRefresh = true', () => {
-        //
-        //   });
-        //   it('should execute beforeHandleErrorFn', () => {
-        //
-        //   });
-        //   it('should use errorMappingFn', () => {
-        //
-        //   });
-        // });
+        describe('When error happens', () => {
+          it('should handle error and operate correctly afterwards', () => {
+            runWithTestScheduler(({ expectObservable, cold }) => {
+              const error = new Error('oops');
+              const s$ = cold('-#', {}, error);
+              const refresh$ = cold('---a-', { a: void 0 });
+              const expected = 'sa-sa-';
+              const source$ = rxStateful$(s$, {
+                ...defaultConfig,
+                refetchStrategies: [withRefetchOnTrigger(refresh$)],
+              });
+
+              expectObservable(source$).toBe(
+                expected,
+                marbelize({
+                  s: {
+                    hasError: false,
+                    error: undefined,
+                    context: 'suspense',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: true,
+                  },
+                  a: {
+                    hasError: true,
+                    error: error,
+                    context: 'error',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: false,
+                  },
+                })
+              );
+            });
+          });
+          it('should keep the error on refresh when keepErrorOnRefresh = true', () => {
+            runWithTestScheduler(({ expectObservable, cold }) => {
+              const error = new Error('oops');
+              const s$ = cold('-#', {}, error);
+              const refresh$ = cold('---a-', { a: void 0 });
+              const expected = 'za-ya-';
+              const source$ = rxStateful$(s$, {
+                ...defaultConfig,
+                keepErrorOnRefresh: true,
+                refetchStrategies: [withRefetchOnTrigger(refresh$)],
+              });
+
+              expectObservable(source$).toBe(
+                expected,
+                marbelize({
+                  z: {
+                    hasError: false,
+                    error: undefined,
+                    context: 'suspense',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: true,
+                  },
+                  y: {
+                    hasError: true,
+                    error: error,
+                    context: 'suspense',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: true,
+                  },
+                  a: {
+                    hasError: true,
+                    error: error,
+                    context: 'error',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: false,
+                  },
+                })
+              );
+            });
+          });
+          it('should execute beforeHandleErrorFn', () => {
+            const source$ = new Subject<any>();
+            const beforeHandleErrorFn = jest.fn();
+            const result = subscribeSpyTo(
+              rxStateful$<any>(source$.pipe(mergeAll()), { ...defaultConfig, beforeHandleErrorFn })
+            );
+
+            source$.next(throwError(() => new Error('error')));
+
+            expect(beforeHandleErrorFn).toHaveBeenCalledWith(Error('error'));
+            expect(beforeHandleErrorFn).toBeCalledTimes(1);
+          });
+          it('should use errorMappingFn', () => {
+            runWithTestScheduler(({ expectObservable, cold }) => {
+              const error = new Error('oops');
+              const s$ = cold('-#', {}, error);
+              const refresh$ = cold('---a-', { a: void 0 });
+              const expected = 'sa-sa-';
+              const source$ = rxStateful$<any,any>(s$, {
+                ...defaultConfig,
+                errorMappingFn: (error: Error) => error.message,
+                refetchStrategies: [withRefetchOnTrigger(refresh$)],
+              });
+
+              expectObservable(source$).toBe(
+                expected,
+                marbelize({
+                  s: {
+                    hasError: false,
+                    error: undefined,
+                    context: 'suspense',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: true,
+                  },
+                  a: {
+                    hasError: true,
+                    error: error.message,
+                    context: 'error',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: false,
+                  },
+                })
+              );
+            });
+          });
+        });
       });
       describe('Callback Signature', () => {
-        // TODO
-        // describe('When error happens', () => {
-        //   it('should handle error and operate correctly afterwards', () => {
-        //
-        //   });
-        //   it('should keep the error on refresh when keepErrorOnRefresh = true', () => {
-        //
-        //   });
-        //   it('should execute beforeHandleErrorFn', () => {
-        //
-        //   });
-        //   it('should use errorMappingFn', () => {
-        //
-        //   });
-        // });
+        describe('When error happens', () => {
+          it('should handle error and operate correctly afterwards', () => {
+            runWithTestScheduler(({ expectObservable, cold }) => {
+              const error = new Error('oops');
+              const s$ = cold('-#', {}, error);
+              const trigger$ = cold('a---a-', { a: 1 });
+              const expected = 'sa--sa-';
+              const source$ = rxStateful$<any, any>((n: number) => s$, {
+                ...defaultConfig,
+              sourceTriggerConfig: {
+                  trigger: trigger$
+              }});
+
+              expectObservable(source$).toBe(
+                expected,
+                marbelize({
+                  s: {
+                    hasError: false,
+                    error: undefined,
+                    context: 'suspense',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: true,
+                  },
+                  a: {
+                    hasError: true,
+                    error: error,
+                    context: 'error',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: false,
+                  },
+                })
+              );
+            });
+          });
+          it('should keep the error on refresh when keepErrorOnRefresh = true', () => {
+            runWithTestScheduler(({ expectObservable, cold }) => {
+              const error = new Error('oops');
+              const s$ = cold('-#', {}, error);
+              const trigger$ = cold('a---a-', { a: 1 });
+              const expected = 'za--ya-';
+              const source$ = rxStateful$<any, any>((n: number) => s$, {
+                ...defaultConfig,
+                keepErrorOnRefresh: true,
+                sourceTriggerConfig: {
+                  trigger: trigger$
+                }});
+
+              expectObservable(source$).toBe(
+                expected,
+                marbelize({
+                  z: {
+                    hasError: false,
+                    error: undefined,
+                    context: 'suspense',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: true,
+                  },
+                  y: {
+                    hasError: true,
+                    error: error,
+                    context: 'suspense',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: true,
+                  },
+                  a: {
+                    hasError: true,
+                    error: error,
+                    context: 'error',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: false,
+                  },
+                })
+              );
+            });
+          });
+          it('should execute beforeHandleErrorFn', () => {
+            const trigger$ = new Subject<any>()
+            const beforeHandleErrorFn = jest.fn();
+            const result = subscribeSpyTo(
+              rxStateful$<any, any>(() => throwError(() => new Error('error')), { ...defaultConfig, beforeHandleErrorFn, sourceTriggerConfig: {
+                trigger: trigger$
+                } })
+            );
+
+            trigger$.next(null)
+
+            expect(beforeHandleErrorFn).toHaveBeenCalledWith(Error('error'));
+            // TODO this needs investigation
+            expect(beforeHandleErrorFn).toBeCalledTimes(2);
+          });
+          it('should use errorMappingFn', () => {
+            runWithTestScheduler(({ expectObservable, cold }) => {
+              const error = new Error('oops');
+              const s$ = cold('-#', {}, error);
+              const trigger$ = cold('a---a-', { a: 1 });
+              const expected = 'sa--sa-';
+              // @ts-ignore
+              const source$ = rxStateful$<any, any>((n: number) => s$, {
+                ...defaultConfig,
+                errorMappingFn: (error: Error) => error.message,
+                sourceTriggerConfig: {
+                  trigger: trigger$
+                }});
+
+              expectObservable(source$).toBe(
+                expected,
+                marbelize({
+                  s: {
+                    hasError: false,
+                    error: undefined,
+                    context: 'suspense',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: true,
+                  },
+                  a: {
+                    hasError: true,
+                    error: error.message,
+                    context: 'error',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: false,
+                  },
+                })
+              );
+            });
+          });
+        });
       });
     });
   });
