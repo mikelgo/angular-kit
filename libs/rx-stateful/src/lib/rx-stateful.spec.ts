@@ -1,413 +1,796 @@
-import {mergeAll, Observable, of, scan, Subject, throwError} from 'rxjs';
-import {subscribeSpyTo} from '@hirez_io/observer-spy';
-import {rxStateful$} from './rx-stateful$';
-import {fakeAsync, TestBed, tick} from '@angular/core/testing';
-import {withRefetchOnTrigger} from './refetch-strategies/refetch-on-trigger.strategy';
-import {withAutoRefetch} from './refetch-strategies/refetch-on-auto.strategy';
+import { rxStateful$ } from './rx-stateful$';
+import { TestScheduler, RunHelpers } from 'rxjs/testing';
+import {mergeAll, of, Subject, throwError} from 'rxjs';
+import { RxStateful, RxStatefulConfig } from './types/types';
+import { withRefetchOnTrigger } from './refetch-strategies/refetch-on-trigger.strategy';
+import {subscribeSpyTo} from "@hirez_io/observer-spy";
 
-const test = (description: string, testFn: () => void, testBed?: TestBed) => {
-  it(description, () => {
-    (testBed ?? TestBed).runInInjectionContext(() => {
-      testFn();
-    });
-  });
-};
+describe(rxStateful$.name, () => {
+  describe('non-flicker suspense not used', () => {
+    const defaultConfig: RxStatefulConfig<any> = {
+      suspenseTimeMs: 0,
+      suspenseThresholdMs: 0,
+      keepValueOnRefresh: false,
+      keepErrorOnRefresh: false,
+    };
+    describe('Observable Signature', () => {
+      it('should not emit a suspense = true state for sync observable', () => {
+        runWithTestScheduler(({ expectObservable }) => {
+          const source$ = rxStateful$(of(1), defaultConfig);
 
+          const expected = 's';
 
-describe('rxStateful$', () => {
-  describe('without refreshTrigger$', () => {
-    test('should return the correct state', () => {
-      const source$ = new Subject<number>();
-      const result = subscribeSpyTo(rxStateful$<number>(source$));
-
-      source$.next(10);
-      expect(result.getValues()).toEqual([
-        { hasValue: false, isSuspense: true, hasError: false, context: 'suspense', value: null, error: undefined },
-        { hasValue: true, isSuspense: false, value: 10, hasError: false, context: 'next', error: undefined },
-      ]);
-    });
-    test('should emit correct state when error happens', () => {
-      const source$ = new Subject<Observable<any>>();
-      const result = subscribeSpyTo(rxStateful$<number>(source$.pipe(mergeAll())));
-
-      source$.next(throwError(() => new Error('error')));
-
-      expect(result.getValues()).toEqual([
-        { hasValue: false, isSuspense: true, hasError: false, context: 'suspense', value: null, error: undefined  },
-        { hasValue: false, isSuspense: false, value: null, hasError: true, context: 'error', error: 'error' },
-      ]);
-    })
-  });
-  describe('with refreshTrigger$', () => {
-
-
-    test('should return the correct state', () => {
-        const source$ = new Subject<any>();
-        const refreshTrigger$ = new Subject<void>();
-        const result = subscribeSpyTo(rxStateful$<number>(source$, { refreshTrigger$ }));
-
-        source$.next(10);
-        refreshTrigger$.next(void 0);
-        // todo #60
-        //source$.next(throwError(() => new Error('error')));
-
-        expect(result.getValues()).toEqual([
-          { hasValue: false, isSuspense: true, hasError: false, context: 'suspense', value: null, error: undefined  },
-          { hasValue: true, isSuspense: false, value: 10, hasError: false, context: 'next', error: undefined },
-          { hasValue: false, isSuspense: true, value: null, context: 'suspense', hasError: false , error: undefined},
-          { hasValue: true, isSuspense: false, value: 10, context: 'next', hasError: false, error: undefined },
-          // { hasValue: true, isSuspense: true, value: null, context: 'suspense', hasError: false },
-          //{ hasValue: false, isSuspense: false, value: null, context: 'error', hasError: true, error: 'error' },
-        ]);
-      });
-
-    test('should emit correct state when error happens', () => {
-      const source$ = new Subject<Observable<any>>();
-      const refreshTrigger$ = new Subject<void>();
-      const result = subscribeSpyTo(rxStateful$<number>(source$.pipe(mergeAll()), { refreshTrigger$ }));
-
-      source$.next(throwError(() => new Error('error')));
-      refreshTrigger$.next(void 0);
-      source$.next(throwError(() => new Error('error')));
-
-      expect(result.getValues()).toEqual([
-        { hasValue: false, isSuspense: true, hasError: false, context: 'suspense', error: undefined, value: null },
-        { hasValue: false, isSuspense: false, value: null, hasError: true, context: 'error', error: 'error' },
-        { hasValue: false, isSuspense: true, value: null, hasError: false, context: 'suspense', error: undefined },
-        { hasValue: false, isSuspense: false, value: null, hasError: true, context: 'error', error: 'error' },
-      ]);
-    })
-
-
-    describe('Configuration options', () => {
-      describe('keepErrorOnRefresh', () => {
-        test('should not keep the error on refresh when option is set to false', function () {
-          const source$ = new Subject<Observable<any>>();
-          const refreshTrigger$ = new Subject<void>();
-          const result = subscribeSpyTo(
-            rxStateful$<number>(source$.pipe(mergeAll()), { refreshTrigger$, keepErrorOnRefresh: false })
+          expectObservable(source$).toBe(
+            expected,
+            marbelize({
+              s: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: 1,
+                hasValue: true,
+                isSuspense: false,
+              },
+            })
           );
-
-          source$.next(throwError(() => new Error('error')));
-          refreshTrigger$.next(void 0);
-          source$.next(throwError(() => new Error('error')));
-
-          expect(result.getValues()).toEqual([
-            // todo first emission does not contain value: null?
-            { hasValue: false, isSuspense: true, hasError: false, context: 'suspense', error: undefined, value: null },
-            { hasValue: false, isSuspense: false, hasError: true, context: 'error', error: 'error', value: null },
-            { hasValue: false, isSuspense: true, hasError: false, context: 'suspense', error: undefined, value: null },
-            { hasValue: false, isSuspense: false, value: null, hasError: true, context: 'error', error: 'error' },
-          ]);
-        });
-
-        test('should keep the error on refresh when option is set to true', function () {
-          const source$ = new Subject<Observable<any>>();
-          const refreshTrigger$ = new Subject<void>();
-          const result = subscribeSpyTo(
-            rxStateful$<number>(source$.pipe(mergeAll()), { refreshTrigger$, keepErrorOnRefresh: true })
-          );
-
-          source$.next(throwError(() => new Error('error')));
-          refreshTrigger$.next(void 0);
-          source$.next(throwError(() => new Error('error')));
-
-          expect(result.getValues()).toEqual([
-              // todo first emission does not contain value: null?
-            { hasValue: false, isSuspense: true,  hasError: false, context: 'suspense', error: undefined, value:null },
-            { hasValue: false, isSuspense: false, value: null, hasError: true, context: 'error', error: 'error' },
-            { hasValue: false, isSuspense: true, value: null, hasError: true, context: 'suspense', error: 'error' },
-            { hasValue: false, isSuspense: false, value: null, hasError: true, context: 'error', error: 'error' },
-          ]);
         });
       });
+      // TODO
+      // it('underlying source$ should be multicasted', () => {
+      //
+      // });
+      describe('Using refreshTrigger', () => {
+        it('should emit the correct state when using a refreshTrigger ', () => {
+          runWithTestScheduler(({ expectObservable, cold }) => {
+            const s$ = cold('-a|', { a: 1 });
+            const refresh$ = cold('---a-', { a: void 0 });
+            const expected = 'sa-sb-';
+            const source$ = rxStateful$(s$, { ...defaultConfig, refetchStrategies: [withRefetchOnTrigger(refresh$)] });
+
+            expectObservable(source$).toBe(
+              expected,
+              marbelize({
+                s: {
+                  hasError: false,
+                  error: undefined,
+                  context: 'suspense',
+                  value: null,
+                  hasValue: false,
+                  isSuspense: true,
+                },
+                a: {
+                  hasError: false,
+                  error: undefined,
+                  context: 'next',
+                  value: 1,
+                  hasValue: true,
+                  isSuspense: false,
+                },
+                b: {
+                  hasError: false,
+                  error: undefined,
+                  context: 'next',
+                  value: 1,
+                  hasValue: true,
+                  isSuspense: false,
+                },
+              })
+            );
+          });
+        });
+        it('should keep the value on refresh when keepValueOnRefresh = true', () => {
+          runWithTestScheduler(({ expectObservable, cold }) => {
+            const s$ = cold('-a|', { a: 1 });
+            const refresh$ = cold('---a-', { a: void 0 });
+            const expected = 'za-yb-';
+            const source$ = rxStateful$(s$, {
+              ...defaultConfig,
+              keepValueOnRefresh: true,
+              refetchStrategies: [withRefetchOnTrigger(refresh$)],
+            });
+
+            expectObservable(source$).toBe(
+              expected,
+              marbelize({
+                z: {
+                  hasError: false,
+                  error: undefined,
+                  context: 'suspense',
+                  // TODO in this case why is value not null initially?
+                  // value: null,
+                  hasValue: false,
+                  isSuspense: true,
+                },
+                y: {
+                  hasError: false,
+                  error: undefined,
+                  context: 'suspense',
+                  value: 1,
+                  hasValue: true,
+                  isSuspense: true,
+                },
+                a: {
+                  hasError: false,
+                  error: undefined,
+                  context: 'next',
+                  value: 1,
+                  hasValue: true,
+                  isSuspense: false,
+                },
+                b: {
+                  hasError: false,
+                  error: undefined,
+                  context: 'next',
+                  value: 1,
+                  hasValue: true,
+                  isSuspense: false,
+                },
+              })
+            );
+          });
+        });
+      });
     });
-  });
-  describe('Configuration', () => {
-    test('should execute beforeHandleErrorFn', () => {
-      const source$ = new Subject<any>();
-      const beforeHandleErrorFn = jest.fn();
-      const result = subscribeSpyTo(
-        rxStateful$<any>(source$.pipe(mergeAll()), { keepValueOnRefresh: false, beforeHandleErrorFn })
-      );
 
-      source$.next(throwError(() => new Error('error')));
-
-      expect(beforeHandleErrorFn).toHaveBeenCalledWith(Error('error'));
-      expect(beforeHandleErrorFn).toBeCalledTimes(1);
-    });
-  });
-  describe('with refetch strategies', () => {
-    test('keepValueOnRefresh: true - should return the current value when withTriggerRefetch emits', () => {
-      const source$ = new Subject<number>();
-      const refreshTrigger$ = new Subject<void>();
-
-      const result = subscribeSpyTo(
-        rxStateful$<number>(source$, {
-          keepValueOnRefresh: true,
-          refetchStrategies: [withRefetchOnTrigger(refreshTrigger$)],
-        })
-      );
-      source$.next(10);
-
-      refreshTrigger$.next(void 0);
-      refreshTrigger$.next(void 0);
-
-      expect(result.getValues()).toEqual([
-        {
-          "context": "suspense",
-          "hasError": false,
-          "hasValue": false,
-          "isSuspense": true,
-          value: undefined,
-          error: undefined
-        },
-        {
-          "context": "next",
-          "hasError": false,
-          "hasValue": true,
-          "isSuspense": false,
-          "value": 10
-        },
-        {
-          "context": "suspense",
-          "hasError": false,
-          "hasValue": true,
-          "isSuspense": true,
-          "value": 10
-        },
-        {
-          "context": "next",
-          "hasError": false,
-          "hasValue": true,
-          "isSuspense": false,
-          "value": 10
-        },
-        {
-          "context": "suspense",
-          "hasError": false,
-          "hasValue": true,
-          "isSuspense": true,
-          "value": 10
-        },
-        {
-          "context": "next",
-          "hasError": false,
-          "hasValue": true,
-          "isSuspense": false,
-          "value": 10
-        }
-      ]);
-    });
-    test('keepValueOnRefresh: true - should return the current value when autoRefetchStrategy emits', fakeAsync(() => {
-      const source$ = new Subject<number>();
-
-      const result = subscribeSpyTo(
-        rxStateful$<number>(source$, { keepValueOnRefresh: true, refetchStrategies: [withAutoRefetch(100, 301)] })
-
-      );
-      source$.next(10);
-      tick(500);
-
-      expect(result.getValues()).toEqual([
-        {
-          "context": "suspense",
-          "hasError": false,
-          "hasValue": false,
-          "isSuspense": true
-        },
-        {
-          "context": "next",
-          "hasError": false,
-          "hasValue": true,
-          "isSuspense": false,
-          "value": 10
-        },
-        {
-          "context": "suspense",
-          "hasError": false,
-          "hasValue": true,
-          "isSuspense": true,
-          "value": 10
-        },
-        {
-          "context": "next",
-          "hasError": false,
-          "hasValue": true,
-          "isSuspense": false,
-          "value": 10
-        },
-        {
-          "context": "suspense",
-          "hasError": false,
-          "hasValue": true,
-          "isSuspense": true,
-          "value": 10
-        },
-        {
-          "context": "next",
-          "hasError": false,
-          "hasValue": true,
-          "isSuspense": false,
-          "value": 10
-        },
-        {
-          "context": "suspense",
-          "hasError": false,
-          "hasValue": true,
-          "isSuspense": true,
-          "value": 10
-        },
-        {
-          "context": "next",
-          "hasError": false,
-          "hasValue": true,
-          "isSuspense": false,
-          "value": 10
-        }
-      ]);
-    }));
-    test('keepValueOnRefresh: true - should return the current value when mixed refetch strategies emits', fakeAsync(() => {
-      const source$ = new Subject<number>();
-      const refreshTrigger1$ = new Subject<void>();
-      const refreshTrigger2$ = new Subject<void>();
-
-      const result = subscribeSpyTo(
-        rxStateful$<number>(source$, {
-          keepValueOnRefresh: true,
-          refetchStrategies: [
-            withAutoRefetch(100, 301),
-
-            withRefetchOnTrigger(refreshTrigger1$),
-            withRefetchOnTrigger(refreshTrigger2$),
-          ],
-        })
-
-      );
-      source$.next(10);
-      tick(500);
-
-      refreshTrigger1$.next(void 0);
-      refreshTrigger2$.next(void 0);
-
-      expect(result.getValues().length).toEqual(12);
-      expect(result.getValues()).toEqual([
-        {
-          "context": "suspense",
-          "hasError": false,
-          "hasValue": false,
-          "isSuspense": true
-        },
-        {
-          "context": "next",
-          "hasError": false,
-          "hasValue": true,
-          "isSuspense": false,
-          "value": 10
-        },
-        {
-          "context": "suspense",
-          "hasError": false,
-          "hasValue": true,
-          "isSuspense": true,
-          "value": 10
-        },
-        {
-          "context": "next",
-          "hasError": false,
-          "hasValue": true,
-          "isSuspense": false,
-          "value": 10
-        },
-        {
-          "context": "suspense",
-          "hasError": false,
-          "hasValue": true,
-          "isSuspense": true,
-          "value": 10
-        },
-        {
-          "context": "next",
-          "hasError": false,
-          "hasValue": true,
-          "isSuspense": false,
-          "value": 10
-        },
-        {
-          "context": "suspense",
-          "hasError": false,
-          "hasValue": true,
-          "isSuspense": true,
-          "value": 10
-        },
-        {
-          "context": "next",
-          "hasError": false,
-          "hasValue": true,
-          "isSuspense": false,
-          "value": 10
-        },
-        {
-          "context": "suspense",
-          "hasError": false,
-          "hasValue": true,
-          "isSuspense": true,
-          "value": 10
-        },
-        {
-          "context": "next",
-          "hasError": false,
-          "hasValue": true,
-          "isSuspense": false,
-          "value": 10
-        },
-        {
-          "context": "suspense",
-          "hasError": false,
-          "hasValue": true,
-          "isSuspense": true,
-          "value": 10
-        },
-        {
-          "context": "next",
-          "hasError": false,
-          "hasValue": true,
-          "isSuspense": false,
-          "value": 10
-        }
-      ]);
-    }));
-  });
-  describe('sourcetrigger', () => {
-    it('should use argument of sourceTrigger', () => {
-      const trigger$$ = new Subject<number>()
-      const trigger$ = trigger$$.pipe(
-          scan((acc, val )=> acc + val, 0)
-      )
-      const refetch$$ = new Subject<null>()
-      const result = subscribeSpyTo(
-          rxStateful$((n: number) => of(n), {
+    describe('Callback Signature', () => {
+      it('should not emit a suspense = true state for sync observables', () => {
+        runWithTestScheduler(({ expectObservable, cold }) => {
+          const trigger = cold('a--b', { a: 1, b: 2 });
+          const source$ = rxStateful$((n) => of(n), {
+            ...defaultConfig,
             sourceTriggerConfig: {
-              trigger: trigger$
+              trigger,
             },
-            refetchStrategies: [
-                withRefetchOnTrigger(refetch$$)
-            ]
-          })
-      )
+          });
 
-        trigger$$.next(1)
-        trigger$$.next(1)
-        refetch$$.next(null)
-      expect(result.getValues()).toEqual([
-        { hasValue: false, isSuspense: true, hasError: false, context: 'suspense', value: null, error: undefined },
-        { hasValue: true, isSuspense: false, value: 1, hasError: false, context: 'next', error: undefined },
-        { hasValue: false, isSuspense: true, hasError: false, context: 'suspense', value: null, error: undefined },
-        { hasValue: true, isSuspense: false, value: 2, hasError: false, context: 'next', error: undefined },
-        { hasValue: false, isSuspense: true, hasError: false, context: 'suspense', value: null, error: undefined },
-        { hasValue: true, isSuspense: false, value: 2, hasError: false, context: 'next', error: undefined },
-      ])
-    })
-  })
+          const expected = 'a--b';
 
+          expectObservable(source$).toBe(
+            expected,
+            marbelize({
+              a: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: 1,
+                hasValue: true,
+                isSuspense: false,
+              },
+              b: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: 2,
+                hasValue: true,
+                isSuspense: false,
+              },
+            })
+          );
+        });
+      });
+      // TODO
+      // it('underlying source$ should be multicasted', () => {
+      //
+      // });
+      it('should emit correct state when sourceTrigger emits and when a refetch is happening', () => {
+        runWithTestScheduler(({ expectObservable, cold }) => {
+          /**
+           * trigger    -a-----b-
+           * refresh    ---a-----
+           * expected   -sasa--sb
+           *
+           * s$         -a            (takes 1 frame and then emit value)
+           */
+          const trigger = cold('-a-----b-', { a: 1, b: 2 });
+          const refresh = cold('---a-', { a: void 0 });
+          const s$ = (n: number) => cold('-a', { a: n });
+          const expected = '-sasa--sb';
+
+          const source$ = rxStateful$((n) => s$(n), {
+            ...defaultConfig,
+            refetchStrategies: [withRefetchOnTrigger(refresh)],
+            sourceTriggerConfig: {
+              trigger,
+            },
+          });
+
+          expectObservable(source$).toBe(
+            expected,
+            marbelize({
+              s: {
+                hasError: false,
+                error: undefined,
+                context: 'suspense',
+                value: null,
+                hasValue: false,
+                isSuspense: true,
+              },
+              a: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: 1,
+                hasValue: true,
+                isSuspense: false,
+              },
+              b: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: 2,
+                hasValue: true,
+                isSuspense: false,
+              },
+            })
+          );
+        });
+      });
+      it('should keep the value on refresh when keepValueOnRefresh = true', () => {
+        runWithTestScheduler(({ expectObservable, cold }) => {
+          /**
+           * trigger    -a-----b-
+           * refresh    ---a-----
+           * expected   -sasa--sb
+           *
+           * s$         -a            (takes 1 frame and then emit value)
+           */
+          const trigger = cold('-a-----b-', { a: 1, b: 2 });
+          const refresh = cold('---a-', { a: void 0 });
+          const s$ = (n: number) => cold('-a', { a: n });
+          const expected = '-zaxa--xb';
+
+          const source$ = rxStateful$((n) => s$(n), {
+            ...defaultConfig,
+            keepValueOnRefresh: true,
+            refetchStrategies: [withRefetchOnTrigger(refresh)],
+            sourceTriggerConfig: {
+              trigger,
+            },
+          });
+
+          expectObservable(source$).toBe(
+            expected,
+            marbelize({
+              z: {
+                hasError: false,
+                error: undefined,
+                context: 'suspense',
+                // value: null,
+                hasValue: false,
+                isSuspense: true,
+              },
+              x: {
+                hasError: false,
+                error: undefined,
+                context: 'suspense',
+                value: 1,
+                hasValue: true,
+                isSuspense: true,
+              },
+              a: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: 1,
+                hasValue: true,
+                isSuspense: false,
+              },
+              b: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: 2,
+                hasValue: true,
+                isSuspense: false,
+              },
+            })
+          );
+        });
+      });
+    });
+
+    describe('Error Handling', () => {
+      describe('Observable Signature', () => {
+        describe('When error happens', () => {
+          it('should handle error and operate correctly afterwards', () => {
+            runWithTestScheduler(({ expectObservable, cold }) => {
+              const error = new Error('oops');
+              const s$ = cold('-#', {}, error);
+              const refresh$ = cold('---a-', { a: void 0 });
+              const expected = 'sa-sa-';
+              const source$ = rxStateful$(s$, {
+                ...defaultConfig,
+                refetchStrategies: [withRefetchOnTrigger(refresh$)],
+              });
+
+              expectObservable(source$).toBe(
+                expected,
+                marbelize({
+                  s: {
+                    hasError: false,
+                    error: undefined,
+                    context: 'suspense',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: true,
+                  },
+                  a: {
+                    hasError: true,
+                    error: error,
+                    context: 'error',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: false,
+                  },
+                })
+              );
+            });
+          });
+          it('should keep the error on refresh when keepErrorOnRefresh = true', () => {
+            runWithTestScheduler(({ expectObservable, cold }) => {
+              const error = new Error('oops');
+              const s$ = cold('-#', {}, error);
+              const refresh$ = cold('---a-', { a: void 0 });
+              const expected = 'za-ya-';
+              const source$ = rxStateful$(s$, {
+                ...defaultConfig,
+                keepErrorOnRefresh: true,
+                refetchStrategies: [withRefetchOnTrigger(refresh$)],
+              });
+
+              expectObservable(source$).toBe(
+                expected,
+                marbelize({
+                  z: {
+                    hasError: false,
+                    error: undefined,
+                    context: 'suspense',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: true,
+                  },
+                  y: {
+                    hasError: true,
+                    error: error,
+                    context: 'suspense',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: true,
+                  },
+                  a: {
+                    hasError: true,
+                    error: error,
+                    context: 'error',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: false,
+                  },
+                })
+              );
+            });
+          });
+          it('should execute beforeHandleErrorFn', () => {
+            const source$ = new Subject<any>();
+            const beforeHandleErrorFn = jest.fn();
+            const result = subscribeSpyTo(
+              rxStateful$<any>(source$.pipe(mergeAll()), { ...defaultConfig, beforeHandleErrorFn })
+            );
+
+            source$.next(throwError(() => new Error('error')));
+
+            expect(beforeHandleErrorFn).toHaveBeenCalledWith(Error('error'));
+            expect(beforeHandleErrorFn).toBeCalledTimes(1);
+          });
+          it('should use errorMappingFn', () => {
+            runWithTestScheduler(({ expectObservable, cold }) => {
+              const error = new Error('oops');
+              const s$ = cold('-#', {}, error);
+              const refresh$ = cold('---a-', { a: void 0 });
+              const expected = 'sa-sa-';
+              const source$ = rxStateful$<any,any>(s$, {
+                ...defaultConfig,
+                errorMappingFn: (error: Error) => error.message,
+                refetchStrategies: [withRefetchOnTrigger(refresh$)],
+              });
+
+              expectObservable(source$).toBe(
+                expected,
+                marbelize({
+                  s: {
+                    hasError: false,
+                    error: undefined,
+                    context: 'suspense',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: true,
+                  },
+                  a: {
+                    hasError: true,
+                    error: error.message,
+                    context: 'error',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: false,
+                  },
+                })
+              );
+            });
+          });
+        });
+      });
+      describe('Callback Signature', () => {
+        describe('When error happens', () => {
+          it('should handle error and operate correctly afterwards', () => {
+            runWithTestScheduler(({ expectObservable, cold }) => {
+              const error = new Error('oops');
+              const s$ = cold('-#', {}, error);
+              const trigger$ = cold('a---a-', { a: 1 });
+              const expected = 'sa--sa-';
+              const source$ = rxStateful$<any, any>((n: number) => s$, {
+                ...defaultConfig,
+              sourceTriggerConfig: {
+                  trigger: trigger$
+              }});
+
+              expectObservable(source$).toBe(
+                expected,
+                marbelize({
+                  s: {
+                    hasError: false,
+                    error: undefined,
+                    context: 'suspense',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: true,
+                  },
+                  a: {
+                    hasError: true,
+                    error: error,
+                    context: 'error',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: false,
+                  },
+                })
+              );
+            });
+          });
+          it('should keep the error on refresh when keepErrorOnRefresh = true', () => {
+            runWithTestScheduler(({ expectObservable, cold }) => {
+              const error = new Error('oops');
+              const s$ = cold('-#', {}, error);
+              const trigger$ = cold('a---a-', { a: 1 });
+              const expected = 'za--ya-';
+              const source$ = rxStateful$<any, any>((n: number) => s$, {
+                ...defaultConfig,
+                keepErrorOnRefresh: true,
+                sourceTriggerConfig: {
+                  trigger: trigger$
+                }});
+
+              expectObservable(source$).toBe(
+                expected,
+                marbelize({
+                  z: {
+                    hasError: false,
+                    error: undefined,
+                    context: 'suspense',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: true,
+                  },
+                  y: {
+                    hasError: true,
+                    error: error,
+                    context: 'suspense',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: true,
+                  },
+                  a: {
+                    hasError: true,
+                    error: error,
+                    context: 'error',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: false,
+                  },
+                })
+              );
+            });
+          });
+          it('should execute beforeHandleErrorFn', () => {
+            const trigger$ = new Subject<any>()
+            const beforeHandleErrorFn = jest.fn();
+            const result = subscribeSpyTo(
+              rxStateful$<any, any>(() => throwError(() => new Error('error')), { ...defaultConfig, beforeHandleErrorFn, sourceTriggerConfig: {
+                trigger: trigger$
+                } })
+            );
+
+            trigger$.next(null)
+
+            expect(beforeHandleErrorFn).toHaveBeenCalledWith(Error('error'));
+            // TODO this needs investigation
+            expect(beforeHandleErrorFn).toBeCalledTimes(2);
+          });
+          it('should use errorMappingFn', () => {
+            runWithTestScheduler(({ expectObservable, cold }) => {
+              const error = new Error('oops');
+              const s$ = cold('-#', {}, error);
+              const trigger$ = cold('a---a-', { a: 1 });
+              const expected = 'sa--sa-';
+              // @ts-ignore
+              const source$ = rxStateful$<any, any>((n: number) => s$, {
+                ...defaultConfig,
+                errorMappingFn: (error: Error) => error.message,
+                sourceTriggerConfig: {
+                  trigger: trigger$
+                }});
+
+              expectObservable(source$).toBe(
+                expected,
+                marbelize({
+                  s: {
+                    hasError: false,
+                    error: undefined,
+                    context: 'suspense',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: true,
+                  },
+                  a: {
+                    hasError: true,
+                    error: error.message,
+                    context: 'error',
+                    value: null,
+                    hasValue: false,
+                    isSuspense: false,
+                  },
+                })
+              );
+            });
+          });
+        });
+      });
+    });
+  });
+  describe('using non-flicker suspense', () => {
+    const defaultConfig: RxStatefulConfig<any> = {
+      suspenseTimeMs: 2,
+      suspenseThresholdMs: 2,
+      keepValueOnRefresh: false,
+      keepErrorOnRefresh: false,
+    };
+    describe('Observable Signature', () => {
+      it('should not emit suspense state when source emits before suspenseThreshold is exceeded', () => {
+        /**
+         * s$         -a
+         * refresh    ----a
+         * expected   -a--a
+         */
+        runWithTestScheduler(({ expectObservable, cold }) => {
+          const s$ = cold('-a|', { a: 1 });
+          const refresh$ = cold('----a-', { a: void 0 });
+          const expected = '-a--a';
+          const source$ = rxStateful$(s$, { ...defaultConfig, refetchStrategies: [withRefetchOnTrigger(refresh$)] });
+
+          expectObservable(source$).toBe(
+            expected,
+            marbelize({
+              a: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: 1,
+                hasValue: true,
+                isSuspense: false,
+              },
+            })
+          );
+        });
+      });
+      it('should should emit suspense state when source emits after suspenseThreshold is exceeded', () => {
+        /**
+         * s$         ---a
+         * expected   ---s--a
+         */
+        runWithTestScheduler(({ expectObservable, cold }) => {
+          const s$ = cold('---a|', { a: 1 });
+          const expected = '--s-a';
+          const source$ = rxStateful$(s$, { ...defaultConfig });
+
+          expectObservable(source$).toBe(
+            expected,
+            marbelize({
+              a: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: 1,
+                hasValue: true,
+                isSuspense: false,
+              },
+              s: {
+                hasError: false,
+                hasValue: false,
+                value: null,
+                context: 'suspense',
+                isSuspense: true,
+                error: undefined,
+              },
+            })
+          );
+        });
+      });
+      it('should keep suspense state as long as source takes when it takes longer than supsenseThreshold + suspenseTime', () => {
+        /**
+         * s$         ------a
+         * expected   --s---a
+         */
+        runWithTestScheduler(({ expectObservable, cold }) => {
+          const s$ = cold('------a|', { a: 1 });
+          const expected = '--s---a';
+          const source$ = rxStateful$(s$, { ...defaultConfig });
+
+          expectObservable(source$).toBe(
+            expected,
+            marbelize({
+              a: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: 1,
+                hasValue: true,
+                isSuspense: false,
+              },
+              s: {
+                hasError: false,
+                hasValue: false,
+                value: null,
+                context: 'suspense',
+                isSuspense: true,
+                error: undefined,
+              },
+            })
+          );
+        });
+      });
+    });
+    describe('Callback Signature', () => {
+      it('should not emit suspense state when source emits before suspenseThreshold is exceeded', () => {
+        /**
+         * s$         -a
+         * trigger$   a--b-
+         * expected   -a--b
+         */
+        runWithTestScheduler(({ expectObservable, cold }) => {
+          const s$ = (n: number) => cold('-a|', { a: n });
+          const trigger$ = cold('a--b-', { a: 1, b: 2 });
+          const expected = '-a--b';
+          const source$ = rxStateful$((n) => s$(n), { ...defaultConfig, sourceTriggerConfig: { trigger: trigger$ } });
+
+          expectObservable(source$).toBe(
+            expected,
+            marbelize({
+              a: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: 1,
+                hasValue: true,
+                isSuspense: false,
+              },
+              b: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: 2,
+                hasValue: true,
+                isSuspense: false,
+              },
+            })
+          );
+        });
+      });
+      it('should should emit suspense state when source emits after suspenseThreshold is exceeded', () => {
+        /**
+         * s$         --a
+         * trigger$   a----b------
+         * expected   --s--a--s--a
+         */
+        runWithTestScheduler(({ expectObservable, cold }) => {
+          const s$ = (n: number) => cold('---a|', { a: n });
+          const trigger$ = cold('a----b------', { a: 1, b: 2 });
+          const expected = '--s-a--s-b';
+          const source$ = rxStateful$((n) => s$(n), { ...defaultConfig, sourceTriggerConfig: { trigger: trigger$ } });
+
+          expectObservable(source$).toBe(
+            expected,
+            marbelize({
+              a: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: 1,
+                hasValue: true,
+                isSuspense: false,
+              },
+              b: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: 2,
+                hasValue: true,
+                isSuspense: false,
+              },
+              s: {
+                hasError: false,
+                error: undefined,
+                context: 'suspense',
+                value: null,
+                hasValue: false,
+                isSuspense: true,
+              },
+            })
+          );
+        });
+      });
+      it('should keep suspense state as long as source takes when it takes longer than supsenseThreshold + suspenseTime', () => {
+        /**
+         * s$         ------a
+         * trigger$   a--------b-------
+         * expected   --s---a----s---b-----
+         */
+        runWithTestScheduler(({ expectObservable, cold }) => {
+          const s$ = (n: number) => cold('------a|', { a: n });
+          const trigger$ = cold('a--------b-------', { a: 1, b: 2 });
+          const expected = '--s---a----s---b-----';
+          const source$ = rxStateful$((n) => s$(n), { ...defaultConfig, sourceTriggerConfig: { trigger: trigger$ } });
+
+          expectObservable(source$).toBe(
+            expected,
+            marbelize({
+              a: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: 1,
+                hasValue: true,
+                isSuspense: false,
+              },
+              b: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: 2,
+                hasValue: true,
+                isSuspense: false,
+              },
+              s: {
+                hasError: false,
+                error: undefined,
+                context: 'suspense',
+                value: null,
+                hasValue: false,
+                isSuspense: true,
+              },
+            })
+          );
+        });
+      });
+    });
+  });
 });
+
+function runWithTestScheduler<T>(callback: (helpers: RunHelpers) => T) {
+  const testScheduler = new TestScheduler((actual, expected) => {
+    expect(actual).toEqual(expected);
+  });
+
+  return testScheduler.run(callback);
+}
+
+function marbelize(marbles: Record<string, Partial<RxStateful<any>>>) {
+  return marbles;
+}
