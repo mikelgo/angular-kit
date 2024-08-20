@@ -2,27 +2,8 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
-## <small>1.6.1 (2024-08-20)</small>
+## 1.7.0 (2024-08-20)
 
-* chore: bump nx to 17.0.0 ([7721d63](https://github.com/mikelgo/angular-kit/commit/7721d63))
-* chore: bump nx to 18.0.0 ([530c496](https://github.com/mikelgo/angular-kit/commit/530c496))
-* chore(rx-stateful): correct test ([ab013d1](https://github.com/mikelgo/angular-kit/commit/ab013d1))
-* chore(rx-stateful): delete old test file ([b72154d](https://github.com/mikelgo/angular-kit/commit/b72154d))
-* chore(rx-stateful): improve test cases using marble tests ([b729c48](https://github.com/mikelgo/angular-kit/commit/b729c48))
-* chore(rx-stateful): improve tests ([4d76518](https://github.com/mikelgo/angular-kit/commit/4d76518))
-* chore(rx-stateful): release version 1.6.1 ([63a8906](https://github.com/mikelgo/angular-kit/commit/63a8906))
-* chore(rx-stateful): release version 1.7.0 ([c042371](https://github.com/mikelgo/angular-kit/commit/c042371))
-* chore(rx-stateful): release version 1.7.0 ([4f2f843](https://github.com/mikelgo/angular-kit/commit/4f2f843))
-* chore(rx-stateful): release version 1.7.1 ([ca6e0e3](https://github.com/mikelgo/angular-kit/commit/ca6e0e3))
-* fix(rx-stateful): when handling errors it emitted by default the Error.message but it should emit th ([4c6a506](https://github.com/mikelgo/angular-kit/commit/4c6a506))
-* feat(rx-stateful): default suspense threshold and time set to 0 to be non-breaking ([40609f5](https://github.com/mikelgo/angular-kit/commit/40609f5))
-* feat(rx-stateful): move RxStatefulClient to experimental package ([4593991](https://github.com/mikelgo/angular-kit/commit/4593991))
-* feat(rx-stateful): non-flicker suspense ([1d60706](https://github.com/mikelgo/angular-kit/commit/1d60706))
-* feat(rx-stateful): optimize distinct emissions by using a comparision function ([b5bfcf5](https://github.com/mikelgo/angular-kit/commit/b5bfcf5))
-* feat(rx-stateful): wip non-flicker suspense ([58f67d0](https://github.com/mikelgo/angular-kit/commit/58f67d0))
-* Bugfix/rx stateful no subs values (#112) ([034ce71](https://github.com/mikelgo/angular-kit/commit/034ce71)), closes [#112](https://github.com/mikelgo/angular-kit/issues/112)
-* docs(rx-stateful): add key benefits ([8cb1718](https://github.com/mikelgo/angular-kit/commit/8cb1718))
-* docs(rx-stateful): update docs with non-flicker loading state ([a12222a](https://github.com/mikelgo/angular-kit/commit/a12222a))
 
 
 
