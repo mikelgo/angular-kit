@@ -2,14 +2,14 @@
 
 # @angular-kit
 
-A set of 🔥 Angular packages tools.
+A set of 🔥 Angular tools.
 
 - 📦 independent packages
 - 🍃 fully tree-shakable as we leverage secondary entry points for each package
 
 ## 📦 Included packages
 
-- [stream](./libs/stream/README.md) - the better async pipe
+- [rxObserve](./libs/stream/README.md) - the better async pipe
 - [rx](./libs/rx/README.md) - reactive tools
 - [effects](https://github.com/mikelgo/angular-kit-effects) - modern util to manage subscriptions with zero-boilerplate code
 - [rx-hooks](./libs/rx-hooks/README.md) - reactive lifecycle hooks 
