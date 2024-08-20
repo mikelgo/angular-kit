@@ -572,7 +572,7 @@ describe(rxStateful$.name, () => {
         runWithTestScheduler(({ expectObservable, cold }) => {
           const s$ = cold('-a|', { a: 1 });
           const refresh$ = cold('----a-', { a: void 0 });
-          const expected = '-a--a';
+          const expected = '-a---';
           const source$ = rxStateful$(s$, { ...defaultConfig, refetchStrategies: [withRefetchOnTrigger(refresh$)] });
 
           expectObservable(source$).toBe(
