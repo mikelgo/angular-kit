@@ -2,18 +2,18 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
-## 1.7.0 (2024-08-20)
+# 1.8.0 
 
+### Bugfixes
+* fix(rx-stateful): when handling errors it emitted by default the Error.message but it should emit th ([4c6a506](https://github.com/mikelgo/angular-kit/commit/4c6a506))
 
-
-
-## 1.7.0 (2024-07-26)
+## <small>1.7.1 (2024-07-26)</small>
+* Bugfix/rx stateful no subs values (#112) ([034ce71](https://github.com/mikelgo/angular-kit/commit/034ce71)), closes [#112](https://github.com/mikelgo/angular-kit/issues/112)
 
 
 
 
 # [1.7.0](https://github.com/mikelgo/angular-kit/compare/rx-stateful-1.6.0...rx-stateful-1.7.0) (2024-05-14)
-
 
 ### Features
 
