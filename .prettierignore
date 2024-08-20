@@ -6,3 +6,5 @@
 .angular
 
 /.nx/cache
+
+/libs/rx-stateful/src/lib/rx-stateful-reworked.spec.ts

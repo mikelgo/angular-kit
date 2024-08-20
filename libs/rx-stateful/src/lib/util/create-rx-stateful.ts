@@ -1,6 +1,10 @@
 import {distinctUntilChanged, filter, map, Observable} from 'rxjs';
 import {InternalRxState, RxStateful, RxStatefulConfig} from '../types/types';
 
+export function defaultComparisonFn<T, E>(a: RxStateful<T, E>, b: RxStateful<T, E>) {
+  return a.value === b.value && a.context === b.context && a.error === b.error
+}
+
 /**
  * @internal
  */
@@ -35,6 +39,6 @@ export function createRxStateful<T, E>(state$: Observable<InternalRxState<T, E>>
             return value;
         }),
         filter((value) => value !== undefined),
-        distinctUntilChanged()
+        distinctUntilChanged(defaultComparisonFn)
     )
 }

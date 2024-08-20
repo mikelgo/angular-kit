@@ -433,7 +433,7 @@ function deriveInitialValue<T, E>(mergedConfig: RxStatefulConfig<T,E>){
 
 function handleError<T,E>(error: E, mergedConfig: RxStatefulConfig<T, E>, error$$: Subject<RxStatefulWithError<T, E>>){
         mergedConfig?.beforeHandleErrorFn?.(error);
-        const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E) => (error as any)?.message);
+        const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E) => (error as any));
         error$$.next({ error: errorMappingFn(error), context: 'error',   isLoading: false,
             isRefreshing: false, value: null });
         return NEVER;
