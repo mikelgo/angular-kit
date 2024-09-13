@@ -2,6 +2,11 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## <small>15.1.1 (2024-09-13)</small>
+
+
+
+
 # [15.1.0](https://github.com/mikelgo/angular-kit/compare/rx-hooks-15.0.0...rx-hooks-15.1.0) (2023-08-25)
 
 
